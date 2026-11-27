@@ -39,6 +39,10 @@
       "name": "Suivi des équipements",
       "description": "Suivez les actifs informatiques et physiques avec gestion du cycle de vie."
     },
+    "rentals": {
+      "name": "Locations de matériel",
+      "description": "Réservez du matériel pour une période, remettez-le et récupérez-le."
+    },
     "example_widgets": {
       "name": "Widgets d'exemple",
       "description": "Module de référence illustrant les patterns de modules Inventari : gérez de simples widgets avec nom, couleur et quantité."

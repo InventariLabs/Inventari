@@ -584,6 +584,21 @@
       "path": "frontend/tests/e2e/helpers/api.ts",
       "literal": "2026-12-31",
       "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
+    },
+    {
+      "path": "frontend/src/utils/__tests__/formatters.test.ts",
+      "literal": "2026-12-01",
+      "reason": "Audited: the date is what the test is about — the zone's DST transition days and a winter/summer round trip; the formatter's output is asserted, nothing compares the date with the clock."
+    },
+    {
+      "path": "backend/app/modules/rentals/tests/conftest.py",
+      "literal": "datetime(2026, 12, 1",
+      "reason": "Audited: conftest's window is fixed input for the buffer, block and calendar tests, which compare it only with itself; every test that judges by the clock — late, today, service-block and extension — builds its own times relative to now."
+    },
+    {
+      "path": "backend/app/modules/rentals/tests/conftest.py",
+      "literal": "datetime(2026, 12, 3",
+      "reason": "Audited: conftest's window is fixed input for the buffer, block and calendar tests, which compare it only with itself; every test that judges by the clock — late, today, service-block and extension — builds its own times relative to now."
     }
   ]
 }

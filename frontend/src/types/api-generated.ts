@@ -7498,6 +7498,316 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/rentals/assets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Assets Endpoint */
+        get: operations["list_assets_endpoint_api_v1_rentals_assets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Availability Endpoint */
+        get: operations["availability_endpoint_api_v1_rentals_availability_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/availability/nearest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Nearest Window Endpoint */
+        get: operations["nearest_window_endpoint_api_v1_rentals_availability_nearest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/blocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Blocks Endpoint */
+        get: operations["list_blocks_endpoint_api_v1_rentals_blocks_get"];
+        put?: never;
+        /** Create Block Endpoint */
+        post: operations["create_block_endpoint_api_v1_rentals_blocks_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/blocks/{block_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Block Endpoint */
+        delete: operations["delete_block_endpoint_api_v1_rentals_blocks__block_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Block Endpoint */
+        patch: operations["update_block_endpoint_api_v1_rentals_blocks__block_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/rentals/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Bookings Endpoint */
+        get: operations["list_bookings_endpoint_api_v1_rentals_bookings_get"];
+        put?: never;
+        /** Create Booking Endpoint */
+        post: operations["create_booking_endpoint_api_v1_rentals_bookings_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/bookings/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check Booking Endpoint */
+        post: operations["check_booking_endpoint_api_v1_rentals_bookings_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/bookings/{booking_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Booking Endpoint */
+        get: operations["get_booking_endpoint_api_v1_rentals_bookings__booking_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/bookings/{booking_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Booking Endpoint */
+        post: operations["cancel_booking_endpoint_api_v1_rentals_bookings__booking_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/bookings/{booking_id}/extend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Extend Booking Endpoint */
+        post: operations["extend_booking_endpoint_api_v1_rentals_bookings__booking_id__extend_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/bookings/{booking_id}/pickup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pickup Booking Endpoint */
+        post: operations["pickup_booking_endpoint_api_v1_rentals_bookings__booking_id__pickup_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/bookings/{booking_id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Return Booking Endpoint */
+        post: operations["return_booking_endpoint_api_v1_rentals_bookings__booking_id__return_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/buffer-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Buffer Rules Endpoint */
+        get: operations["list_buffer_rules_endpoint_api_v1_rentals_buffer_rules_get"];
+        /** Set Buffer Rule Endpoint */
+        put: operations["set_buffer_rule_endpoint_api_v1_rentals_buffer_rules_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/buffer-rules/{rule_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Buffer Rule Endpoint */
+        delete: operations["delete_buffer_rule_endpoint_api_v1_rentals_buffer_rules__rule_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Calendar Endpoint */
+        get: operations["calendar_endpoint_api_v1_rentals_calendar_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Categories Endpoint */
+        get: operations["list_categories_endpoint_api_v1_rentals_categories_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Models Endpoint */
+        get: operations["list_models_endpoint_api_v1_rentals_models_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rentals/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Today Endpoint */
+        get: operations["today_endpoint_api_v1_rentals_today_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/roles": {
         parameters: {
             query?: never;
@@ -12479,6 +12789,32 @@ export interface components {
             /** Hide Retired */
             hide_retired?: boolean;
         };
+        /** AssetOption */
+        AssetOption: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Model */
+            model?: string | null;
+            /** Category Id */
+            category_id?: string | null;
+            /** Category Code */
+            category_code?: string | null;
+            /** Category Name */
+            category_name?: string | null;
+            /** Status */
+            status: string;
+            /** Serial Number */
+            serial_number?: string | null;
+            /** Asset Tag */
+            asset_tag?: string | null;
+            /** Barcode */
+            barcode?: string | null;
+        };
         /**
          * AssetTimelineEvent
          * @description One entry of the asset timeline, assembled server-side.
@@ -13055,6 +13391,84 @@ export interface components {
              */
             expired: boolean;
         };
+        /** BlockCreate */
+        BlockCreate: {
+            /**
+             * Item Id
+             * Format: uuid
+             */
+            item_id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Reason */
+            reason: string;
+        };
+        /** BlockSchema */
+        BlockSchema: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Item Id
+             * Format: uuid
+             */
+            item_id: string;
+            /** Item Name */
+            item_name: string;
+            /** Model */
+            model?: string | null;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Reason */
+            reason: string;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "MANUAL" | "SERVICE";
+            /** Booking Id */
+            booking_id?: string | null;
+            /** Borrower Name */
+            borrower_name?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** BlockUpdate */
+        BlockUpdate: {
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Reason */
+            reason: string;
+        };
         /**
          * BoMLineCreateForRecipe
          * @description Input for POST /recipes/{id}/bom-lines — add an ingredient.
@@ -13450,6 +13864,199 @@ export interface components {
             parent_template_id: string;
             root: components["schemas"]["BomTreeNode"];
         };
+        /** BookingCheckRequest */
+        BookingCheckRequest: {
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Lines */
+            lines: components["schemas"]["BookingLineIn"][];
+            /** Booking Id */
+            booking_id?: string | null;
+        };
+        /** BookingCheckResponse */
+        BookingCheckResponse: {
+            /** Ok */
+            ok: boolean;
+            /** Lines */
+            lines: components["schemas"]["LineCheck"][];
+        };
+        /** BookingCreate */
+        BookingCreate: {
+            /** Borrower Partner Id */
+            borrower_partner_id?: string | null;
+            /** Borrower User Id */
+            borrower_user_id?: string | null;
+            /** Borrower Name */
+            borrower_name?: string | null;
+            /** Borrower Email */
+            borrower_email?: string | null;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Note */
+            note?: string | null;
+            /** Lines */
+            lines: components["schemas"]["BookingLineIn"][];
+        };
+        /**
+         * BookingLineIn
+         * @description One thing a booking asks for: an asset, or a model and a count.
+         */
+        BookingLineIn: {
+            /** Item Id */
+            item_id?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Quantity */
+            quantity?: number;
+        };
+        /** BookingListRow */
+        BookingListRow: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "RESERVED" | "PICKED_UP" | "RETURNED" | "CANCELLED";
+            /** Is Late */
+            is_late: boolean;
+            /** Late Days */
+            late_days: number;
+            /** Borrower Name */
+            borrower_name: string;
+            /**
+             * Borrower Kind
+             * @enum {string}
+             */
+            borrower_kind: "partner" | "user" | "external";
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Units Count */
+            units_count: number;
+            /** Summary */
+            summary: string;
+        };
+        /** BookingSchema */
+        BookingSchema: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "RESERVED" | "PICKED_UP" | "RETURNED" | "CANCELLED";
+            /** Is Late */
+            is_late: boolean;
+            /** Late Days */
+            late_days: number;
+            /**
+             * Borrower Kind
+             * @enum {string}
+             */
+            borrower_kind: "partner" | "user" | "external";
+            /** Borrower Partner Id */
+            borrower_partner_id?: string | null;
+            /** Borrower User Id */
+            borrower_user_id?: string | null;
+            /** Borrower Name */
+            borrower_name: string;
+            /** Borrower Email */
+            borrower_email?: string | null;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Note */
+            note?: string | null;
+            /** Lines */
+            lines: components["schemas"]["LineSchema"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Created By Name */
+            created_by_name?: string | null;
+            /** Can Pickup */
+            can_pickup: boolean;
+            /** Can Return */
+            can_return: boolean;
+            /** Can Cancel */
+            can_cancel: boolean;
+            /** Can Extend */
+            can_extend: boolean;
+            /** Handed Out At */
+            handed_out_at?: string | null;
+            /** Returned At */
+            returned_at?: string | null;
+        };
+        /** BufferRuleIn */
+        BufferRuleIn: {
+            /** Model */
+            model?: string | null;
+            /** Category Id */
+            category_id?: string | null;
+            /** Hours Before */
+            hours_before?: number;
+            /** Hours After */
+            hours_after?: number;
+        };
+        /** BufferRuleSchema */
+        BufferRuleSchema: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Model */
+            model?: string | null;
+            /** Category Id */
+            category_id?: string | null;
+            /** Category Code */
+            category_code?: string | null;
+            /** Category Name */
+            category_name?: string | null;
+            /** Hours Before */
+            hours_before: number;
+            /** Hours After */
+            hours_after: number;
+        };
         /**
          * BuiltInTemplate
          * @description A layout shipped with the module, before anyone has copied it.
@@ -13664,12 +14271,128 @@ export interface components {
             /** Updated */
             updated: number;
         };
+        /** BusyInterval */
+        BusyInterval: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "reserved" | "out" | "late" | "returned" | "block" | "buffer";
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Label */
+            label: string;
+            /** Reason */
+            reason?: string | null;
+            /** Booking Id */
+            booking_id?: string | null;
+        };
         /** ByCategory */
         ByCategory: {
             /** Category Name */
             category_name: string;
             /** Count */
             count: number;
+        };
+        /** CalendarAnyUnit */
+        CalendarAnyUnit: {
+            /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
+            /** Borrower Name */
+            borrower_name: string;
+            /** Quantity */
+            quantity: number;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Status */
+            status: string;
+        };
+        /** CalendarBar */
+        CalendarBar: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "reserved" | "out" | "late" | "returned" | "block" | "buffer";
+            /** Label */
+            label: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Booking Id */
+            booking_id?: string | null;
+        };
+        /** CalendarGroup */
+        CalendarGroup: {
+            /** Model */
+            model?: string | null;
+            /** Total Units */
+            total_units: number;
+            /** Service Units */
+            service_units: number;
+            /** Units */
+            units: components["schemas"]["CalendarUnit"][];
+            /** Any Unit */
+            any_unit: components["schemas"]["CalendarAnyUnit"][];
+        };
+        /** CalendarResponse */
+        CalendarResponse: {
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Groups */
+            groups: components["schemas"]["CalendarGroup"][];
+        };
+        /** CalendarUnit */
+        CalendarUnit: {
+            /**
+             * Item Id
+             * Format: uuid
+             */
+            item_id: string;
+            /** Name */
+            name: string;
+            /** Serial Number */
+            serial_number?: string | null;
+            /** Asset Tag */
+            asset_tag?: string | null;
+            /** Status */
+            status: string;
+            /** Bars */
+            bars?: components["schemas"]["CalendarBar"][];
         };
         /** CampaignCreate */
         CampaignCreate: {
@@ -14193,6 +14916,18 @@ export interface components {
             /** Category Ids */
             category_ids: string[];
         };
+        /** CategoryOption */
+        CategoryOption: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code?: string | null;
+            /** Name */
+            name: string;
+        };
         /** CategoryRotation */
         CategoryRotation: {
             /** Category Name */
@@ -14317,6 +15052,30 @@ export interface components {
              * Format: date-time
              */
             closed_at: string;
+        };
+        /**
+         * ConflictDetail
+         * @description What stands in the way of a line, said unit by unit.
+         */
+        ConflictDetail: {
+            /** Item Id */
+            item_id?: string | null;
+            /** Item Name */
+            item_name?: string | null;
+            /** Item Serial Number */
+            item_serial_number?: string | null;
+            /** Kind */
+            kind: string;
+            /** Label */
+            label: string;
+            /** Starts At */
+            starts_at?: string | null;
+            /** Ends At */
+            ends_at?: string | null;
+            /** Booking Id */
+            booking_id?: string | null;
+            /** Reason */
+            reason?: string | null;
         };
         /** ConsumptionStats */
         ConsumptionStats: {
@@ -16314,6 +17073,14 @@ export interface components {
             period: string;
             /** Count */
             count: number;
+        };
+        /** ExtendRequest */
+        ExtendRequest: {
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
         };
         /**
          * ExtraCostAllocation
@@ -18399,6 +19166,47 @@ export interface components {
              */
             language: "en" | "pl" | "de" | "fr" | "es" | "pt";
         };
+        /** LineCheck */
+        LineCheck: {
+            /** Index */
+            index: number;
+            /** Ok */
+            ok: boolean;
+            /** Label */
+            label: string;
+            /** Requested */
+            requested: number;
+            /** Available */
+            available: number;
+            /** Conflicts */
+            conflicts?: components["schemas"]["ConflictDetail"][];
+            /**
+             * Max Quantity
+             * @default 0
+             */
+            max_quantity: number;
+            nearest_window?: components["schemas"]["WindowSuggestion"] | null;
+        };
+        /** LineSchema */
+        LineSchema: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Item Id */
+            item_id?: string | null;
+            /** Item Name */
+            item_name?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Quantity */
+            quantity: number;
+            /** Resolved Count */
+            resolved_count: number;
+            /** Units */
+            units?: components["schemas"]["UnitSchema"][];
+        };
         /** LinkIngredientTemplateRequest */
         LinkIngredientTemplateRequest: {
             /**
@@ -19179,6 +19987,13 @@ export interface components {
             /** Message */
             message: string;
         };
+        /** ModelOption */
+        ModelOption: {
+            /** Model */
+            model: string;
+            /** Total Units */
+            total_units: number;
+        };
         /**
          * ModuleEnablePreview
          * @description What switching a module on would put into motion.
@@ -19346,6 +20161,27 @@ export interface components {
             /** Value */
             value: number;
         };
+        /**
+         * MoveIn
+         * @description Move a later booking of the returned unit to another unit of its model.
+         */
+        MoveIn: {
+            /**
+             * Line Id
+             * Format: uuid
+             */
+            line_id: string;
+            /**
+             * From Item Id
+             * Format: uuid
+             */
+            from_item_id: string;
+            /**
+             * To Item Id
+             * Format: uuid
+             */
+            to_item_id: string;
+        };
         /** MyAssetHistoryItem */
         MyAssetHistoryItem: {
             /**
@@ -19418,6 +20254,13 @@ export interface components {
         NameTaxRate: {
             /** Tax Rate Id */
             tax_rate_id: string | null;
+        };
+        /** NearestWindowResponse */
+        NearestWindowResponse: {
+            /** Starts At */
+            starts_at?: string | null;
+            /** Ends At */
+            ends_at?: string | null;
         };
         /**
          * NeedRowRead
@@ -20304,10 +21147,46 @@ export interface components {
              */
             total_capped: boolean;
         };
+        /** PaginatedResponse[BlockSchema] */
+        PaginatedResponse_BlockSchema_: {
+            /** Items */
+            items: components["schemas"]["BlockSchema"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Has More */
+            has_more: boolean;
+            /**
+             * Total Capped
+             * @default false
+             */
+            total_capped: boolean;
+        };
         /** PaginatedResponse[BoMLineRead] */
         PaginatedResponse_BoMLineRead_: {
             /** Items */
             items: components["schemas"]["BoMLineRead"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Has More */
+            has_more: boolean;
+            /**
+             * Total Capped
+             * @default false
+             */
+            total_capped: boolean;
+        };
+        /** PaginatedResponse[BookingListRow] */
+        PaginatedResponse_BookingListRow_: {
+            /** Items */
+            items: components["schemas"]["BookingListRow"][];
             /** Total */
             total: number;
             /** Limit */
@@ -22187,6 +23066,11 @@ export interface components {
              * @default false
              */
             resumed: boolean;
+        };
+        /** PickupRequest */
+        PickupRequest: {
+            /** Item Ids */
+            item_ids?: string[];
         };
         /**
          * PlaceholderInfo
@@ -25781,6 +26665,29 @@ export interface components {
             /** User Id */
             user_id: string;
         };
+        /** RentalAvailabilityResponse */
+        RentalAvailabilityResponse: {
+            /** Item Id */
+            item_id?: string | null;
+            /** Model */
+            model?: string | null;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Total Units */
+            total_units: number;
+            /** Free Units */
+            free_units: number;
+            /** Busy */
+            busy?: components["schemas"]["BusyInterval"][];
+        };
         /**
          * ReorderRuleCreate
          * @description Create a reorder rule for one (product, location) pair.
@@ -26172,6 +27079,32 @@ export interface components {
          * @enum {string}
          */
         ReturnReasonCode: "DAMAGED" | "WRONG_ITEM" | "QUALITY" | "NOT_NEEDED" | "OTHER";
+        /** ReturnRequest */
+        ReturnRequest: {
+            /** Units */
+            units: components["schemas"]["ReturnUnitIn"][];
+            /** Moves */
+            moves?: components["schemas"]["MoveIn"][];
+        };
+        /** ReturnUnitIn */
+        ReturnUnitIn: {
+            /**
+             * Unit Id
+             * Format: uuid
+             */
+            unit_id: string;
+            /**
+             * Condition
+             * @enum {string}
+             */
+            condition: "GOOD" | "DAMAGED" | "NEEDS_REPAIR";
+            /** Note */
+            note?: string | null;
+            /** Service Reason */
+            service_reason?: string | null;
+            /** Service Until */
+            service_until?: string | null;
+        };
         /**
          * RoleCreate
          * @description Request body for creating a new org-scoped role.
@@ -28880,6 +29813,52 @@ export interface components {
                 [key: string]: string;
             } | null;
         };
+        /** TodayItem */
+        TodayItem: {
+            /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
+            /** Borrower Name */
+            borrower_name: string;
+            /** What */
+            what: string;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Until */
+            until?: string | null;
+            /**
+             * Late Days
+             * @default 0
+             */
+            late_days: number;
+        };
+        /** TodayResponse */
+        TodayResponse: {
+            /**
+             * Date
+             * Format: date-time
+             */
+            date: string;
+            /** Pickups Count */
+            pickups_count: number;
+            /** Returns Count */
+            returns_count: number;
+            /** Late Count */
+            late_count: number;
+            /** Late */
+            late: components["schemas"]["TodayItem"][];
+            /** Pickups */
+            pickups: components["schemas"]["TodayItem"][];
+            /** Returns */
+            returns: components["schemas"]["TodayItem"][];
+            /** In Service */
+            in_service: components["schemas"]["BlockSchema"][];
+        };
         /**
          * Token
          * @description Login/refresh response.
@@ -28998,6 +29977,35 @@ export interface components {
             available_quantity: number;
             /** Available Uom */
             available_uom: string | null;
+        };
+        /** UnitSchema */
+        UnitSchema: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Item Id
+             * Format: uuid
+             */
+            item_id: string;
+            /** Item Name */
+            item_name: string;
+            /** Model */
+            model?: string | null;
+            /** Serial Number */
+            serial_number?: string | null;
+            /** Asset Tag */
+            asset_tag?: string | null;
+            /** Assignment Id */
+            assignment_id?: string | null;
+            /** Condition */
+            condition?: ("GOOD" | "DAMAGED" | "NEEDS_REPAIR") | null;
+            /** Note */
+            note?: string | null;
+            /** Returned At */
+            returned_at?: string | null;
         };
         /**
          * UnlinkedIngredient
@@ -29678,6 +30686,19 @@ export interface components {
             color?: ("blue" | "green" | "amber" | "red" | "violet" | "slate") | null;
             /** Quantity */
             quantity?: number | null;
+        };
+        /** WindowSuggestion */
+        WindowSuggestion: {
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
         };
         /**
          * WmsPickCoverageOut
@@ -45290,6 +46311,681 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_assets_endpoint_api_v1_rentals_assets_get: {
+        parameters: {
+            query?: {
+                search?: string | null;
+                category_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetOption"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    availability_endpoint_api_v1_rentals_availability_get: {
+        parameters: {
+            query: {
+                starts_at: string;
+                ends_at: string;
+                item_id?: string | null;
+                model?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RentalAvailabilityResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    nearest_window_endpoint_api_v1_rentals_availability_nearest_get: {
+        parameters: {
+            query: {
+                starts_at: string;
+                ends_at: string;
+                item_id?: string | null;
+                model?: string | null;
+                quantity?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NearestWindowResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_blocks_endpoint_api_v1_rentals_blocks_get: {
+        parameters: {
+            query?: {
+                item_id?: string | null;
+                active_only?: boolean;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResponse_BlockSchema_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_block_endpoint_api_v1_rentals_blocks_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BlockCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BlockSchema"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_block_endpoint_api_v1_rentals_blocks__block_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                block_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_block_endpoint_api_v1_rentals_blocks__block_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                block_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BlockUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BlockSchema"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_bookings_endpoint_api_v1_rentals_bookings_get: {
+        parameters: {
+            query?: {
+                status?: string | null;
+                search?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResponse_BookingListRow_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_booking_endpoint_api_v1_rentals_bookings_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BookingCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookingSchema"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    check_booking_endpoint_api_v1_rentals_bookings_check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BookingCheckRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookingCheckResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_booking_endpoint_api_v1_rentals_bookings__booking_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookingSchema"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_booking_endpoint_api_v1_rentals_bookings__booking_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookingSchema"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    extend_booking_endpoint_api_v1_rentals_bookings__booking_id__extend_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExtendRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookingSchema"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pickup_booking_endpoint_api_v1_rentals_bookings__booking_id__pickup_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PickupRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookingSchema"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    return_booking_endpoint_api_v1_rentals_bookings__booking_id__return_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReturnRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookingSchema"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_buffer_rules_endpoint_api_v1_rentals_buffer_rules_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BufferRuleSchema"][];
+                };
+            };
+        };
+    };
+    set_buffer_rule_endpoint_api_v1_rentals_buffer_rules_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BufferRuleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BufferRuleSchema"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_buffer_rule_endpoint_api_v1_rentals_buffer_rules__rule_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                rule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    calendar_endpoint_api_v1_rentals_calendar_get: {
+        parameters: {
+            query: {
+                starts_at: string;
+                ends_at: string;
+                model?: string | null;
+                category_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CalendarResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_categories_endpoint_api_v1_rentals_categories_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryOption"][];
+                };
+            };
+        };
+    };
+    list_models_endpoint_api_v1_rentals_models_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelOption"][];
+                };
+            };
+        };
+    };
+    today_endpoint_api_v1_rentals_today_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TodayResponse"];
                 };
             };
         };
