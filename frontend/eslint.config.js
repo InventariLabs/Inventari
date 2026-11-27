@@ -302,7 +302,6 @@ export default tseslint.config(
     files: [
       "src/modules/warehouse/components/DocumentFormModal.tsx",
       "src/modules/warehouse/pages/DocumentDetailPage.tsx",
-      "src/modules/equipment/components/ImportEquipmentModal.tsx",
       "src/modules/equipment/hooks/useAssetListActions.ts",
       "src/modules/equipment/pages/AssetListPage.tsx",
       "src/modules/inventory/pages/ItemsPage.tsx",

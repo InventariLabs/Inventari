@@ -133,10 +133,84 @@ function DefaultTargetSelect({
   );
 }
 
+type DuplicateMode = "create_only" | "update" | "duplicate";
+
+/** What a row does when the register already has its serial number. */
+function DuplicateModeSelect({
+  value,
+  onChange,
+}: {
+  value: DuplicateMode;
+  onChange: (mode: DuplicateMode) => void;
+}) {
+  const { t } = useTranslation("equipment");
+  return (
+    <div>
+      <Select
+        label={t("import.duplicateMode", "Duplicate serial numbers")}
+        value={value}
+        onChange={(id) => onChange(id as DuplicateMode)}
+        options={[
+          {
+            id: "create_only",
+            name: t("import.duplicateCreateOnly", "Skip existing assets"),
+          },
+          {
+            id: "update",
+            name: t("import.duplicateUpdate", "Update existing"),
+          },
+          {
+            id: "duplicate",
+            name: t("import.duplicateAllow", "Create duplicates"),
+          },
+        ]}
+      />
+    </div>
+  );
+}
+
+/**
+ * Whether the import creates the places and categories the file names. Each
+ * switch is offered only to an account holding the key it spends; a hidden one
+ * posts false, and the server's own check stays the authority.
+ */
+function useFoundingSwitches() {
+  const { t } = useTranslation("items");
+  const canWriteCategories = useCanWrite("categories");
+  const canWriteStorages = useCanWrite("locations");
+  const [createCategories, setCreateCategories] = useState(true);
+  const [createLocations, setCreateLocations] = useState(true);
+
+  return {
+    flags: {
+      createLocations: canWriteStorages && createLocations,
+      createCategories: canWriteCategories && createCategories,
+    },
+    switches: (
+      <div className="space-y-3">
+        {canWriteStorages && (
+          <Checkbox
+            checked={createLocations}
+            onChange={(e) => setCreateLocations(e.target.checked)}
+            label={t("items:import.autoCreateLocations")}
+          />
+        )}
+        {canWriteCategories && (
+          <Checkbox
+            checked={createCategories}
+            onChange={(e) => setCreateCategories(e.target.checked)}
+            label={t("items:import.autoCreateCategories")}
+          />
+        )}
+      </div>
+    ),
+  };
+}
+
 export default function ImportEquipmentModal({
   onClose,
 }: ImportEquipmentModalProps) {
-  const { t } = useTranslation(["equipment", "common", "items"]);
+  const { t } = useTranslation(["equipment", "common"]);
   const executeImport = useEquipmentImportExecute();
   const categories = useAllCategories();
 
@@ -149,17 +223,11 @@ export default function ImportEquipmentModal({
   const [analyzeResult, setAnalyzeResult] =
     useState<ImportAnalyzeResult | null>(null);
   const [mapping, setMapping] = useState<Record<string, string>>({});
-  const [duplicateMode, setDuplicateMode] = useState<
-    "create_only" | "update" | "duplicate"
-  >("create_only");
+  const [duplicateMode, setDuplicateMode] =
+    useState<DuplicateMode>("create_only");
   const [defaultLocationId, setDefaultLocationId] = useState("");
   const [defaultCategoryId, setDefaultCategoryId] = useState("");
-  // Each switch is offered only to an account holding the key it spends; a
-  // hidden one posts false, and the server's own check stays the authority.
-  const canWriteCategories = useCanWrite("categories");
-  const canWriteStorages = useCanWrite("locations");
-  const [createCategories, setCreateCategories] = useState(true);
-  const [createLocations, setCreateLocations] = useState(true);
+  const founding = useFoundingSwitches();
   const [importResult, setImportResult] = useState<ImportExecuteResult | null>(
     null,
   );
@@ -207,8 +275,7 @@ export default function ImportEquipmentModal({
         mapping: { ...mapping, duplicate_mode: duplicateMode },
         defaultLocationId: defaultLocationId || undefined,
         defaultCategoryId: defaultCategoryId || undefined,
-        createLocations: canWriteStorages && createLocations,
-        createCategories: canWriteCategories && createCategories,
+        ...founding.flags,
       },
       {
         onSuccess: (result) => {
@@ -420,53 +487,12 @@ export default function ImportEquipmentModal({
                 />
               </div>
 
-              {/* duplicate handling for rows whose serial number
-                  already exists in the registry. */}
-              <div>
-                <Select
-                  label={t("import.duplicateMode", "Duplicate serial numbers")}
-                  value={duplicateMode}
-                  onChange={(id) =>
-                    setDuplicateMode(
-                      id as "create_only" | "update" | "duplicate",
-                    )
-                  }
-                  options={[
-                    {
-                      id: "create_only",
-                      name: t(
-                        "import.duplicateCreateOnly",
-                        "Skip existing assets",
-                      ),
-                    },
-                    {
-                      id: "update",
-                      name: t("import.duplicateUpdate", "Update existing"),
-                    },
-                    {
-                      id: "duplicate",
-                      name: t("import.duplicateAllow", "Create duplicates"),
-                    },
-                  ]}
-                />
-              </div>
+              <DuplicateModeSelect
+                value={duplicateMode}
+                onChange={setDuplicateMode}
+              />
 
-              <div className="space-y-3">
-                {canWriteStorages && (
-                  <Checkbox
-                    checked={createLocations}
-                    onChange={(e) => setCreateLocations(e.target.checked)}
-                    label={t("items:import.autoCreateLocations")}
-                  />
-                )}
-                {canWriteCategories && (
-                  <Checkbox
-                    checked={createCategories}
-                    onChange={(e) => setCreateCategories(e.target.checked)}
-                    label={t("items:import.autoCreateCategories")}
-                  />
-                )}
-              </div>
+              {founding.switches}
 
               <SheetActions>
                 <Button variant="outline" onClick={() => setStep("upload")}>

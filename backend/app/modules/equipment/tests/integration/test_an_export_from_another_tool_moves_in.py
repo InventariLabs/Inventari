@@ -144,7 +144,7 @@ _SHELF = _sheet(
         '',
         'SH-1',
         '2024-01-05',
-        '2027-01-05',
+        '2025-01-05',
     ],
     [
         'Tripod',
@@ -292,7 +292,7 @@ def test_the_shelf_export(
         name: _meta(asset)['equipment_status'] for name, asset in assets.items()
     } == {'Camera': 'AVAILABLE', 'Tripod': 'DEPLOYED', 'Lamp': 'DEPLOYED'}
     assert assets['Camera'].purchase_price == Decimal('1289')
-    assert _meta(assets['Camera'])['warranty_until'] == '2027-01-05'
+    assert _meta(assets['Camera'])['warranty_until'] == '2025-01-05'
 
 
 def test_months_of_warranty_end_that_long_after_the_purchase(
