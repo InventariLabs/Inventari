@@ -441,6 +441,7 @@ apart.
 | `ITEM_CURRENCY_MISMATCH` | Item currency ({item_currency}) must match organization currency ({organization_currency}) |
 | `ITEM_NOT_DELETED` | Item is not deleted |
 | `ITEM_NOT_FOUND` | Item not found |
+| `ITEM_PRICE_ABOVE_CEILING` | Restated per {unit}, the price comes to {price}, and the most a record can keep is {ceiling}. |
 | `ITEM_PURGE_REASON_REQUIRED` | A reason is required for permanent deletion in production |
 | `ITEM_PURGE_REQUIRES_ARCHIVED` | Only archived items can be purged |
 | `ITEM_QUANTITY_ABOVE_CEILING` | The quantity {quantity} is past what the column holds — the largest storable value is {ceiling} |
