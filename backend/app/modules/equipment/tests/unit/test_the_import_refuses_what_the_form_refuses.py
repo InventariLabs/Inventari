@@ -27,7 +27,7 @@ def _run(df: pd.DataFrame, mapping: dict[str, str]) -> Any:
     org_id = uuid4()
     user = UserContextDTO(id=uuid4(), organization_id=org_id)
     return execute_equipment_import(
-        AsyncMock(),
+        AsyncMock(begin_nested=MagicMock()),
         b'fake',
         'test.csv',
         mapping,

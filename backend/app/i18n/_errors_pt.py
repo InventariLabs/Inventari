@@ -316,6 +316,7 @@ ERRORS_PT: ErrorMessages = {
     'import_location_not_found': 'Nenhum local se chama “{value}”',
     'import_price_invalid': 'Coluna "{column}": "{value}" não é um preço',
     'import_date_invalid': 'Coluna "{column}": "{value}" não é uma data',
+    'import_warranty_months_without_purchase_date': 'Coluna "{column}": "{value}" conta meses e a linha não tem data de compra. Associe a data de compra ou uma coluna com a data em que a garantia termina',
     'import_job_failed': 'A importação parou por causa de um erro inesperado.',
     'import_job_interrupted': 'A importação foi interrompida antes de terminar.',
     'export_job_failed': 'A exportação parou por causa de um erro inesperado.',

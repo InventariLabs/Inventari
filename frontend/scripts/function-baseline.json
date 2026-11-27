@@ -94,11 +94,6 @@
     }
   },
   "maxLinesPerFunction": {
-    "src/modules/equipment/components/ImportEquipmentModal.tsx": {
-      "ImportEquipmentModal": [
-        308
-      ]
-    },
     "src/modules/equipment/hooks/useAssetListActions.ts": {
       "useAssetListActions": [
         418

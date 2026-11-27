@@ -13254,6 +13254,10 @@ export interface components {
             default_location_id?: string | null;
             /** Default Category Id */
             default_category_id?: string | null;
+            /** Create Missing Locations */
+            create_missing_locations?: boolean;
+            /** Create Missing Categories */
+            create_missing_categories?: boolean;
         };
         /** Body_extract_from_image_api_v1_vision_extract_post */
         Body_extract_from_image_api_v1_vision_extract_post: {
@@ -16780,6 +16784,16 @@ export interface components {
              * @default []
              */
             skipped_serials: string[];
+            /**
+             * Created Locations
+             * @default []
+             */
+            created_locations: string[];
+            /**
+             * Created Categories
+             * @default []
+             */
+            created_categories: string[];
         };
         /**
          * ImportLeftBehind

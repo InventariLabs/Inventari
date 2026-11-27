@@ -402,6 +402,7 @@ ERRORS_ES: ErrorMessages = {
     'import_location_not_found': 'Ninguna ubicación se llama «{value}»',
     'import_price_invalid': 'Columna «{column}»: «{value}» no es un precio',
     'import_date_invalid': 'Columna «{column}»: «{value}» no es una fecha',
+    'import_warranty_months_without_purchase_date': 'Columna «{column}»: «{value}» cuenta meses y la fila no tiene fecha de compra. Asigne la fecha de compra o una columna con la fecha en que termina la garantía',
     'import_job_failed': 'La importación se detuvo por un error inesperado.',
     'import_job_interrupted': 'La importación se interrumpió antes de terminar.',
     'export_job_failed': 'La exportación se detuvo por un error inesperado.',

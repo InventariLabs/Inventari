@@ -7,6 +7,8 @@ import { http, HttpResponse } from "msw";
 
 import { server } from "@/test/mocks/server";
 import { onePage } from "@/test/mocks/page";
+import { useAuthStore } from "@/store/authStore";
+import type { User } from "@/types";
 import { downloadBlob } from "@/utils/helpers";
 
 import ImportEquipmentModal from "./ImportEquipmentModal";
@@ -39,8 +41,13 @@ const ANALYSIS = {
 
 let executed: string;
 
+function signIn(user: Partial<User>) {
+  useAuthStore.setState({ user: user as User });
+}
+
 beforeEach(() => {
   executed = "";
+  signIn({ role: "admin" });
   server.use(
     http.get("/api/v1/locations", () =>
       HttpResponse.json(
@@ -59,6 +66,8 @@ beforeEach(() => {
         skipped: 0,
         skipped_serials: [],
         updated: 0,
+        created_locations: ["Workshop"],
+        created_categories: ["Power Tools"],
         errors: [{ row: 7, error: "Serial number missing" }],
       });
     }),
@@ -126,9 +135,19 @@ describe("ImportEquipmentModal — from file to result", () => {
     fireEvent.click(screen.getByRole("combobox", { name: "Default location" }));
     fireEvent.click(await screen.findByText("Server Room"));
 
+    await user.click(
+      screen.getByRole("checkbox", {
+        name: "Create missing locations automatically",
+      }),
+    );
+
     await user.click(screen.getByRole("button", { name: "Import" }));
 
     expect(await screen.findByText(/Serial number missing/)).toBeVisible();
+    expect(screen.getByText("Workshop")).toBeVisible();
+    expect(screen.getByText("Power Tools")).toBeVisible();
+    expect(partOf(executed, "create_missing_locations")).toBe("false");
+    expect(partOf(executed, "create_missing_categories")).toBe("true");
     expect(JSON.parse(partOf(executed, "mapping_json") ?? "null")).toEqual({
       name: "Asset",
       serial_number: "Serial",
@@ -140,6 +159,23 @@ describe("ImportEquipmentModal — from file to result", () => {
     // The dialog's corner X is called Close too; this is the result's own.
     await user.click(screen.getByText("Close", { selector: "button" }));
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it("offers no switch for what the account may not create, and asks for none", async () => {
+    signIn({ role: "user", permissions: ["items:write", "equipment:write"] });
+    const user = userEvent.setup();
+    renderModal();
+
+    chooseFile();
+    await user.click(screen.getByRole("button", { name: /Analyze/ }));
+    await screen.findByText("12 rows found — map columns below");
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Import" }));
+
+    await screen.findByText(/Serial number missing/);
+    expect(partOf(executed, "create_missing_locations")).toBe("false");
+    expect(partOf(executed, "create_missing_categories")).toBe("false");
   });
 
   it("will not import while no column is mapped to the name, and Back returns to the upload", async () => {

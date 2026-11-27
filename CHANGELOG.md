@@ -94,6 +94,18 @@ says what the release does rather than what changed since them.
 - A SKU read off the opening-stock sheet is stored trimmed and in upper case,
   and a code with a character a SKU cannot hold refuses its row, so a product
   founded from a sheet can be saved in its form.
+- An equipment sheet exported from Snipe-IT or Shelf imports with the
+  suggested mapping. A place or a category the sheet names and the
+  organization has not got is created, under a switch of its own for each, as
+  in the product import, and the result lists what was created; with the
+  switch off the row is refused by that name — a category is no longer dropped
+  in silence. Creating them takes the `locations:write` and `categories:write`
+  permissions: an account or an API key without them sends
+  `create_missing_locations=false` and `create_missing_categories=false`, or
+  is refused. The status words of both tools are read, a warranty given in
+  months ends that long after the purchase date, and the "Cost", "Purchase
+  Cost", "Value", "Purchased", "Warranty Expires" and "Warranty ends" columns
+  are recognised.
 - A product's unit weight or volume that is negative, or 100,000,000 and up,
   is refused with a validation error wherever a request writes it: creating a
   product, creating or editing a stock record, and the quick add after a scan.

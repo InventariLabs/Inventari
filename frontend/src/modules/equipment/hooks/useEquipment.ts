@@ -398,17 +398,23 @@ export function useEquipmentImportExecute() {
       mapping,
       defaultLocationId,
       defaultCategoryId,
+      createLocations,
+      createCategories,
     }: {
       file: File;
       mapping: Record<string, string>;
       defaultLocationId?: string;
       defaultCategoryId?: string;
+      createLocations?: boolean;
+      createCategories?: boolean;
     }) =>
       equipmentApi.executeImport(
         file,
         mapping,
         defaultLocationId,
         defaultCategoryId,
+        createLocations,
+        createCategories,
       ),
     (qc) => {
       invalidation.equipment(qc);

@@ -7,7 +7,8 @@ import pandas as pd
 from babel.dates import format_skeleton
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import ServiceRejectionError
+from app.core.contracts import CategoryCreateDTO, SystemPermission, UserContextDTO
+from app.core.exceptions import ForbiddenException, ServiceRejectionError
 from app.core.import_sheet import (
     SheetColumns,
     cell_text,
@@ -17,7 +18,7 @@ from app.core.import_sheet import (
 )
 from app.core.location_path import join_location_path
 from app.core.logging import get_logger
-from app.i18n.service import get_current_lang
+from app.i18n.service import get_current_lang, get_plural_error_message
 
 logger = get_logger(__name__)
 
@@ -98,6 +99,56 @@ async def analyze_import_file(file_content: bytes, filename: str) -> dict[str, A
     }
 
 
+def refuse_founding_without_permission(
+    user: UserContextDTO,
+    mapping: Any,
+    *,
+    create_missing_locations: bool,
+    create_missing_categories: bool,
+) -> None:
+    """Refuse an import that would found what its caller may not create.
+
+    Founding a category or a whole location path is the work the front doors
+    (POST /categories, POST /locations) gate by permission — an import asks
+    for items:write only, and both switches default to on, so without this
+    check it would grant a permission the caller does not hold. Refused, not
+    silently downgraded: the sheet asked for creation, and quietly importing
+    without it would be a half-true answer. The sheet asks only through a
+    column the mapping names — with no category or location column nothing can
+    be founded, whatever the switches say. Every missing key is named, so an
+    account short on both reads one refusal that says the whole price.
+    """
+    named = mapping if isinstance(mapping, dict) else {}
+    wanted = (
+        (
+            create_missing_categories,
+            'category',
+            SystemPermission.CATEGORIES_WRITE,
+            'categories:write',
+        ),
+        (
+            create_missing_locations,
+            'location',
+            SystemPermission.STORAGES_WRITE,
+            'locations:write',
+        ),
+    )
+    missing = [
+        key
+        for asked, field, permission, key in wanted
+        if asked and named.get(field) and not user.has_permission(permission)
+    ]
+    if missing:
+        raise ForbiddenException(
+            message=get_plural_error_message(
+                'import_create_forbidden',
+                len(missing),
+                get_current_lang(),
+                permissions=', '.join(missing),
+            )
+        )
+
+
 #: What the application itself puts between the steps of a location's path.
 #: The breadcrumb on every screen uses it, so it is what somebody copying a
 #: location out of the interface will paste into a spreadsheet. ``>`` is
@@ -149,6 +200,9 @@ async def resolve_storage_location_async(
     mapping: dict[str, str],
     default_id: str | None,
     cache: dict[str, str],
+    *,
+    founder: UserContextDTO | None = None,
+    founded: list[str] | None = None,
 ) -> str | None:
     """Async: look up a storage location by name or path from an import row.
 
@@ -164,6 +218,11 @@ async def resolve_storage_location_async(
     refused, with the candidates spelled out — the caller shows the refusal
     beside the row it came from, which is the one place a person can act on
     it. Choosing for them is the one thing this must not do.
+
+    With a *founder*, a place the organization has not got is created in
+    their name: the steps that name an existing place are kept, the ones
+    after them are founded inside it, and each new place's path is appended
+    to *founded*. Without one an unknown place resolves to ``None``.
     """
     from app.core.public_api import core_api
 
@@ -184,9 +243,41 @@ async def resolve_storage_location_async(
     if not segments:
         return None
 
-    candidates = [loc for loc in locations if _path_ends_at(loc, segments, by_id)]
-    if not candidates:
+    place = _one_place(segments, locations, by_id, text)
+    if place is not None:
+        cache[text] = str(place.id)
+        return cache[text]
+    if founder is None:
         return None
+
+    # The longest leading part of the path that names a place is where the
+    # rest is founded; none at all founds the whole path at the top.
+    kept = len(segments) - 1
+    parent = None
+    while kept and parent is None:
+        leading = segments[:kept]
+        parent = _one_place(leading, locations, by_id, join_location_path(leading))
+        if parent is None:
+            kept -= 1
+    parent_id: UUID | None = parent.id if parent else None
+    for name in segments[kept:]:
+        place = await core_api.locations.create_async(
+            db, org_id, name=name, user_id=founder.id, parent_id=parent_id
+        )
+        by_id[place.id] = place
+        parent_id = place.id
+        if founded is not None:
+            founded.append(_full_path(place, by_id))
+
+    cache[text] = str(parent_id)
+    return cache[text]
+
+
+def _one_place(
+    segments: list[str], locations: list[Any], by_id: dict[UUID, Any], text: str
+) -> Any | None:
+    """The one location *segments* name, ``None`` for none; several are refused."""
+    candidates = [loc for loc in locations if _path_ends_at(loc, segments, by_id)]
     if len(candidates) > 1:
         paths = sorted(_full_path(loc, by_id) for loc in candidates)
         shown = ', '.join(paths[:_CANDIDATES_SHOWN])
@@ -199,9 +290,7 @@ async def resolve_storage_location_async(
             shown=shown,
             example=paths[0],
         )
-
-    cache[text] = str(candidates[0].id)
-    return cache[text]
+    return candidates[0] if candidates else None
 
 
 async def resolve_category_async(
@@ -211,23 +300,44 @@ async def resolve_category_async(
     mapping: dict[str, str],
     default_id: str | None,
     cache: dict[str, str],
+    *,
+    founder: UserContextDTO | None = None,
+    founded: list[str] | None = None,
+    context_tag: str | None = None,
 ) -> str | None:
-    """Async: look up a category by code or name from an import row."""
+    """Async: look up a category by code or name from an import row.
+
+    ``None`` means the row names no category. One the organization has not got
+    is created in *founder*'s name (under *context_tag*, its name appended to
+    *founded*), and without a founder the row is refused by name: a record
+    filed under no category would count as imported while its category was
+    dropped.
+    """
     from app.core.public_api import core_api
 
-    name = row_text(row, mapping.get('category'))
-    if not name and default_id:
-        return default_id
+    column = mapping.get('category')
+    name = row_text(row, column)
     if not name:
-        return None
-    if name in cache:
-        return cache[name]
+        return default_id or None
+    key = name.casefold()
+    if key in cache:
+        return cache[key]
 
     categories = await core_api.categories.list_async(db, org_id)
     for cat in categories:
-        if (cat.code and cat.code.lower() == name.lower()) or (
-            cat.name and cat.name.lower() == name.lower()
+        if (cat.code and cat.code.casefold() == key) or (
+            cat.name and cat.name.casefold() == key
         ):
-            cache[name] = str(cat.id)
-            return str(cat.id)
-    return None
+            cache[key] = str(cat.id)
+            return cache[key]
+    if founder is None:
+        raise ServiceRejectionError(
+            'import_column_category_not_found', column=column, value=name
+        )
+    created = await core_api.categories.create_async(
+        db, CategoryCreateDTO(name=name, context_tag=context_tag), founder
+    )
+    if founded is not None:
+        founded.append(name)
+    cache[key] = str(created.id)
+    return cache[key]

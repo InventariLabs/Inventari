@@ -190,6 +190,9 @@ export { default as Pagination } from "@/components/ui/Pagination";
 // of the pages visited, and the first page again when the question changes.
 export { useKeysetPaging } from "@/hooks/useKeysetPaging";
 
+// What an import created beside its records, listed by name on the result.
+export { ImportFoundedList } from "@/components/import/ImportFoundedList";
+
 // Generated wire types and the helper a create payload uses when a field may be
 // left to the server's default.
 export type { components } from "@/types/api-generated";

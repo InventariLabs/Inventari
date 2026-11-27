@@ -2,16 +2,20 @@
 
 import re
 import unicodedata
+from dataclasses import dataclass, field
+from datetime import date
 from decimal import Decimal, InvalidOperation
 from typing import Any
 from uuid import UUID
 
+import pandas as pd
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import ItemCreateDTO, ItemUpdateDTO, UserContextDTO
 from app.core.datetimes import DATE_FORMAT
 from app.core.exceptions import (
+    AppException,
     ServiceRejectionError,
     is_reader_facing_value_error,
     refusal_row,
@@ -23,6 +27,7 @@ from app.core.file_import import (
 )
 from app.core.import_sheet import (
     SheetColumns,
+    explain,
     read_rows,
     row_text,
 )
@@ -114,6 +119,10 @@ _FIELD_ALIASES: dict[str, list[str]] = {
         "prix d'achat",
         'precio de compra',
         'preço de compra',
+        # Snipe-IT and Shelf head the column with these.
+        'cost',
+        'purchase cost',
+        'value',
     ],
     'purchase_date': [
         'purchase date',
@@ -122,10 +131,14 @@ _FIELD_ALIASES: dict[str, list[str]] = {
         "date d'achat",
         'fecha de compra',
         'data de compra',
+        'purchased',
     ],
     'warranty_until': [
         'warranty until',
+        'warranty expires',
+        'warranty ends',
         'warranty',
+        'warranty months',
         'gwarancja do',
         'garantie bis',
         "garantie jusqu'à",
@@ -157,6 +170,17 @@ _FIELD_ALIAS_INDEX: dict[str, str] = {
     for alias in aliases
 }
 
+#: Headers that may count months instead of naming a day. The suggestion takes
+#: one only when no other header names the same field: Snipe-IT writes
+#: "Warranty" (24) beside "Warranty Expires" (the date).
+_SECOND_CHOICE_HEADERS = frozenset(
+    _normalize_header(header) for header in ('warranty', 'warranty months')
+)
+
+#: A warranty cell that counts months: "24", "24 months". Three digits at most,
+#: so no date or year-first stamp reads as a duration.
+_WARRANTY_MONTHS = re.compile(r'(\d{1,3})(?:\s*months?)?', re.IGNORECASE)
+
 
 # A status cell as a person writes it: the stored code, or the label the
 # list, the detail page and the add form print, in any language the app
@@ -164,11 +188,21 @@ _FIELD_ALIAS_INDEX: dict[str, str] = {
 # edited and re-imported sheet carries the label, and every row of it was
 # refused while only the upper-case code was understood. The catalogs are
 # the source; a test reads each of them back through this list, so a label
-# changed there and not here fails before it reaches a sheet.
+# changed there and not here fails before it reaches a sheet. The words after
+# the labels are the states Snipe-IT and Shelf export.
 _STATUS_WORDS: dict[str, list[str]] = {
-    'AVAILABLE': ['available', 'dostępny', 'verfügbar', 'disponible', 'disponível'],
+    'AVAILABLE': [
+        'available',
+        'dostępny',
+        'verfügbar',
+        'disponible',
+        'disponível',
+        'ready to deploy',
+        'pending',
+    ],
     'DEPLOYED': [
         'checked out',
+        'in custody',
         'wydany',
         'wydano',
         'ausgeliehen',
@@ -183,8 +217,19 @@ _STATUS_WORDS: dict[str, list[str]] = {
         'wartung',
         'mantenimiento',
         'manutenção',
+        'out for repair',
+        'broken',
     ],
-    'RETIRED': ['retired', 'wycofany', 'ausgemustert', 'retiré', 'retirado', 'baixado'],
+    'RETIRED': [
+        'retired',
+        'wycofany',
+        'ausgemustert',
+        'retiré',
+        'retirado',
+        'baixado',
+        'archived',
+        'lost/stolen',
+    ],
 }
 
 _STATUS_INDEX: dict[str, str] = {
@@ -229,6 +274,29 @@ def _sheet_date(row: Any, column: str | None, sheet: SheetColumns) -> str | None
         ) from exc
 
 
+def _sheet_warranty(
+    row: Any,
+    column: str | None,
+    sheet: SheetColumns,
+    purchase_date: str | None,
+) -> str | None:
+    """The day the warranty ends: a date, or months counted from the purchase.
+
+    Months with no purchase date have no day to count from, and the row is
+    refused saying so.
+    """
+    text = row_text(row, column)
+    months = _WARRANTY_MONTHS.fullmatch(text) if text else None
+    if months is None:
+        return _sheet_date(row, column, sheet)
+    if purchase_date is None:
+        raise ServiceRejectionError(
+            'import_warranty_months_without_purchase_date', column=column, value=text
+        )
+    end: date = date.fromisoformat(purchase_date) + pd.DateOffset(months=int(months[1]))
+    return end.strftime(DATE_FORMAT)
+
+
 def _sheet_price(row: Any, column: str | None, sheet: SheetColumns) -> Decimal | None:
     """A price column as a number, or a refusal naming the cell.
 
@@ -253,10 +321,12 @@ def _sheet_price(row: Any, column: str | None, sheet: SheetColumns) -> Decimal |
 def _suggested_mapping(headers: list[str]) -> dict[str, str]:
     """Map canonical field names to the first header that matches an alias."""
     suggested: dict[str, str] = {}
-    for header in headers:
-        field = _FIELD_ALIAS_INDEX.get(_normalize_header(header))
-        if field and field not in suggested:
-            suggested[field] = header
+    for header in sorted(
+        headers, key=lambda h: _normalize_header(h) in _SECOND_CHOICE_HEADERS
+    ):
+        target = _FIELD_ALIAS_INDEX.get(_normalize_header(header))
+        if target and target not in suggested:
+            suggested[target] = header
     return suggested
 
 
@@ -281,8 +351,15 @@ async def execute_equipment_import(
     user: UserContextDTO,
     default_location_id: str | None = None,
     default_category_id: str | None = None,
+    create_missing_locations: bool = True,
+    create_missing_categories: bool = True,
 ) -> dict[str, Any]:
-    """Import equipment items from a file with column mapping."""
+    """Import equipment items from a file with column mapping.
+
+    A place or a category the sheet names and the organization has not got is
+    founded, unless its switch is off; then the row is refused by that name.
+    Each row is its own savepoint, so a refused row founds nothing.
+    """
     df = read_rows(content, filename)
     sheet = SheetColumns(df)
 
@@ -295,8 +372,10 @@ async def execute_equipment_import(
 
     duplicate_mode = str(mapping.get('duplicate_mode') or 'create_only')
 
-    location_cache: dict[str, str] = {}
-    category_cache: dict[str, str] = {}
+    founding = _Founding(
+        location_founder=user if create_missing_locations else None,
+        category_founder=user if create_missing_categories else None,
+    )
 
     for index, row in df.iterrows():
         # The row as the mapping preview numbers it: data rows from 1, the
@@ -304,27 +383,34 @@ async def execute_equipment_import(
         # the preview the reader picks the mapping on, and the refusals the
         # result screen lists.
         row_num = int(index) + 1
+        mark = founding.mark()
         try:
-            outcome = await _process_row(
-                db=db,
-                row=row,
-                mapping=mapping,
-                sheet=sheet,
-                org_id=org_id,
-                user=user,
-                default_location_id=default_location_id,
-                default_category_id=default_category_id,
-                duplicate_mode=duplicate_mode,
-                location_cache=location_cache,
-                category_cache=category_cache,
-            )
+            async with db.begin_nested():
+                outcome = await _process_row(
+                    db=db,
+                    row=row,
+                    mapping=mapping,
+                    sheet=sheet,
+                    org_id=org_id,
+                    user=user,
+                    default_location_id=default_location_id,
+                    default_category_id=default_category_id,
+                    duplicate_mode=duplicate_mode,
+                    founding=founding,
+                )
         except (
             ValueError,
             SQLAlchemyError,
             InvalidOperation,
             InterceptorError,
+            AppException,
         ) as exc:
-            if isinstance(exc, InterceptorError) or (
+            founding.forget_since(mark)
+            if isinstance(exc, AppException):
+                # A name an archived place still holds, a limit reached: the
+                # sentence the form would answer with.
+                errors.append({'row': row_num, 'error': explain(exc, mapping)})
+            elif isinstance(exc, InterceptorError) or (
                 isinstance(exc, ValueError) and is_reader_facing_value_error(exc)
             ):
                 # A refusal this codebase wrote, in the request's language.
@@ -371,7 +457,37 @@ async def execute_equipment_import(
         'updated': updated,
         'errors': errors[:20],
         'skipped_serials': skipped_serials[:20],
+        'created_locations': founding.locations,
+        'created_categories': founding.categories,
     }
+
+
+@dataclass
+class _Founding:
+    """What the rows share about places and categories: who may found them
+    (``None`` when the switch is off), the names already resolved, and what
+    the import has founded so far."""
+
+    location_founder: UserContextDTO | None
+    category_founder: UserContextDTO | None
+    location_cache: dict[str, str] = field(default_factory=dict)
+    category_cache: dict[str, str] = field(default_factory=dict)
+    locations: list[str] = field(default_factory=list)
+    categories: list[str] = field(default_factory=list)
+
+    def mark(self) -> tuple[int, int]:
+        return len(self.locations), len(self.categories)
+
+    def forget_since(self, mark: tuple[int, int]) -> None:
+        """Drop what a rolled-back row founded. The savepoint takes its
+        INSERTs, not these lists; a cached id would fail every later row
+        naming the same thing."""
+        if self.mark() == mark:
+            return
+        del self.locations[mark[0] :]
+        del self.categories[mark[1] :]
+        self.location_cache.clear()
+        self.category_cache.clear()
 
 
 def _parse_id(value: str, error_key: str) -> UUID:
@@ -393,8 +509,7 @@ async def _process_row(
     default_location_id: str | None,
     default_category_id: str | None,
     duplicate_mode: str,
-    location_cache: dict[str, str],
-    category_cache: dict[str, str],
+    founding: _Founding,
 ) -> str:
     """Process one import row; returns the outcome as a string."""
     from app.core.public_api import core_api
@@ -403,33 +518,20 @@ async def _process_row(
     if not name:
         return 'failed_missing_name'
 
-    storage_location_id = await resolve_storage_location_async(
-        db, org_id, row, mapping, default_location_id, location_cache
-    )
-    if not storage_location_id:
-        location_text = row_text(row, mapping.get('location'))
-        if location_text:
-            # Name the cell: "could not resolve" alone left the reader to
-            # guess which spelling of which place the sheet carried.
-            raise ServiceRejectionError(
-                'import_location_not_found', value=location_text
-            )
-        return 'failed_missing_location'
-
-    category_id = await resolve_category_async(
-        db, org_id, row, mapping, default_category_id, category_cache
-    )
-
     equipment_meta: dict[str, Any] = {}
-    for field in ('serial_number', 'asset_tag', 'model', 'notes'):
-        val = row_text(row, mapping.get(field))
+    for key in ('serial_number', 'asset_tag', 'model', 'notes'):
+        val = row_text(row, mapping.get(key))
         if val:
-            equipment_meta[field] = val
+            equipment_meta[key] = val
 
-    for field in ('purchase_date', 'warranty_until'):
-        parsed = _sheet_date(row, mapping.get(field), sheet)
-        if parsed:
-            equipment_meta[field] = parsed
+    purchase_date = _sheet_date(row, mapping.get('purchase_date'), sheet)
+    if purchase_date:
+        equipment_meta['purchase_date'] = purchase_date
+    warranty_until = _sheet_warranty(
+        row, mapping.get('warranty_until'), sheet, purchase_date
+    )
+    if warranty_until:
+        equipment_meta['warranty_until'] = warranty_until
 
     status = _sheet_status(row, mapping.get('equipment_status'))
     if status is not None:
@@ -465,6 +567,40 @@ async def _process_row(
                 user=user,
             )
             return 'updated'
+
+    # Resolved last, for a row that does become a new asset: a skipped or
+    # updated one keeps the place and category it has, and founds none.
+    storage_location_id = await resolve_storage_location_async(
+        db,
+        org_id,
+        row,
+        mapping,
+        default_location_id,
+        founding.location_cache,
+        founder=founding.location_founder,
+        founded=founding.locations,
+    )
+    if not storage_location_id:
+        location_text = row_text(row, mapping.get('location'))
+        if location_text:
+            # Name the cell: "could not resolve" alone left the reader to
+            # guess which spelling of which place the sheet carried.
+            raise ServiceRejectionError(
+                'import_location_not_found', value=location_text
+            )
+        return 'failed_missing_location'
+
+    category_id = await resolve_category_async(
+        db,
+        org_id,
+        row,
+        mapping,
+        default_category_id,
+        founding.category_cache,
+        founder=founding.category_founder,
+        founded=founding.categories,
+        context_tag='equipment',
+    )
 
     payload = ItemCreateDTO(
         name=name.strip(),
