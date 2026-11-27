@@ -412,6 +412,7 @@ apart.
 | `IMPORT_ROW_FAILED` | The row could not be imported |
 | `IMPORT_TOO_MANY_ROWS` | The file has {count} rows; the limit is {limit}. Split it into smaller files. |
 | `IMPORT_UNKNOWN_UNIT` | Column "{column}": unknown unit "{value}". Known units: {units} |
+| `IMPORT_WARRANTY_MONTHS_WITHOUT_PURCHASE_DATE` | Column "{column}": "{value}" counts months and the row has no purchase date. Map the purchase date, or a column with the date the warranty ends |
 | `INGREDIENT_DEFAULTS_UNREADABLE_FILE` | The file could not be read. The import expects a .json or .csv file with one row per ingredient. |
 | `INGREDIENT_DEFAULT_NAME_HAS_NO_KEY` | A name made only of invisible characters cannot be saved. |
 | `INSUFFICIENT_QUANTITY` | Not enough stock to perform this action |
