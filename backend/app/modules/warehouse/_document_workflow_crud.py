@@ -761,7 +761,7 @@ async def duplicate_document(
         else set()
     )
     line_copies = [
-        DocumentLineCreate(
+        DocumentLineCreate.carrying(
             item_id=line.item_id if line.item_id in live_records else None,
             product_template_id=line.product_template_id,
             name=line.name,

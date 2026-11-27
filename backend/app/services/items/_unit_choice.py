@@ -37,7 +37,7 @@ from app.models.item import Item
 from app.models.item_history import ItemAction
 from app.models.product_template import ProductTemplate
 from app.models.uom import Uom, UomCategory
-from app.schemas.validators import PRICE_MAX
+from app.schemas.validators import PRICE_MAX, QUANTITY_MAX
 from app.services.uom_service import STOCK_PLACES, convert_quantity, get_uom_async
 
 from .history import log_history_async
@@ -247,9 +247,16 @@ async def keep_in_card_unit_async(
             chosen_unit=chosen.symbol if chosen else '—',
         )
     if data.get('quantity') is not None:
-        data['quantity'] = quantise(
-            Decimal(str(data['quantity'])) * ratio, STOCK_PLACES
-        )
+        quantity = quantise(Decimal(str(data['quantity'])) * ratio, STOCK_PLACES)
+        # The request's bound belongs to the unit it named; kilograms on a
+        # card kept in grams can outgrow the column once restated.
+        if quantity > QUANTITY_MAX:
+            raise ServiceRejectionError(
+                'item_quantity_above_ceiling',
+                quantity=stated_quantity(quantity),
+                ceiling=stated_quantity(QUANTITY_MAX),
+            )
+        data['quantity'] = quantity
     if data.get('purchase_price') is not None:
         price = quantise(Decimal(str(data['purchase_price'])) / ratio, PRICE_PLACES)
         # A price per gram restated per kilogram can outgrow the column the

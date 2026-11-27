@@ -120,7 +120,7 @@ async def register_picking_as_document_async(
             ingredient_info[ing_id] = (uom_id, name)
 
         lines = [
-            DocumentLineCreate(
+            DocumentLineCreate.carrying(
                 item_id=item.item_id,
                 expected_quantity=item.quantity_consumed or Decimal('0'),
                 uom_id=_ingredient_uom(ingredient_info, item),
