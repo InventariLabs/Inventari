@@ -257,7 +257,7 @@
   "form": {
     "selectUnit": "Sélectionner l'unité…",
     "unitLabel": "Unité",
-    "unitLockedByStock": "Verrouillée tant qu’il y a du stock : une autre unité ne ferait que réétiqueter la quantité.",
+    "unitLockedByStock": "L’unité est verrouillée tant qu’il y a du stock : une autre ne ferait que réétiqueter la quantité.",
     "unitEmpty": "Choisir",
     "templateUnitHint": "{{product}} est compté en {{unit}} — cette fiche prend cette unité, sauf si vous en choisissez une autre.",
     "existingProducts": "Déjà dans vos produits :"

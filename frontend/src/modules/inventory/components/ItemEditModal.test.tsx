@@ -986,7 +986,7 @@ describe("ItemEditModal — a category list that failed", () => {
 });
 
 describe("the unit of a record that holds stock", () => {
-  const HINT = /Fixed while there is stock/i;
+  const HINT = /unit is fixed while there is stock/i;
 
   async function openWith(quantity: number) {
     server.use(
