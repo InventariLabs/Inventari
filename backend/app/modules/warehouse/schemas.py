@@ -13,7 +13,7 @@ from pydantic import (
 )
 
 from app.core.contracts import UomInfoDTO
-from app.core.module_sdk import PaginatedResponse
+from app.core.module_sdk import PRICE_MAX, PaginatedResponse
 
 from ._schemas_import import (  # noqa: F401
     DocumentImportAnalyzeResponse,
@@ -124,7 +124,9 @@ class DocumentLineCreate(BaseModel):
     serial_number: str | None = Field(default=None, max_length=100)
     expiry_date: date | None = None
     notes: str | None = None
-    unit_price: Decimal | None = Field(default=None, max_digits=12, decimal_places=2)
+    unit_price: Decimal | None = Field(
+        default=None, ge=0, le=PRICE_MAX, decimal_places=2
+    )
     tax_rate: Decimal | None = Field(default=None, max_digits=5, decimal_places=2)
     source_po_line_id: UUID | None = None
     # The shelf the worker named on this line. Kept on the create schema so
@@ -144,6 +146,17 @@ class DocumentLineCreate(BaseModel):
     held_quantity: Decimal | None = Field(default=None, ge=0)
     discrepancy_code: DocumentDiscrepancyCode | None = None
     discrepancy_reason: str | None = Field(default=None, max_length=500)
+
+    @classmethod
+    def carrying(cls, unit_price: Decimal | None, **fields: Any) -> Self:
+        """A line copied from something stored, its price included.
+
+        The price bounds are for what a request names: a price below zero that
+        already stands is carried as it is, so the copy does not fail on it.
+        """
+        if unit_price is not None and unit_price < 0:
+            return cls(**fields).model_copy(update={'unit_price': unit_price})
+        return cls(unit_price=unit_price, **fields)
 
     @field_validator('name', 'brand', 'batch_number', 'serial_number')
     @classmethod

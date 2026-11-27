@@ -282,7 +282,7 @@ class WarehouseAPI:
         from .schemas import DocumentCreate, DocumentLineCreate
 
         doc_lines = [
-            DocumentLineCreate(
+            DocumentLineCreate.carrying(
                 product_template_id=line.product_template_id,
                 name=line.name,
                 expected_quantity=line.quantity,
