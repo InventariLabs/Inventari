@@ -295,6 +295,7 @@ class ErrorMessages(TypedDict):
     import_location_not_found: str
     import_price_invalid: str
     import_date_invalid: str
+    import_warranty_months_without_purchase_date: str
     import_job_failed: str
     import_job_interrupted: str
     export_job_failed: str

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { ItemImportOutcome } from "@/components/import/types";
+import { ImportFoundedList } from "@/module-sdk";
 import { GrocyLeftBehindList } from "./GrocyLeftBehindList";
-import { ImportFoundedList } from "./ImportFoundedList";
 
 interface Props {
   result: ItemImportOutcome;

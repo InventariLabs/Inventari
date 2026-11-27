@@ -449,6 +449,7 @@ class TestAnalyzeExecuteRoundtrip:
                         'location': 'storage',
                     }
                 ),
+                'create_missing_locations': 'false',
             },
         )
         assert r.status_code == status.HTTP_200_OK
@@ -485,6 +486,8 @@ class TestAnalyzeExecuteRoundtrip:
             'skipped': 0,
             'updated': 0,
             'skipped_serials': [],
+            'created_locations': [],
+            'created_categories': [],
         }
 
         db_session.expire_all()
@@ -551,7 +554,10 @@ class TestTheImportReadsTheSheetTheAppExports:
             files={
                 'file': ('assets.csv', b'name,storage\nLaptop-1,Shelf 9\n', 'text/csv')
             },
-            data={'mapping_json': json.dumps({'name': 'name', 'location': 'storage'})},
+            data={
+                'mapping_json': json.dumps({'name': 'name', 'location': 'storage'}),
+                'create_missing_locations': 'false',
+            },
         )
 
         assert resp.status_code == status.HTTP_200_OK, resp.text
@@ -594,7 +600,10 @@ class TestTheImportReadsTheSheetTheAppExports:
             files={
                 'file': ('assets.csv', b'name,storage\nLaptop-1,Shelf 1\n', 'text/csv')
             },
-            data={'mapping_json': json.dumps({'name': 'name', 'location': 'storage'})},
+            data={
+                'mapping_json': json.dumps({'name': 'name', 'location': 'storage'}),
+                'create_missing_locations': 'false',
+            },
         )
 
         assert resp.status_code == status.HTTP_200_OK, resp.text

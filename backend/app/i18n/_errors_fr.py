@@ -400,6 +400,7 @@ ERRORS_FR: ErrorMessages = {
     'import_location_not_found': 'Aucun emplacement ne s’appelle « {value} »',
     'import_price_invalid': 'Colonne « {column} » : « {value} » n’est pas un prix',
     'import_date_invalid': 'Colonne « {column} » : « {value} » n’est pas une date',
+    'import_warranty_months_without_purchase_date': 'Colonne « {column} » : « {value} » compte des mois et la ligne n’a pas de date d’achat. Associez la date d’achat ou une colonne avec la date de fin de garantie',
     'import_job_failed': 'L’importation s’est arrêtée à cause d’une erreur inattendue.',
     'import_job_interrupted': 'L’importation a été interrompue avant la fin.',
     'export_job_failed': 'L’export s’est arrêté à cause d’une erreur inattendue.',

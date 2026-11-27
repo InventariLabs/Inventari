@@ -67,7 +67,7 @@ class TestTheImportKeepsTheDigitsTheSheetTyped:
         org_id = uuid4()
         user = UserContextDTO(id=uuid4(), organization_id=org_id)
         return await execute_equipment_import(
-            AsyncMock(),
+            AsyncMock(begin_nested=MagicMock()),
             content,
             filename,
             mapping,

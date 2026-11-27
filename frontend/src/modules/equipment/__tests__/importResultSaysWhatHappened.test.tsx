@@ -14,6 +14,8 @@ const result = (over: Record<string, unknown>) => ({
   updated: 0,
   errors: [],
   skipped_serials: [],
+  created_locations: [],
+  created_categories: [],
   ...over,
 });
 

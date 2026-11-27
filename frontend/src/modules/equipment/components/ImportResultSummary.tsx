@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { AlertCircle, AlertTriangle, Check, Info } from "lucide-react";
 import { Card } from "@/components/ui/Card";
+import { ImportFoundedList } from "@/module-sdk";
 import type { ImportExecuteResult } from "@/modules/equipment/api/equipment";
 
 /**
@@ -18,7 +19,7 @@ export function ImportResultSummary({
 }: {
   result: ImportExecuteResult;
 }) {
-  const { t } = useTranslation("equipment");
+  const { t } = useTranslation(["equipment", "items"]);
   const skipped = result.skipped ?? 0;
   const updated = result.updated ?? 0;
   const wroteNothing = result.imported === 0 && updated === 0;
@@ -70,6 +71,24 @@ export function ImportResultSummary({
           </div>
         </div>
       </Card>
+
+      {(result.created_locations.length > 0 ||
+        result.created_categories.length > 0) && (
+        <Card className="p-4 space-y-3 max-h-40 overflow-y-auto">
+          <ImportFoundedList
+            heading={t("items:import.foundedLocations", {
+              count: result.created_locations.length,
+            })}
+            names={result.created_locations}
+          />
+          <ImportFoundedList
+            heading={t("items:import.foundedCategories", {
+              count: result.created_categories.length,
+            })}
+            names={result.created_categories}
+          />
+        </Card>
+      )}
 
       {result.errors.length > 0 && (
         <Card className="p-4 bg-red-50 border-red-200">
