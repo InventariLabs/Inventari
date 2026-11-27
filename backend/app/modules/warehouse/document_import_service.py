@@ -21,6 +21,7 @@ from app.core.import_sheet import (
     read_csv_sheet,
     read_rows,
     refuse_beyond_row_cap,
+    sku_from_cell,
 )
 from app.core.logging import get_logger
 from app.core.public_api import core_api
@@ -325,6 +326,10 @@ async def _lines_from_rows(
             )
             if was_matched:
                 await _refuse_a_unit_the_product_cannot_take(db, org_id, line)
+            elif sku_value and create_stubs_for_unmatched:
+                # The row founds a product: its code takes the shape the
+                # product form holds, or the row is refused.
+                sku_value = sku_from_cell(sku_value, column_mapping['sku'])
             if doc_id is not None:
                 db.add(line)
             created_lines.append(line)

@@ -127,6 +127,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
             'stock.csv',
             MAPPING,
             _ctx(async_test_user),
+            count_as_one=True,
         )
 
         assert result['imported'] == 1, result
@@ -156,6 +157,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
             'stock.csv',
             MAPPING,
             _ctx(async_test_user),
+            count_as_one=True,
         )
 
         assert result['imported'] == 2, result
@@ -182,6 +184,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
             'stock.csv',
             MAPPING,
             _ctx(async_test_user),
+            count_as_one=True,
         )
 
         assert result['imported'] == 0, result
@@ -201,6 +204,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
             'stock.csv',
             MAPPING,
             _ctx(async_test_user),
+            count_as_one=True,
         )
         item = (await db.execute(select(Item).where(Item.name == 'Wax'))).scalar_one()
         item.label_code = 'SHELF-07'
@@ -213,6 +217,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
             {**MAPPING, 'label_code': 'Code'},
             _ctx(async_test_user),
             on_label_match='overwrite',
+            count_as_one=True,
         )
 
         assert result['updated'] == 1, result
@@ -258,6 +263,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
             'stock.csv',
             MAPPING,
             _ctx(async_test_user),
+            count_as_one=True,
         )
 
         assert result['imported'] == 1, result
@@ -291,6 +297,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
             'stock.csv',
             {'name': 'Name', 'location': 'Storage'},
             _ctx(async_test_user),
+            count_as_one=True,
         )
 
         assert result['imported'] == 0, result
@@ -333,6 +340,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
             'stock.csv',
             MAPPING,
             _ctx(async_test_user),
+            count_as_one=True,
         )
         item = (await db.execute(select(Item).where(Item.name == 'Wax'))).scalar_one()
         item.label_code = 'STRICT-01'
@@ -345,6 +353,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
             {**MAPPING, 'label_code': 'Code'},
             _ctx(async_test_user),
             on_label_match='overwrite',
+            count_as_one=True,
         )
 
         assert result['updated'] == 1, result
@@ -397,6 +406,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
             'stock.csv',
             {'name': 'Name', 'location': 'Storage'},
             _ctx(async_test_user),
+            count_as_one=True,
         )
 
         assert result['imported'] == 1, result
@@ -437,6 +447,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
             'stock.csv',
             {'name': 'Name', 'location': 'Storage'},
             _ctx(async_test_user),
+            count_as_one=True,
         )
 
         assert result['imported'] == 0, result
@@ -480,6 +491,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
             'stock.csv',
             {'name': 'Name', 'location': 'Storage', 'field:paid': 'Paid'},
             _ctx(async_test_user),
+            count_as_one=True,
         )
 
         assert result['imported'] == 1, result
@@ -557,6 +569,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
             'stock.csv',
             mapping,
             _ctx(async_test_user),
+            count_as_one=True,
         )
 
         assert result['imported'] == 2, result

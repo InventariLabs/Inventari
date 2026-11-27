@@ -2507,6 +2507,11 @@ export interface paths {
          *     product the organization already has: add it anyway (the default, and
          *     what the import always did), skip the row, or overwrite the product.
          *
+         *     A sheet whose mapping names no quantity column (nor a ``stock_at:<place>``
+         *     column per location) adds products without stock; ``count_as_one`` asks
+         *     for a record of one per row instead. ``location_slash`` says whether a
+         *     "/" in a location cell divides the levels of a path or belongs to the name.
+         *
          *     A sheet of more than ``INLINE_ROW_LIMIT`` rows takes minutes, longer than
          *     a browser or a proxy waits, so it is answered at once with ``202`` and a
          *     job (:class:`ItemImportJobResponse`) that is read at
@@ -13307,6 +13312,13 @@ export interface components {
              * @enum {string}
              */
             on_label_match?: "add" | "skip" | "overwrite";
+            /**
+             * Location Slash
+             * @enum {string}
+             */
+            location_slash?: "path" | "name";
+            /** Count As One */
+            count_as_one?: boolean;
         };
         /** Body_import_lines_api_v1_purchase_orders__po_id__import_lines_post */
         Body_import_lines_api_v1_purchase_orders__po_id__import_lines_post: {
@@ -17790,6 +17802,9 @@ export interface components {
          *     product the organization already had, under the update mode the reader
          *     chose; both stay zero when the import only adds.
          *
+         *     A row of a sheet with a quantity column per location counts once for every
+         *     location it puts stock into, in ``total`` as in ``imported``.
+         *
          *     ``joined_existing`` counts the imported rows filed under a product that
          *     already existed — by its barcode, or by its name and brand — and so added
          *     stock to it rather than making a new product. A product two rows of one
@@ -21721,6 +21736,11 @@ export interface components {
             total: number;
             /** Imported */
             imported: number;
+            /**
+             * Contacts
+             * @default 0
+             */
+            contacts: number;
             /** Failed */
             failed: number;
             /**

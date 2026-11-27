@@ -29,7 +29,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal
-from typing import Any, cast, get_args
+from typing import Any, cast
 from uuid import UUID
 
 from sqlalchemy import select
@@ -42,8 +42,6 @@ from app.core.import_sheet import explain
 from app.core.logging import get_logger
 from app.core.move_contributors import MoveMatches, bring_async, contributors_for
 from app.core.open_package import OPENED_KEY
-from app.i18n._types import Language
-from app.i18n.service import get_unit_label
 from app.models.category import Category
 from app.models.item import Item
 from app.models.organization import Organization
@@ -54,7 +52,7 @@ from app.models.storage_type import StorageType
 from app.schemas.item import ItemCreate
 
 from ._create import _default_piece_uom_id_async, create_item_async
-from ._import import _default_storage_type_id
+from ._import_locations import default_storage_type_id
 from ._template import find_template_async
 
 logger = get_logger(__name__)
@@ -305,23 +303,15 @@ async def _match_units_async(
     Answers the matches, the Grocy units nothing matched, and the units here
     that hold whole numbers only.
 
-    Grocy units are free words ("Piece", "Packung", "Tin"); a word no unit
-    matches — by symbol, by the import aliases, or by the label the app shows
-    in any maintained language — counts the stock in pieces, and is named
-    in the summary.
+    Grocy units are free words ("Piece", "Packung", "Tin"); a word the shared
+    resolver matches to no unit counts the stock in pieces, and is named in
+    the summary.
     """
     from app.core.uom_resolver import UomResolverAsync
     from app.services.uom_service import list_uoms_for_org_async
 
     resolver = UomResolverAsync(db, org_id)
     uoms = await list_uoms_for_org_async(db, org_id)
-    # Organization units win over a system unit that shares a label.
-    uoms.sort(key=lambda u: u.organization_id is not None)
-    labels = {
-        _name_key(get_unit_label(u.symbol, lang)).rstrip('.'): u.id
-        for lang in get_args(Language)
-        for u in uoms
-    }
     pieces = await _default_piece_uom_id_async(db, org_id)
     matched: dict[int, UUID] = {}
     unknown: list[int] = []
@@ -329,9 +319,7 @@ async def _match_units_async(
         found: UUID | None = None
         for word in (unit.name, unit.plural):
             if word and found is None:
-                found = await resolver.resolve(word) or labels.get(
-                    _name_key(word).rstrip('.')
-                )
+                found = await resolver.resolve(word)
         if found is None:
             unknown.append(unit.id)
         matched[unit.id] = found or pieces
@@ -419,7 +407,7 @@ class _Run:
         by_name: dict[str, UUID] = {}
         for loc_id, name in rows.all():
             by_name.setdefault(_name_key(name), loc_id)
-        default_type = await _default_storage_type_id(self.db, self.org_id)
+        default_type = await default_storage_type_id(self.db, self.org_id)
         freezer_type = await self._freezer_type_async() or default_type
         for loc in self.grocy.locations.values():
             if not loc.active:

@@ -27,6 +27,7 @@ const LABEL_KEYS: Record<(typeof PARTNER_IMPORT_FIELDS)[number], string> = {
   phone: "fields.phone",
   website: "fields.website",
   contact_person: "fields.contactPerson",
+  company: "import.companyField",
   street: "address.street",
   city: "address.city",
   postal_code: "address.postalCode",
@@ -64,12 +65,24 @@ export default function PartnerImportModal({ onClose }: Props) {
         added: (count) => t("import.added", { count }),
         closeAndView: t("import.closeAndView"),
       }}
-      mappingExtras={() => (
+      resultExtras={(result) =>
+        result.contacts > 0 && (
+          <p className="text-center text-sm text-on">
+            {t("import.contacts", { count: result.contacts })}
+          </p>
+        )
+      }
+      mappingExtras={({ mapping }) => (
         <>
           {/* What the import will and will not do to who is already there. */}
           <p className="px-2 text-sm text-on-secondary">
             {t("import.addOnlyNote")}
           </p>
+          {mapping.company && (
+            <p className="px-2 text-sm text-on-secondary">
+              {t("import.contactNote")}
+            </p>
+          )}
           <div className="px-2 max-w-xs">
             <Select
               label={t("import.defaultType")}

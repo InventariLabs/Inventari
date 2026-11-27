@@ -114,8 +114,12 @@
     "closeAndView": "Fermer et voir les partenaires",
     "added_one": "{{count}} partenaire ajouté.",
     "added_other": "{{count}} partenaires ajoutés.",
+    "contacts_one": "{{count}} personne de contact a été ajoutée à sa société.",
+    "contacts_other": "{{count}} personnes de contact ont été ajoutées à leurs sociétés.",
     "defaultType": "Type pour les lignes sans type",
     "addOnlyNote": "L'import ne fait qu'ajouter des partenaires. Une ligne nommant un partenaire que vous avez déjà — le même nom quelle que soit la casse, ou le même numéro fiscal — est refusée et listée avec sa raison.",
+    "contactNote": "Une ligne qui indique une société dans cette colonne est une personne de contact : elle rejoint cette société du même fichier, comme personne de contact et comme ligne dans ses notes.",
+    "companyField": "Société de la personne de contact",
     "analyzeFailed": "Impossible de lire le fichier",
     "failed": "L'import a échoué"
   },

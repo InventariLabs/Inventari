@@ -47,7 +47,13 @@ def _ctx(user) -> UserContextDTO:
 
 async def _import(db: AsyncSession, user, rows: list[dict], **kwargs) -> dict:
     return await import_items(
-        db, _csv(rows), 'stock.csv', MAPPING, _ctx(user), **kwargs
+        db,
+        _csv(rows),
+        'stock.csv',
+        MAPPING,
+        _ctx(user),
+        **kwargs,
+        count_as_one=True,
     )
 
 
@@ -124,6 +130,7 @@ class TestAnUnknownCategoryRefusesTheRow:
             _ctx(async_test_user),
             create_missing_categories=False,
             create_missing_locations=False,
+            count_as_one=True,
         )
 
         assert result['imported'] == 0

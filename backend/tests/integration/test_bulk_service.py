@@ -356,6 +356,7 @@ class TestImportItems:
             user_ctx,
             create_missing_locations=False,
             create_missing_categories=False,
+            count_as_one=True,
         )
         assert result['imported'] == 1
 
@@ -407,6 +408,7 @@ class TestImportItems:
             user_ctx,
             create_missing_locations=False,
             create_missing_categories=False,
+            count_as_one=True,
         )
         assert result['imported'] == 1
 
@@ -441,6 +443,7 @@ class TestImportItems:
             user_ctx,
             create_missing_locations=False,
             create_missing_categories=True,
+            count_as_one=True,
         )
         assert result['imported'] == 1
 
@@ -451,13 +454,13 @@ class TestImportItems:
         ).first()
         assert cat is not None
 
-    async def test_import_default_quantity_is_one(
+    async def test_import_one_of_each_without_a_quantity_column(
         self,
         real_async_db_session: AsyncSession,
         async_test_user,
         async_test_storage_location,
     ):
-        """Items imported without quantity column default to 1."""
+        """Asked for one of each, a row without a quantity column is one."""
         xlsx = self._make_xlsx_bytes(
             [
                 {'Name': 'Default Qty', 'Tag': 'x'},
@@ -474,6 +477,7 @@ class TestImportItems:
             user_ctx,
             create_missing_locations=False,
             create_missing_categories=False,
+            count_as_one=True,
         )
         assert result['imported'] == 1
 
@@ -532,6 +536,7 @@ class TestImportItems:
             user_ctx,
             create_missing_locations=False,
             create_missing_categories=False,
+            count_as_one=True,
         )
         assert result['imported'] == 1
 

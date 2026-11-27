@@ -116,8 +116,12 @@
     "closeAndView": "Close and view partners",
     "added_one": "Added {{count}} partner.",
     "added_other": "Added {{count}} partners.",
+    "contacts_one": "{{count}} contact person was added to their company.",
+    "contacts_other": "{{count}} contact people were added to their companies.",
     "defaultType": "Type for rows without one",
     "addOnlyNote": "Import only adds partners. A row naming a partner you already have — the same name in any letter case, or the same tax ID — is refused and listed with its reason.",
+    "contactNote": "A row naming a company in this column is a contact person: it goes onto that company from the same file, as its contact person and a line in its notes.",
+    "companyField": "Company of a contact person",
     "analyzeFailed": "Could not read the file",
     "failed": "Import failed"
   },

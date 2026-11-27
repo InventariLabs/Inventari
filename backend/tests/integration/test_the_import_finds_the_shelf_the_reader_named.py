@@ -106,7 +106,12 @@ class TestTheImportFindsTheShelfTheReaderNamed:
             ],
         ):
             result = await import_items(
-                db, _csv(rows), 'stock.csv', MAPPING, _ctx(async_test_user)
+                db,
+                _csv(rows),
+                'stock.csv',
+                MAPPING,
+                _ctx(async_test_user),
+                count_as_one=True,
             )
             assert result['failed'] == 0, result
 
@@ -138,6 +143,7 @@ class TestTheImportFindsTheShelfTheReaderNamed:
             'stock.csv',
             MAPPING,
             _ctx(async_test_user),
+            count_as_one=True,
         )
 
         assert result['failed'] == 0, result
@@ -170,6 +176,7 @@ class TestTheImportFindsTheShelfTheReaderNamed:
             'stock.csv',
             MAPPING,
             _ctx(async_test_user),
+            count_as_one=True,
         )
 
         assert result['failed'] == 0, result
@@ -211,6 +218,7 @@ class TestTheImportFindsTheShelfTheReaderNamed:
             MAPPING,
             _ctx(async_test_user),
             create_missing_locations=False,
+            count_as_one=True,
         )
 
         assert result['imported'] == 0

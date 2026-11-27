@@ -408,7 +408,84 @@ describe("ImportModal (products)", () => {
       createLocations: false,
       createCategories: true,
       onLabelMatch: "add",
+      locationSlash: "path",
+      countAsOne: false,
       onProgress: expect.any(Function),
+    });
+  });
+
+  it("offers products without stock for a list with no quantity, and sends one of each when asked", async () => {
+    analyzeImport.mockResolvedValue({
+      headers: ["Name", "Category"],
+      preview_rows: [],
+      total_rows: 0,
+      filled_counts: {},
+    });
+    mutateAsync.mockResolvedValue(imported);
+    await reachMappingStep();
+
+    expect(screen.getByRole("radio", { name: "Products only" })).toBeChecked();
+    expect(screen.getByText(/takes its last step/)).toBeInTheDocument();
+    expect(
+      screen.queryByRole("radio", { name: "Separates levels" }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: "One of each" }));
+    fireEvent.click(screen.getByRole("button", { name: /Process Import/ }));
+    await screen.findByText("Added 1 product.");
+    expect(mutateAsync).toHaveBeenLastCalledWith(
+      expect.objectContaining({ countAsOne: true }),
+    );
+  });
+
+  it("asks how a slash in a location reads and sends the answer", async () => {
+    analyzeImport.mockResolvedValue({
+      headers: ["Name", "Quantity", "Location"],
+      preview_rows: [],
+      total_rows: 0,
+      filled_counts: {},
+    });
+    mutateAsync.mockResolvedValue(imported);
+    await reachMappingStep();
+
+    expect(
+      screen.getByRole("radio", { name: "Separates levels" }),
+    ).toBeChecked();
+    expect(
+      screen.queryByRole("radio", { name: "Products only" }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: "Part of the name" }));
+    fireEvent.click(screen.getByRole("button", { name: /Process Import/ }));
+    await screen.findByText("Added 1 product.");
+    expect(mutateAsync).toHaveBeenLastCalledWith(
+      expect.objectContaining({ locationSlash: "name", countAsOne: false }),
+    );
+  });
+
+  it("names the columns that hold stock per location, which can be left unread", async () => {
+    analyzeImport.mockResolvedValue({
+      headers: ["Item Name", "Qty(Warehouse)", "Qty(Shop)"],
+      preview_rows: [],
+      total_rows: 0,
+      filled_counts: {},
+    });
+    mutateAsync.mockResolvedValue(imported);
+    await reachMappingStep();
+
+    const perLocation = screen.getByRole("checkbox", {
+      name: /Qty\(Warehouse\), Qty\(Shop\)/,
+    });
+    expect(perLocation).toBeChecked();
+    expect(
+      screen.queryByRole("radio", { name: "Products only" }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(perLocation);
+    expect(screen.getByRole("radio", { name: "Products only" })).toBeChecked();
+    fireEvent.click(perLocation);
+    fireEvent.click(screen.getByRole("button", { name: /Process Import/ }));
+    await screen.findByText("Added 1 product.");
+    expect(mutateAsync.mock.lastCall![0].mapping).toMatchObject({
+      "stock_at:Warehouse": "Qty(Warehouse)",
+      "stock_at:Shop": "Qty(Shop)",
     });
   });
 

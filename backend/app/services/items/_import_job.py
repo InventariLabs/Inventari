@@ -35,6 +35,7 @@ from app.i18n.service import get_current_lang, get_error_message
 from app.models.item_import_job import ItemImportJob
 
 from ._import import LabelMatch, import_items
+from ._import_locations import LocationSlash
 
 logger = get_logger(__name__)
 
@@ -124,6 +125,8 @@ def _sheet_work(
     create_missing_locations: bool,
     create_missing_categories: bool,
     on_label_match: LabelMatch,
+    location_slash: LocationSlash = 'path',
+    count_as_one: bool = False,
 ) -> Work:
     async def work(
         db: AsyncSession, on_batch: Callable[[int], Awaitable[None]]
@@ -138,6 +141,8 @@ def _sheet_work(
             create_missing_categories=create_missing_categories,
             on_label_match=on_label_match,
             on_batch=on_batch,
+            location_slash=location_slash,
+            count_as_one=count_as_one,
         )
 
     return work
