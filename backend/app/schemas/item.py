@@ -23,6 +23,7 @@ from app.schemas.validators import (
     QUANTITY_MAX,
     ProductMeasure,
     RemovalStrategy,
+    UnitPrice,
     decimal_from_int_float,
     empty_string_to_none,
     normalize_barcode,
@@ -216,6 +217,8 @@ class ItemCreate(_QuantityAsNamed, ItemBase):
     #: unset, a card minted by this call takes the next one of the
     #: organization's numbering, as before.
     sku: str | None = None
+    # Bounded here and not on ``ItemBase``, which the response model shares.
+    purchase_price: UnitPrice | None = None
 
     @field_validator('sku', mode='before')
     @classmethod
@@ -259,7 +262,7 @@ class ItemUpdate(_QuantityAsNamed):
     image_url: str | None = None
 
     # COST TRACKING
-    purchase_price: Decimal | None = None
+    purchase_price: UnitPrice | None = None
     currency: str | None = None
 
     # Product-level fields, written to the item's template (ADR-015)

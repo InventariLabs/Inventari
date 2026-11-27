@@ -358,6 +358,7 @@ apart.
 | `EQUIPMENT_CANNOT_CHECKOUT_IN_MAINTENANCE` | Cannot check out an asset that is in maintenance; set it to Available first |
 | `EQUIPMENT_CANNOT_CHECKOUT_RETIRED` | Cannot check out a retired asset |
 | `EQUIPMENT_DEPLOY_REQUIRES_CHECKOUT` | An asset becomes deployed by checking it out to someone. Check it out instead of setting the status. |
+| `EQUIPMENT_MODULE_UNAVAILABLE` | The equipment module is switched off, so nothing can be handed out |
 | `EQUIPMENT_STATUS_INVALID` | Invalid status: {status} |
 | `EQUIPMENT_STATUS_TRANSITION_DENIED` | Cannot change status from {old} to {new} |
 | `EQUIPMENT_STATUS_TRANSITION_FROM_RETIRED` | Cannot change status from {old} to {new}. Retired assets must be explicitly unretired first. |
@@ -441,6 +442,7 @@ apart.
 | `ITEM_CURRENCY_MISMATCH` | Item currency ({item_currency}) must match organization currency ({organization_currency}) |
 | `ITEM_NOT_DELETED` | Item is not deleted |
 | `ITEM_NOT_FOUND` | Item not found |
+| `ITEM_PRICE_ABOVE_CEILING` | Restated per {unit}, the price comes to {price}, and the most a record can keep is {ceiling}. |
 | `ITEM_PURGE_REASON_REQUIRED` | A reason is required for permanent deletion in production |
 | `ITEM_PURGE_REQUIRES_ARCHIVED` | Only archived items can be purged |
 | `ITEM_QUANTITY_ABOVE_CEILING` | The quantity {quantity} is past what the column holds — the largest storable value is {ceiling} |
@@ -618,6 +620,30 @@ apart.
 | `RELOCATION_BLOCKED_BY_RESERVATIONS` | Cannot move item: source stock has outstanding reservations. Release or fulfill them first. |
 | `RELOCATION_DESTINATION_FOREIGN` | Cannot move item: the destination is not this organization. |
 | `REMOVAL_STRATEGY_OF_SHARED_PRODUCT` | This product comes from the shared catalogue, so the order its stock leaves in is the catalogue's and cannot be changed for one organization. |
+| `RENTAL_ASSET_LINE_QUANTITY` | An asset line asks for one unit |
+| `RENTAL_ASSET_NOT_BOOKABLE` | This unit cannot be booked |
+| `RENTAL_AVAILABILITY_NEEDS_TARGET` | Ask for availability of an asset or a model |
+| `RENTAL_BLOCK_WINDOW_ORDER` | The block ends after it starts |
+| `RENTAL_BOOKING_NEEDS_ONE_BORROWER` | A booking names one borrower: a partner, a member, or somebody outside the system |
+| `RENTAL_BORROWER_NEEDS_NAME` | A borrower outside the system has a name |
+| `RENTAL_BUFFER_NEEDS_MODEL` | A buffer rule names a model |
+| `RENTAL_BUFFER_NEEDS_ONE_TARGET` | A buffer rule names a model or a category, not both |
+| `RENTAL_CANCEL_NOT_RESERVED` | Only a booking that has not been handed out can be cancelled |
+| `RENTAL_EXTEND_NOT_ACTIVE` | Only a reserved or handed-out booking can be extended |
+| `RENTAL_EXTEND_NOT_LATER` | The new return must be later than the current one |
+| `RENTAL_LINE_NAMES_ONE_KIND` | A line names one asset or one model, not both |
+| `RENTAL_MODEL_LINE_NEEDS_MODEL` | A model line names a model |
+| `RENTAL_MOVE_NEEDS_SAME_MODEL` | A booking moves only to a unit of the same model |
+| `RENTAL_MOVE_TARGET_TAKEN` | The chosen unit is not free for that booking |
+| `RENTAL_PICKUP_DUPLICATE_SCAN` | The same unit was scanned twice |
+| `RENTAL_PICKUP_NOT_RESERVED` | Only a reserved booking can be handed out |
+| `RENTAL_PICKUP_WINDOW_PASSED` | This booking's window is over: extend the booking, then hand it out |
+| `RENTAL_RETURN_NEEDS_EVERY_UNIT` | The return lists every unit of the booking |
+| `RENTAL_RETURN_NOT_PICKED_UP` | Only a handed-out booking can be returned |
+| `RENTAL_SERVICE_NEEDS_REASON_AND_DATE` | A unit going to service says what happened and until when |
+| `RENTAL_SERVICE_UNTIL_IN_PAST` | The service ends after it starts |
+| `RENTAL_UNIT_ON_TWO_LINES` | The same unit is on two lines of the booking |
+| `RENTAL_WINDOW_ORDER` | The return comes after the pickup |
 | `REORDER_MAX_BELOW_MIN` | max_quantity ({max_quantity}) must be >= min_quantity ({min_quantity}) |
 | `REORDER_MIN_QUANTITY_NEGATIVE` | min_quantity must be >= 0, got {min_quantity} |
 | `REORDER_RULE_NOT_FOUND` | Reorder rule not found |

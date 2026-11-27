@@ -45,6 +45,18 @@ QUANTITY_MAX = Decimal(
     f'{"9" * (QUANTITY_MAX_DIGITS - QUANTITY_SCALE)}.{"9" * QUANTITY_SCALE}'
 )
 
+#: ``items.purchase_price`` is numeric(PRICE_MAX_DIGITS, PRICE_SCALE): the
+#: ceiling is the largest value the column can hold.
+PRICE_MAX_DIGITS = 10
+PRICE_SCALE = 2
+PRICE_MAX = Decimal(f'{"9" * (PRICE_MAX_DIGITS - PRICE_SCALE)}.{"9" * PRICE_SCALE}')
+
+#: A record's unit price as a request names it: from zero, since nothing costs
+#: less than nothing, up to what the column holds, so that an oversized price is
+#: a 422 naming the field instead of the driver's 500. Never on a field a
+#: response fills from a stored row, which is answered as it is.
+UnitPrice = Annotated[Decimal, Field(ge=0, le=PRICE_MAX)]
+
 #: A product's unit weight or volume as a request names it.
 #: ``product_templates.weight_value`` and ``volume_value`` are numeric(14, 6),
 #: so a magnitude from 1e8 up overflows the column: the bound answers it with a

@@ -31,6 +31,7 @@ import uuid
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 from typing import Any
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from sqlalchemy import or_
 
@@ -39,6 +40,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from app.core.barcode import gtin_check_digit
 from app.database import SessionLocal
 from app.models.item import Item
+from app.models.organization import Organization
 from app.models.partner import Partner
 from app.models.product_template import ProductTemplate
 from app.models.storage_location import LocationUsage, StorageLocation
@@ -3823,6 +3825,303 @@ DEMO_MAINTENANCE = [
 ]
 
 
+#: Who the demo lends to. A school and a foundation are the two lenders'
+#: customers a visitor recognizes; the other two are people outside the system.
+DEMO_RENTAL_BORROWERS = [
+    ('Szkoła Podstawowa nr 3', 'sekretariat@sp3.example.com'),
+    ('Fundacja Ogród', 'kontakt@ogrod.example.com'),
+    ('Jan Wiśniewski', 'jan.wisniewski@example.com'),
+    ('Studio Foto', 'studio@foto.example.com'),
+]
+
+
+def _organization_day(db, org_id):
+    """The organization's clock and two ways to name a moment inside its day.
+
+    The demo's "today" screen reads the organization's calendar, not the
+    server's, so the seeded week is pinned to that clock: a pickup at 15:00
+    local has to land inside the local day whatever the server's zone is.
+    """
+    org = db.get(Organization, org_id)
+    try:
+        zone = ZoneInfo((org.timezone if org is not None else None) or 'UTC')
+    except (ZoneInfoNotFoundError, ValueError):
+        zone = ZoneInfo('UTC')
+    local_now = datetime.now(UTC).astimezone(zone)
+    midnight = local_now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    def local_at(day_offset: int, hour: int, minute: int = 0) -> datetime:
+        return (midnight + timedelta(days=day_offset)).replace(hour=hour, minute=minute)
+
+    def later_today(hour: int, minute: int = 0) -> datetime:
+        """A local moment still ahead today, so the day's lists have an item.
+
+        The demo rebuilds at any hour; a fixed 15:00 is right in the morning
+        and gone by the evening, so once it has passed the seed takes the
+        next half hour, never crossing midnight.
+        """
+        candidate = local_at(0, hour, minute)
+        if candidate <= local_now:
+            candidate = (local_now + timedelta(minutes=30)).replace(
+                second=0, microsecond=0
+            )
+        end_of_day = local_at(1, 0) - timedelta(minutes=5)
+        return min(candidate, end_of_day).astimezone(UTC)
+
+    return local_at, later_today
+
+
+def _create_rentals_demo(db, org_id, created_by) -> int:
+    """Bookings around today, so the module's first screen has all its states.
+
+    One loan is late, one goes out today, one comes back today, one came back
+    last week, and one unit is in service. The calendar then shows a reserved
+    bar, a handed-out one, a late one, a returned one and a service block —
+    every colour the legend names, on the day the demo opens.
+    """
+    from app.modules.equipment.models import EquipmentAssignment
+    from app.modules.rentals.models import (
+        RentalBlock,
+        RentalBooking,
+        RentalBookingLine,
+        RentalBookingUnit,
+        RentalBufferRule,
+    )
+
+    if db.query(RentalBooking).filter(RentalBooking.organization_id == org_id).count():
+        return 0
+
+    held = {
+        row[0]
+        for row in db.query(EquipmentAssignment.item_id)
+        .filter(
+            EquipmentAssignment.organization_id == org_id,
+            EquipmentAssignment.checked_in_at.is_(None),
+        )
+        .all()
+    }
+    assets = [
+        item
+        for item in db.query(Item)
+        .filter(Item.organization_id == org_id, Item.is_deleted.is_(False))
+        .order_by(Item.name)
+        .all()
+        if item.id not in held
+        and (item.meta_data or {}).get('equipment', {}).get('equipment_status')
+        == 'AVAILABLE'
+    ][:5]
+    if len(assets) < 4:
+        return 0
+
+    now = datetime.now(UTC)
+    local_at, later_today = _organization_day(db, org_id)
+    created = 0
+
+    def booking_for(
+        item,
+        *,
+        status,
+        borrower_index,
+        starts_at,
+        ends_at,
+        picked_up_at=None,
+        returned_at=None,
+        condition=None,
+        note=None,
+    ):
+        name, email = DEMO_RENTAL_BORROWERS[borrower_index % len(DEMO_RENTAL_BORROWERS)]
+        booking = RentalBooking(
+            id=uuid.uuid4(),
+            organization_id=org_id,
+            status=status,
+            borrower_name=name,
+            borrower_email=email,
+            starts_at=starts_at,
+            ends_at=ends_at,
+            picked_up_at=picked_up_at,
+            returned_at=returned_at,
+            note=note,
+            created_by=created_by,
+        )
+        line = RentalBookingLine(
+            id=uuid.uuid4(),
+            organization_id=org_id,
+            booking_id=booking.id,
+            item_id=item.id,
+            quantity=1,
+        )
+        unit = RentalBookingUnit(
+            id=uuid.uuid4(),
+            organization_id=org_id,
+            booking_id=booking.id,
+            line_id=line.id,
+            item_id=item.id,
+            condition=condition,
+            returned_at=returned_at,
+        )
+        db.add_all([booking, line, unit])
+        db.flush()
+        return booking, unit
+
+    # A loan that is late: the "Today" screen opens on it.
+    late_booking, late_unit = booking_for(
+        assets[0],
+        status='PICKED_UP',
+        borrower_index=2,
+        starts_at=local_at(-3, 10).astimezone(UTC),
+        ends_at=local_at(-1, 17).astimezone(UTC),
+        picked_up_at=local_at(-3, 10).astimezone(UTC),
+        note='late loan',
+    )
+    late_assignment = EquipmentAssignment(
+        id=uuid.uuid4(),
+        organization_id=org_id,
+        item_id=assets[0].id,
+        assigned_to_name=late_booking.borrower_name,
+        assigned_to_email=late_booking.borrower_email,
+        checked_out_at=late_booking.starts_at,
+        expected_return_at=late_booking.ends_at,
+        checked_out_by=created_by,
+        checkout_notes='Handed out with the booking.',
+    )
+    db.add(late_assignment)
+    # The unit points at the hand-out by plain column, not a relationship, so
+    # SQLAlchemy cannot order the insert before the unit's update; flush it.
+    db.flush()
+    late_unit.assignment_id = late_assignment.id
+    _set_equipment_status(assets[0], 'DEPLOYED')
+    created += 1
+
+    # A pickup for this afternoon, waiting on the desk.
+    pickup_at = later_today(15)
+    booking_for(
+        assets[1],
+        status='RESERVED',
+        borrower_index=0,
+        starts_at=pickup_at,
+        ends_at=pickup_at + timedelta(days=3),
+        note='pickup today',
+    )
+    created += 1
+
+    # A return due this afternoon.
+    today_booking, today_unit = booking_for(
+        assets[2],
+        status='PICKED_UP',
+        borrower_index=1,
+        starts_at=now - timedelta(days=2),
+        ends_at=later_today(16),
+        picked_up_at=now - timedelta(days=2),
+        note='return today',
+    )
+    today_assignment = EquipmentAssignment(
+        id=uuid.uuid4(),
+        organization_id=org_id,
+        item_id=assets[2].id,
+        assigned_to_name=today_booking.borrower_name,
+        assigned_to_email=today_booking.borrower_email,
+        checked_out_at=today_booking.starts_at,
+        expected_return_at=today_booking.ends_at,
+        checked_out_by=created_by,
+        checkout_notes='Handed out with the booking.',
+    )
+    db.add(today_assignment)
+    db.flush()
+    today_unit.assignment_id = today_assignment.id
+    _set_equipment_status(assets[2], 'DEPLOYED')
+    created += 1
+
+    # One that came back last week, so the calendar has history.
+    returned_booking, returned_unit = booking_for(
+        assets[3],
+        status='RETURNED',
+        borrower_index=3,
+        starts_at=local_at(-9, 9).astimezone(UTC),
+        ends_at=local_at(-6, 12).astimezone(UTC),
+        picked_up_at=local_at(-9, 9).astimezone(UTC),
+        returned_at=local_at(-6, 12).astimezone(UTC),
+        condition='GOOD',
+        note='returned loan',
+    )
+    returned_assignment = EquipmentAssignment(
+        id=uuid.uuid4(),
+        organization_id=org_id,
+        item_id=assets[3].id,
+        assigned_to_name=returned_booking.borrower_name,
+        assigned_to_email=returned_booking.borrower_email,
+        checked_out_at=returned_booking.starts_at,
+        expected_return_at=returned_booking.ends_at,
+        checked_in_at=returned_booking.returned_at,
+        checked_out_by=created_by,
+        checked_in_by=created_by,
+        checkin_condition='GOOD',
+        checkout_notes='Handed out with the booking.',
+    )
+    db.add(returned_assignment)
+    db.flush()
+    returned_unit.assignment_id = returned_assignment.id
+    created += 1
+
+    # A unit in service, and the block that keeps it off the calendar.
+    if len(assets) >= 5:
+        db.add(
+            RentalBlock(
+                id=uuid.uuid4(),
+                organization_id=org_id,
+                item_id=assets[4].id,
+                starts_at=local_at(-1, 9).astimezone(UTC),
+                ends_at=local_at(4, 17).astimezone(UTC),
+                reason='returned damaged — display replaced',
+                source='SERVICE',
+                booking_id=returned_booking.id,
+                created_by=created_by,
+            )
+        )
+        _set_equipment_status(assets[4], 'MAINTENANCE')
+
+    # A buffer on the first model: the booking sheet explains the gap after a
+    # return, and the calendar draws it.
+    model = _rental_model_of(assets[0])
+    if (
+        model
+        and not db.query(RentalBufferRule)
+        .filter(
+            RentalBufferRule.organization_id == org_id,
+            RentalBufferRule.model == model,
+        )
+        .first()
+    ):
+        db.add(
+            RentalBufferRule(
+                id=uuid.uuid4(),
+                organization_id=org_id,
+                model=model,
+                hours_before=2,
+                hours_after=4,
+            )
+        )
+
+    db.flush()
+    return created
+
+
+def _rental_model_of(item) -> str | None:
+    template = getattr(item, 'template', None)
+    if template is not None and getattr(template, 'name', None):
+        return str(template.name)
+    meta = (item.meta_data or {}).get('equipment', {})
+    model = str(meta.get('model') or '').strip()
+    return model or None
+
+
+def _set_equipment_status(item, status: str) -> None:
+    meta = dict(item.meta_data or {})
+    equipment_ns = dict(meta.get('equipment') or {})
+    equipment_ns['equipment_status'] = status
+    meta['equipment'] = equipment_ns
+    item.meta_data = meta
+
+
 def _create_maintenance_demo(db, org_id, created_by) -> int:
     """One asset in the workshop, one with a service history.
 
@@ -4585,6 +4884,25 @@ def _clean_module_extras(db, org_id) -> None:
             synchronize_session=False
         )
 
+    from app.modules.rentals.models import (
+        RentalBlock,
+        RentalBooking,
+        RentalBufferRule,
+    )
+
+    # The rentals demo writes nothing outside its own tables and carries no
+    # seed marker in a reader-visible field, so the module's rows of this
+    # organization go as a whole; lines and units cascade from the booking.
+    db.query(RentalBlock).filter(RentalBlock.organization_id == org_id).delete(
+        synchronize_session=False
+    )
+    db.query(RentalBooking).filter(RentalBooking.organization_id == org_id).delete(
+        synchronize_session=False
+    )
+    db.query(RentalBufferRule).filter(
+        RentalBufferRule.organization_id == org_id
+    ).delete(synchronize_session=False)
+
     recipe_ids = [
         row[0]
         for row in db.query(Recipe.id)
@@ -4693,6 +5011,7 @@ SEEDED_MODULES = frozenset(
         'stock_takes',
         'recipes',
         'shopping_lists',
+        'rentals',
     }
 )
 
@@ -4866,6 +5185,12 @@ def _seed_module_extras(db, org_id, created_by, enabled, maker_ids, say) -> dict
             'maintenance_logs',
             'maintenance log(s)',
             lambda: _create_maintenance_demo(db, org_id, created_by),
+        ),
+        (
+            'rentals',
+            'rental_bookings',
+            'rental booking(s)',
+            lambda: _create_rentals_demo(db, org_id, created_by),
         ),
     )
 
