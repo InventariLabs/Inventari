@@ -43,8 +43,7 @@ describe("NotFoundPage", () => {
     // The answer comes from data, not from a module somebody imported: in the
     // app only enabled modules ever reach the registry, so asking it which
     // module owns a path could never name one that is off — the screen could
-    // not fire at all. (The suite's global setup imports a handful of modules,
-    // so the registry is no proof either way here; the table is.)
+    // not fire at all.
     expect(MODULE_PATHS.shopping_lists.paths).toContain("/shopping-lists");
 
     renderAt("/shopping-lists");

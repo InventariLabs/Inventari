@@ -6,10 +6,8 @@ type AuthStoreModule = typeof import("./authStore");
 let i18n: I18nModule["default"];
 let useAuthStore: AuthStoreModule["useAuthStore"];
 
-// The test setup imports module definitions, and one of them reaches the auth
-// store before this file's mocks exist — a store loaded then keeps the real
-// authApi. Re-evaluate both modules per test so the mock above is the one the
-// store actually calls.
+// Both modules are evaluated anew per test, so each test starts from a store
+// and an i18n instance that no earlier test has switched.
 beforeEach(async () => {
   vi.resetModules();
   i18n = (await import("@/i18n/config")).default;
