@@ -15,7 +15,11 @@ import { toast } from "sonner";
 import { useFormMemoryStore } from "@/store/formMemoryStore";
 import { computeFieldDefinitions } from "./computeFieldDefinitions";
 import { buildSubmissionPayload } from "./buildSubmissionPayload";
-import { requiredFieldErrors, settleUnitOnPayload } from "./submitUnit";
+import {
+  apiFieldNames,
+  fieldRuleErrors,
+  settleUnitOnPayload,
+} from "./submitUnit";
 import { focusFirstInvalidField } from "../utils/focusFirstInvalidField";
 import {
   convertQuantity,
@@ -603,11 +607,7 @@ export function useItemForm({
     (e?: React.FormEvent) => {
       if (e) e.preventDefault();
 
-      const newErrors: Record<string, string> = requiredFieldErrors(
-        fieldDefinitions,
-        formData,
-        t("common:labels.required"),
-      );
+      const newErrors = fieldRuleErrors(fieldDefinitions, formData, t);
 
       if (!formData.name?.trim())
         newErrors.name = t("items:validation.nameRequired");
@@ -731,6 +731,8 @@ export function useItemForm({
     errors,
     setErrors,
     fieldDefinitions,
+    /** For `extractApiError`: names the field a refused save is about. */
+    fieldNames: apiFieldNames(fieldDefinitions, (f) => getLabel(f, tDyn)),
     handleInputChange,
     handleMetadataChange,
     submit,

@@ -9,6 +9,7 @@ import { unitLabel } from "@/lib/i18nHelpers";
 import { formatQuantity } from "@/utils/formatters";
 import type { FieldDefinition, Uom } from "@/types";
 import { getPlaceholder, getLabel } from "./helpers";
+import { MEASURE_MAX } from "@/modules/inventory/hooks/submitUnit";
 import { makeTDynamic } from "@/lib/i18nHelpers";
 
 interface WeightFieldProps {
@@ -92,6 +93,8 @@ export function WeightField({
             id={id}
             type="number"
             inputMode="decimal"
+            min={0}
+            max={MEASURE_MAX}
             step="any"
             value={String(value ?? "")}
             // Named from the same source as the visible label the parent
