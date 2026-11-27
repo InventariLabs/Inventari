@@ -254,6 +254,9 @@ describe("module name parity", () => {
       "webhooks",
       "approvals",
       "warehouse",
+      // The identifier was taken from the agreed English label ("Rentals",
+      // pl "Wypożyczenia"), so the two legitimately coincide.
+      "rentals",
     ]);
     const problems: string[] = [];
     for (const name of backendModules) {

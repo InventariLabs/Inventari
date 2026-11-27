@@ -667,10 +667,34 @@ const dist = join(root, "dist");
  * 420, 435 and 655. The other screens stand under theirs (receive 487.7 of
  * 490, issue 596.7 of 600, history 621.8 of 625, products 629.2 of 640,
  * initial 194.3).
+ *
+ * Re-measured 2026-11-26 on the branch that adds the rentals module: receive
+ * measures 491.5 KiB gz against its 490, issue 600.5 against 600 and history
+ * 625.6 against 625. What the branch adds is copy in six languages — the
+ * module's own screens, refusals and guide, the Polish catalogue in the
+ * language chunk every first paint loads — and a few exports on the module SDK
+ * barrel (the side sheet, the date field, the scrolling row, the organization's
+ * clock); no import walked into the startup path, and the SDK's unused select,
+ * tabs and badge exports were left out rather than pull Radix into every
+ * screen's barrel. Those three phone budgets move a step of five, to 495, 605
+ * and 630; the other screens stand under theirs (app first paint 414.3 of
+ * 415, login 419.2 of 420, launcher 434.2 of 435, start 654.1 of 655,
+ * products 633.4 of 640, initial 194.6 of 245).
+ *
+ * Re-measured 2026-11-27 on the rentals branch, merged with the development
+ * line at 6fcdfd3a2: app first paint measures 415.0 KiB gz and no longer fits
+ * its 415, where the line alone stands at 411.1. The difference is the
+ * module's own: its copy in six languages, of which the Polish catalogue loads
+ * with every first paint (158.7 to 162.1), and its registration in the App
+ * chunk (58.1 to 58.4); no import walked into the startup path. The first
+ * paint budget moves a step of five, to 420. The phone screens stand under
+ * theirs (login 419.9 of 420, launcher 434.9 of 435, start 654.9 of 655,
+ * receive 492.3 of 495, issue 601.3 of 605, history 626.3 of 630, products
+ * 634.4 of 640, initial 194.5 of 245).
  */
 const BUDGETS = {
   initial: 245,
-  appFirstPaint: 415,
+  appFirstPaint: 420,
 };
 
 /**

@@ -92,6 +92,61 @@ describe("ItemEditModal — leaving, refusals and the photo", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
+  /** Save sits under the scrolling body and the refusal at the top of it, so
+   * a reader who scrolled down to the field they changed has to be taken to
+   * the sentence, on every refused press. */
+  it("brings the refusal into view, each time the save is refused", async () => {
+    const refusal =
+      "This record holds 2.500 kg. Changing the unit to l would relabel that number.";
+    server.use(
+      http.put("/api/v1/items/1", () =>
+        HttpResponse.json(
+          {
+            detail: {
+              code: "ITEM_UNIT_CHANGE_BLOCKED_BY_STOCK",
+              message: refusal,
+            },
+          },
+          { status: 400 },
+        ),
+      ),
+    );
+    render(<ItemEditModal itemId="1" onClose={() => {}} />);
+    await screen.findByDisplayValue("Test Item");
+
+    // jsdom lays nothing out: the sheet's body is 400px high from y=100, and
+    // the reader has scrolled it until its top is 300px above that.
+    const body = document.getElementById("edit-item-form")!.parentElement!;
+    body.style.overflowY = "auto";
+    let scrolled = 450;
+    Object.defineProperty(body, "scrollTop", {
+      get: () => scrolled,
+      set: (top: number) => {
+        scrolled = Math.max(0, top);
+      },
+    });
+    Object.defineProperty(body, "clientHeight", { value: 400 });
+    const rects = vi
+      .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+      .mockImplementation(function (this: HTMLElement) {
+        const banner = this.getAttribute("role") === "alert";
+        return { top: banner ? -200 : 100, height: 40 } as DOMRect;
+      });
+
+    const save = screen.getByRole("button", { name: /save changes/i });
+    fireEvent.click(save);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(refusal);
+    await waitFor(() => expect(scrolled).toBe(0));
+
+    scrolled = 450;
+    await waitFor(() => expect(save).toBeEnabled());
+    fireEvent.click(save);
+
+    await waitFor(() => expect(scrolled).toBe(0));
+    rects.mockRestore();
+  });
+
   it("backs out of the delete-reason dialog without deleting", async () => {
     const deleted = vi.fn();
     server.use(

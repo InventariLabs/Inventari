@@ -39,6 +39,10 @@
       "name": "Geräteverfolgung",
       "description": "IT- und physische Assets mit Lebenszyklusverwaltung verfolgen."
     },
+    "rentals": {
+      "name": "Verleih",
+      "description": "Geräte für einen Zeitraum reservieren, ausgeben und zurücknehmen."
+    },
     "example_widgets": {
       "name": "Beispiel-Widgets",
       "description": "Referenzmodul für die Inventari-Modulmuster: einfache Widgets mit Name, Farbe und Anzahl verwalten."

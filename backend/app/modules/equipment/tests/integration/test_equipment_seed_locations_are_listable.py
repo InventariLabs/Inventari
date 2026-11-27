@@ -20,11 +20,13 @@ from __future__ import annotations
 
 import uuid
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
 from sqlalchemy import create_engine, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.architecture_lint._quality_checks import _collect_module_tablenames
 from app.core.contracts import UserContextDTO
 from app.core.db_isolation import isolated_db_url as _isolated_db_url
 from app.core.module_migrations import run_module_migrations
@@ -164,15 +166,28 @@ def isolated_db_with_seed(isolated_db_url: str) -> str:
     import app.modules.equipment.models  # noqa: F401
 
     engine = create_engine(isolated_db_url)
-    module_tables = {
-        'audit_campaigns',
-        'audit_responses',
-        'audit_response_items',
-        'equipment_assignments',
-        'equipment_attachments',
-        'equipment_document_templates',
-        'equipment_maintenance_logs',
-    }
+    # This fixture creates the core's tables and lets the equipment migrations
+    # create the module's own. Another module's table that points at an
+    # equipment one (a rental line naming its hand-out) has to stay out too:
+    # the table it names is not there yet. The exclusion is closed over
+    # module tables, so a new sibling dependency needs no edit here.
+    equipment_dir = Path(__file__).resolve().parents[2]
+    equipment_tables = _collect_module_tablenames(equipment_dir)
+    modules_root = Path(__file__).resolve().parents[3]
+    all_module_tables: set[str] = set()
+    for module_dir in modules_root.iterdir():
+        if module_dir.is_dir() and not module_dir.name.startswith('_'):
+            all_module_tables |= _collect_module_tablenames(module_dir)
+    module_tables = set(equipment_tables)
+    growing = True
+    while growing:
+        growing = False
+        for table in Base.metadata.sorted_tables:
+            if table.name in module_tables or table.name not in all_module_tables:
+                continue
+            if any(fk.column.table.name in module_tables for fk in table.foreign_keys):
+                module_tables.add(table.name)
+                growing = True
     core_tables = [
         t for t in Base.metadata.sorted_tables if t.name not in module_tables
     ]

@@ -1159,7 +1159,7 @@ name invented here has nowhere to hide.
 <!-- module-reserved-names:start -->
 - core feature names: `announcements`, `api_keys`, `categories`, `core`, `items`, `locations`, `printing`, `purchase_orders`, `recipes`, `shopping_lists`, `stats`, `stock_takes`, `warehouse`, `webhooks`
 - virtual module names: `partners`
-- modules this repository ships: `api_keys`, `approvals`, `equipment`, `example_widgets`, `maker`, `mcp_server`, `nutrition`, `printing`, `purchase_orders`, `recipes`, `shopping_lists`, `stats`, `stock_takes`, `vision`, `warehouse`, `webhooks`
+- modules this repository ships: `api_keys`, `approvals`, `equipment`, `example_widgets`, `maker`, `mcp_server`, `nutrition`, `printing`, `purchase_orders`, `recipes`, `rentals`, `shopping_lists`, `stats`, `stock_takes`, `vision`, `warehouse`, `webhooks`
 - core translation namespaces (a module's namespace is its own name, so a module here answers the core's own translation calls): `auth`, `categories`, `common`, `items`, `labels`, `locations`, `modules`, `onboarding`, `permissions`, `scan`
 - core frontend directories (directories the core keeps in the frontend source, under `frontend/src/` and under `frontend/src/modules/`): `__mocks__`, `announcements`, `components`, `config`, `contexts`, `hooks`, `i18n`, `inventory`, `launcher`, `lib`, `modules`, `onboarding`, `pages`, `partners`, `settings`, `shared`, `spaces`, `store`, `test`, `types`, `utils`
 <!-- module-reserved-names:end -->

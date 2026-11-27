@@ -14,6 +14,26 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- A Rentals module promises equipment for a window and follows it to the
+  desk and back. A booking names a borrower (a partner, a member, or somebody
+  outside the system with a name and an e-mail), a pickup and a return, and
+  lines of a specific unit or a model with a count; the sheet refuses a line
+  that does not fit, names what is in the way, and offers fewer units or the
+  nearest window of the same length in which enough are free. The calendar
+  groups the fleet by model, draws each unit's reserved, handed-out, late and
+  returned time beside its service blocks and buffer hours, and keeps an
+  "any unit" row for bookings a scan has not resolved yet. Handing out is a
+  scan (or a choice) per unit, and the hand-out is confirmed only when every
+  line is covered. A unit handed out before its booking starts is taken from
+  that moment, so the hand-out is refused if somebody else has it before then,
+  and a booking whose window is over is extended before it is handed out.
+  Taking back records each unit's condition, and a unit that needs service
+  opens a block in the same step, moving a later booking to a free unit of its
+  model when one exists or ending the block before it. Today opens the module
+  with the loans past their window, the day's pickups and returns and what is
+  in service, and overdue is read from the window rather than stored. The
+  module needs the equipment register and is switched off on its own; it ships
+  in the six maintained languages with demo data and a guide page.
 - Moving in from another tool: the product import suggests the columns of the
   exports of Odoo (products and stock), Sortly, inFlow, Zoho, Katana, BoxHero
   and Homebox, and maps the SKU, the description, the stock alert and a
@@ -91,6 +111,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- When saving a product's edit form is refused — for example a unit changed
+  while the product holds stock — the form scrolls to the sentence that says
+  why and screen readers announce it. It stood above the fields, out of sight
+  of a reader who had scrolled down, so pressing **Save** seemed to do nothing.
 - A SKU read off the opening-stock sheet is stored trimmed and in upper case,
   and a code with a character a SKU cannot hold refuses its row, so a product
   founded from a sheet can be saved in its form.

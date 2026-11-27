@@ -551,11 +551,12 @@ export class ApiHelper {
   }
 
   /**
-   * Switches every optional module on, maker included. A project that can
-   * share a phase with `module-gate` must not call it: this would undo the
-   * switch-off its assertions rely on. Today none does: `chromium`, `mobile`
-   * and `pl-PL` finish in an earlier phase, and every other project that
-   * touches the module list depends on `module-gate` or on `chromium`.
+   * Switches on the optional modules the specs read, maker included, whatever
+   * profile the organisation was onboarded with. A project that can share a
+   * phase with `module-gate` must not call it: this would undo the switch-off
+   * its assertions rely on. Today none does: `chromium`, `mobile` and `pl-PL`
+   * finish in an earlier phase, and every other project that touches the
+   * module list depends on `module-gate` or on `chromium`.
    */
   async enableAllModules(token: string): Promise<void> {
     // stats, printing and announcements are always on: a toggle for them is
@@ -572,6 +573,7 @@ export class ApiHelper {
       "purchase_orders",
       "partners",
       "maker",
+      "vision",
     ];
     for (const mod of modulesToEnable) {
       await this.toggleModule(token, mod, true);
