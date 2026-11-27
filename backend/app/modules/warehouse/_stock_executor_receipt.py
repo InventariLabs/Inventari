@@ -488,7 +488,7 @@ async def _refuse_a_cost_the_books_cannot_keep(
 ) -> None:
     """Refuse by name a cost per stock unit that is past the price ceiling.
 
-    A line price within its own bound can outgrow it once restated into a
+    A line price within its own bound can end up past it when restated into a
     larger unit, and so can a delivery cost spread over a very small quantity.
     Both the record's price and the cost layer are kept per stock unit.
     """
