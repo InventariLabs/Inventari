@@ -45,6 +45,8 @@ interface ProductFormContentProps {
   onAddStorage?: (query: string) => void;
   /** The unit the matched product template keeps — the hint by the picker. */
   templateUnit?: TemplateUnitPrompt | null;
+  /** The record holds stock, so its unit cannot be changed. */
+  unitLocked?: boolean;
   /**
    * Offer the existing products whose name contains the typed one. Only a
    * form that creates a record asks: an open record is not a new product.
@@ -148,6 +150,7 @@ export default function ProductFormContent({
   storageGate,
   onAddStorage,
   templateUnit = null,
+  unitLocked,
   suggestExistingProducts = false,
   readOnly = false,
 }: ProductFormContentProps) {
@@ -368,6 +371,7 @@ export default function ProductFormContent({
             errors={errors}
             className="grid-cols-1 lg:grid-cols-2"
             templateUnit={templateUnit}
+            unitLocked={unitLocked}
           />
         </div>
       )}

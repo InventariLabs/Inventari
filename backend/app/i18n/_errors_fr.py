@@ -48,6 +48,7 @@ ERRORS_FR: ErrorMessages = {
         'ne peut pas être enregistré. Arrondissez la quantité à cette '
         'précision.'
     ),
+    'item_price_above_ceiling': 'Ramené à l’unité {unit}, le prix atteint {price}, alors qu’une fiche en garde au plus {ceiling}.',
     'item_unit_cannot_be_removed': (
         "L'unité {unit} ne peut pas être retirée : une quantité sans unité "
         'ne dit rien. Choisissez plutôt une autre unité.'

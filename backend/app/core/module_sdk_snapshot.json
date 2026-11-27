@@ -2000,6 +2000,10 @@
       "kind": "class",
       "members": {}
     },
+    "PRICE_MAX": {
+      "kind": "value",
+      "type": "Decimal"
+    },
     "PaginatedResponse": {
       "bases": [
         "BaseModel",
@@ -2545,6 +2549,10 @@
           "kind": "attribute"
         }
       }
+    },
+    "UnitPrice": {
+      "kind": "value",
+      "type": "_AnnotatedAlias"
     },
     "UomResolverAsync": {
       "bases": [

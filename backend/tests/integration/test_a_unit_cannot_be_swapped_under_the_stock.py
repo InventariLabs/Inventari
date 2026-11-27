@@ -70,6 +70,42 @@ class TestAUnitCannotBeSwappedUnderTheStock:
         db_session.refresh(item)
         assert item.uom_id == pcs.id
 
+    @pytest.mark.parametrize(
+        ('language', 'stated'),
+        [('pl', '5,6 kg'), ('en', '5.6 kg'), ('de', '5,6 kg')],
+    )
+    def test_the_refusal_states_the_quantity_the_readers_way(
+        self,
+        language: str,
+        stated: str,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        test_household: Organization,
+        test_storage_location: StorageLocation,
+    ) -> None:
+        """The reader's decimal mark, and none of the column's padding zeros."""
+        h = ModuleTestHelper(db_session)
+        kg, g = h.get_uom('kg'), h.get_uom('g')
+        item = Item(
+            name='Five and six tenths',
+            organization_id=test_household.id,
+            storage_location_id=test_storage_location.id,
+            quantity=Decimal('5.600'),
+            uom_id=kg.id,
+        )
+        db_session.add(item)
+        db_session.commit()
+
+        resp = client.put(
+            f'/api/v1/items/{item.id}',
+            headers={**auth_headers, 'Accept-Language': language},
+            json={'uom_id': str(g.id)},
+        )
+
+        assert resp.status_code == status.HTTP_400_BAD_REQUEST, resp.text
+        assert stated in resp.json()['detail']['message'], resp.text
+
     def test_an_empty_record_can_still_change_its_unit(
         self,
         client: TestClient,

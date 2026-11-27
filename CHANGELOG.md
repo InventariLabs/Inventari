@@ -136,6 +136,13 @@ says what the release does rather than what changed since them.
   An oversized value no longer ends in a server error. The product forms say
   which field a refused value belongs to, and the weight field states the range
   it accepts and refuses a value outside it before anything is sent.
+- A purchase price that is negative, or 100,000,000 and up, is refused with a
+  validation error when a product is created, edited, scanned in or added as
+  equipment, and when it grows past that ceiling on being restated into the
+  product's unit. An oversized value no longer ends in a server error, and the
+  equipment import names the cell. While a product holds stock, its edit form
+  keeps the unit fixed and says why, and the refusal of a unit change writes
+  the quantity with the reader's decimal mark and unit names.
 - Taking back a recipe pick, or cancelling a cooking session, no longer loses
   what was used from the same record at the same moment, and picking an
   ingredient no longer fails when that record, or a document of the same

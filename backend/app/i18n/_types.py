@@ -718,6 +718,7 @@ class ErrorMessages(TypedDict):
     bom_line_cycle: str
     item_unit_change_blocked_by_stock: str
     item_unit_cannot_be_removed: str
+    item_price_above_ceiling: str
     item_unit_differs_from_template_confirmation_required: str
     item_unit_not_convertible_to_card: str
     meta_data_spelled_twice: str

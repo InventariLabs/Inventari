@@ -49886,6 +49886,7 @@
             "anyOf": [
               {
                 "type": "number",
+                "maximum": 99999999.99,
                 "minimum": 0.0
               },
               {
@@ -62344,7 +62345,9 @@
           "purchase_price": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.99,
+                "minimum": 0.0
               },
               {
                 "type": "string"
@@ -63091,7 +63094,9 @@
           "purchase_price": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.99,
+                "minimum": 0.0
               },
               {
                 "type": "string"
@@ -63538,7 +63543,9 @@
           "purchase_price": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.99,
+                "minimum": 0.0
               },
               {
                 "type": "string"

@@ -101,6 +101,30 @@ class TestCoreItemsCreateDto:
         )
         assert data.quantity == Decimal('0.1')
 
+    @pytest.mark.asyncio
+    async def test_create_carries_a_price_below_zero_that_a_module_copies(
+        self,
+        real_async_db_session,
+        async_test_household,
+        async_test_user,
+        async_test_storage_location,
+    ):
+        """A split or a count copies a stored price; only a request is bounded."""
+        data = ItemCreateDTO(
+            name='Copied price',
+            location_id=async_test_storage_location.id,
+            purchase_price=Decimal('-1.00'),
+        )
+
+        result = await core_api.items.create_async(
+            real_async_db_session,
+            async_test_household.id,
+            data,
+            make_user_context(async_test_household.id, async_test_user.id),
+        )
+
+        assert result.purchase_price == Decimal('-1.00')
+
     def test_create_dto_negative_quantity_rejected(self, async_test_storage_location):
         with pytest.raises(ValidationError):
             ItemCreateDTO(

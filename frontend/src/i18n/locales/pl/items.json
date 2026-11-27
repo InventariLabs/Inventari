@@ -282,6 +282,7 @@
   "form": {
     "selectUnit": "Wybierz jednostkę…",
     "unitLabel": "Jednostka",
+    "unitLockedByStock": "Jednostka jest zablokowana, dopóki jest stan: inna tylko przemianowałaby tę samą ilość.",
     "unitEmpty": "Ustaw",
     "templateUnitHint": "{{product}} jest liczony w {{unit}} — ta pozycja przyjmie tę jednostkę, jeśli nie wybierzesz innej.",
     "existingProducts": "Już w Twoich produktach:"

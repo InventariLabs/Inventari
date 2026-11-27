@@ -257,6 +257,7 @@
   "form": {
     "selectUnit": "Selecione a unidade…",
     "unitLabel": "Unidade",
+    "unitLockedByStock": "A unidade fica bloqueada enquanto houver estoque: outra só mudaria o rótulo da quantidade.",
     "unitEmpty": "Escolher",
     "templateUnitHint": "{{product}} é contado em {{unit}} — este registro usa essa unidade, a menos que você escolha outra.",
     "existingProducts": "Já nos seus produtos:"

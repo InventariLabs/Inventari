@@ -48,6 +48,7 @@ ERRORS_ES: ErrorMessages = {
         '{quantity} no se puede guardar. Redondea la cantidad a esa '
         'precisión.'
     ),
+    'item_price_above_ceiling': 'Convertido por {unit}, el precio es {price} y un registro admite como máximo {ceiling}.',
     'item_unit_cannot_be_removed': (
         'La unidad {unit} no se puede quitar: una cantidad sin unidad no '
         'dice nada. Elija otra unidad en su lugar.'

@@ -65,7 +65,18 @@ class CoreItemsWritesMixin:
         payload = data.model_dump()
         lot_id = payload.pop('lot_id')
         owner_id = payload.pop('owner_id')
-        item_create = ItemCreate(**payload)
+        price = payload['purchase_price']
+        if price is not None and price < 0:
+            # A module copies a stored record or a document line onward (a
+            # split remainder, a counted twin, a receipt): a price below zero
+            # that already stands is carried as it is, the way an opened
+            # package carries it. The lower bound is for a price a request
+            # names; the ceiling is the column's and holds here too.
+            item_create = ItemCreate(**{**payload, 'purchase_price': None}).model_copy(
+                update={'purchase_price': price}
+            )
+        else:
+            item_create = ItemCreate(**payload)
         item = await create_item(
             db=db,
             item_in=item_create,

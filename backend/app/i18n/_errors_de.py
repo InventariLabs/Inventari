@@ -50,6 +50,7 @@ ERRORS_DE: ErrorMessages = {
         'deshalb lässt sich {quantity} nicht speichern. Runden Sie die Menge '
         'auf diese Genauigkeit.'
     ),
+    'item_price_above_ceiling': 'Umgerechnet auf {unit} beträgt der Preis {price}, ein Datensatz fasst aber höchstens {ceiling}.',
     'item_unit_cannot_be_removed': (
         'Die Einheit {unit} lässt sich nicht entfernen: Eine Menge ohne '
         'Einheit sagt nichts. Wählen Sie stattdessen eine andere Einheit.'
