@@ -635,6 +635,7 @@ apart.
 | `RENTAL_RETURN_NEEDS_EVERY_UNIT` | The return lists every unit of the booking |
 | `RENTAL_RETURN_NOT_PICKED_UP` | Only a handed-out booking can be returned |
 | `RENTAL_SERVICE_NEEDS_REASON_AND_DATE` | A unit going to service says what happened and until when |
+| `RENTAL_SERVICE_UNTIL_IN_PAST` | The service ends after it starts |
 | `RENTAL_WINDOW_ORDER` | The return comes after the pickup |
 | `REORDER_MAX_BELOW_MIN` | max_quantity ({max_quantity}) must be >= min_quantity ({min_quantity}) |
 | `REORDER_MIN_QUANTITY_NEGATIVE` | min_quantity must be >= 0, got {min_quantity} |

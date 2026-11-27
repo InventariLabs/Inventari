@@ -40,6 +40,7 @@ class ErrorMessages(TypedDict):
     rental_window_order: str
     rental_block_window_order: str
     rental_service_needs_reason_and_date: str
+    rental_service_until_in_past: str
     rental_buffer_needs_one_target: str
     rental_buffer_needs_model: str
     rental_booking_not_found: str

@@ -581,6 +581,7 @@ ERRORS_ES: ErrorMessages = {
     'rental_window_order': 'La devolución es posterior a la recogida',
     'rental_block_window_order': 'El bloqueo termina después de empezar',
     'rental_service_needs_reason_and_date': 'Un equipo que va a servicio dice qué pasó y hasta cuándo no está disponible',
+    'rental_service_until_in_past': 'El servicio termina después de empezar',
     'rental_buffer_needs_one_target': 'Una regla de margen nombra un modelo o una categoría, no ambos',
     'rental_buffer_needs_model': 'Una regla de margen nombra un modelo',
     'rental_booking_not_found': 'Reserva no encontrada',

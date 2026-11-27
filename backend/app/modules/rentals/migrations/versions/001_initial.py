@@ -132,9 +132,7 @@ def upgrade() -> None:
             'OR (item_id IS NULL AND model IS NOT NULL)',
             name='ck_rental_booking_lines_one_kind',
         ),
-        sa.CheckConstraint(
-            'quantity > 0', name='ck_rental_booking_lines_quantity'
-        ),
+        sa.CheckConstraint('quantity > 0', name='ck_rental_booking_lines_quantity'),
     )
     create_index_if_absent(
         'ix_rental_booking_lines_organization_id',
@@ -269,6 +267,7 @@ def upgrade() -> None:
         sa.CheckConstraint(
             "source IN ('MANUAL', 'SERVICE')", name='ck_rental_blocks_source'
         ),
+        sa.CheckConstraint('ends_at > starts_at', name='ck_rental_blocks_window_order'),
     )
     create_index_if_absent(
         'ix_rental_blocks_organization_id',

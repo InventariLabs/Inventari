@@ -200,6 +200,7 @@ class RentalBlock(CoreModelBase):
         CheckConstraint(
             "source IN ('MANUAL', 'SERVICE')", name='ck_rental_blocks_source'
         ),
+        CheckConstraint('ends_at > starts_at', name='ck_rental_blocks_window_order'),
         Index(
             'ix_rental_blocks_org_item_window',
             'organization_id',

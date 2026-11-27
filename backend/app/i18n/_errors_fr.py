@@ -580,6 +580,7 @@ ERRORS_FR: ErrorMessages = {
     'rental_window_order': 'Le retour suit le retrait',
     'rental_block_window_order': 'Le blocage se termine après son début',
     'rental_service_needs_reason_and_date': 'Un bien envoyé en service indique ce qui est arrivé et jusqu’à quand il est indisponible',
+    'rental_service_until_in_past': 'Le service se termine après son début',
     'rental_buffer_needs_one_target': 'Une règle de tampon nomme un modèle ou une catégorie, pas les deux',
     'rental_buffer_needs_model': 'Une règle de tampon nomme un modèle',
     'rental_booking_not_found': 'Réservation introuvable',

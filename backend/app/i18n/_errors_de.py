@@ -584,6 +584,7 @@ ERRORS_DE: ErrorMessages = {
     'rental_window_order': 'Die Rückgabe liegt nach der Abholung',
     'rental_block_window_order': 'Die Sperre endet nach ihrem Beginn',
     'rental_service_needs_reason_and_date': 'Ein Gerät in den Service nennt den Grund und bis wann es nicht verfügbar ist',
+    'rental_service_until_in_past': 'Der Service endet nach seinem Beginn',
     'rental_buffer_needs_one_target': 'Eine Pufferregel nennt ein Modell oder eine Kategorie, nicht beides',
     'rental_buffer_needs_model': 'Eine Pufferregel nennt ein Modell',
     'rental_booking_not_found': 'Buchung nicht gefunden',

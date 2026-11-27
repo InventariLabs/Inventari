@@ -8,7 +8,7 @@ would), and every refusal that names what is in the way does so as data
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Literal
 from uuid import UUID
 
@@ -195,10 +195,17 @@ class ReturnUnitIn(BaseModel):
 
     @model_validator(mode='after')
     def _service_has_a_reason_and_a_date(self) -> ReturnUnitIn:
-        if self.condition == 'NEEDS_REPAIR' and (
-            not (self.service_reason or '').strip() or self.service_until is None
-        ):
+        if self.condition != 'NEEDS_REPAIR':
+            return self
+        if not (self.service_reason or '').strip() or self.service_until is None:
             raise ServiceRejectionError('rental_service_needs_reason_and_date')
+        # The block opens at the return, so an end before it would store an
+        # inverted window and leave the unit bookable at once.
+        until = self.service_until
+        if until.tzinfo is None:
+            until = until.replace(tzinfo=UTC)
+        if until <= datetime.now(UTC):
+            raise ServiceRejectionError('rental_service_until_in_past')
         return self
 
 
