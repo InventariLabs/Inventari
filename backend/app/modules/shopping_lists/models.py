@@ -135,7 +135,8 @@ class ShoppingListItem(Base):
     # Source (suggestion vs. manual)
     source: Mapped[str] = mapped_column(
         String(50), default='manual'
-    )  # 'manual', 'auto_low_stock', 'auto_consumption', 'auto_expiring'
+    )  # 'manual', 'auto_low_stock', 'auto_consumption', 'auto_expired',
+    # 'auto_expiring', 'grocy'
 
     # Priority (optional)
     priority: Mapped[int] = mapped_column(

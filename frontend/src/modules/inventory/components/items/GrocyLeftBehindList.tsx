@@ -6,6 +6,10 @@ type LeftBehind = components["schemas"]["ImportLeftBehind"];
 /** Each kind's words, named in full so the unused-key gate sees them read. */
 const LABELS: Record<LeftBehind["what"], string> = {
   inactive_products: "items:import.grocyMove.leftBehind.inactive_products",
+  inactive_locations: "items:import.grocyMove.leftBehind.inactive_locations",
+  inactive_product_groups:
+    "items:import.grocyMove.leftBehind.inactive_product_groups",
+  inactive_stores: "items:import.grocyMove.leftBehind.inactive_stores",
   extra_barcodes: "items:import.grocyMove.leftBehind.extra_barcodes",
   unit_conversions: "items:import.grocyMove.leftBehind.unit_conversions",
   units_as_pieces: "items:import.grocyMove.leftBehind.units_as_pieces",
@@ -23,6 +27,13 @@ const LABELS: Record<LeftBehind["what"], string> = {
   batteries: "items:import.grocyMove.leftBehind.batteries",
   tasks: "items:import.grocyMove.leftBehind.tasks",
   equipment: "items:import.grocyMove.leftBehind.equipment",
+};
+
+/** The words for a kind whose module was to bring it and failed: its usual
+ *  words would give another reason for its staying behind. */
+const FAILED_LABELS: Partial<Record<LeftBehind["what"], string>> = {
+  shopping_list_entries:
+    "items:import.grocyMove.leftBehind.shopping_list_entries_failed",
 };
 
 interface Props {
@@ -45,7 +56,10 @@ export function GrocyLeftBehindList({ entries }: Props) {
         {entries.map((entry) => (
           <li key={entry.what} className="flex justify-between gap-4">
             <span>
-              {t(LABELS[entry.what])}
+              {t(
+                (entry.failed && FAILED_LABELS[entry.what]) ||
+                  LABELS[entry.what],
+              )}
               {entry.names.length > 0 && `: ${entry.names.join(", ")}`}
             </span>
             <span className="tabular-nums text-on-secondary">

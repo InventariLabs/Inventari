@@ -40,7 +40,12 @@ from app.core.exceptions import ServiceRejectionError
 from app.core.grocy_file import GrocyFile, GrocyProduct, GrocyStockEntry
 from app.core.import_sheet import explain
 from app.core.logging import get_logger
-from app.core.move_contributors import MoveMatches, bring_async, contributors_for
+from app.core.move_contributors import (
+    MoveMatches,
+    MoveOutcome,
+    bring_async,
+    contributors_for,
+)
 from app.core.open_package import OPENED_KEY
 from app.models.category import Category
 from app.models.item import Item
@@ -68,6 +73,9 @@ _BATCH = 50
 #: The kinds of record a summary lists, in the order it lists them.
 _LEFT_BEHIND_ORDER = (
     'inactive_products',
+    'inactive_locations',
+    'inactive_product_groups',
+    'inactive_stores',
     'extra_barcodes',
     'unit_conversions',
     'units_as_pieces',
@@ -130,16 +138,24 @@ def left_behind(
     grocy: GrocyFile,
     units_as_pieces: list[str],
     taken: set[str] | frozenset[str] = frozenset(),
+    failed: set[str] | frozenset[str] = frozenset(),
 ) -> list[dict[str, Any]]:
     """What the file holds that a move does not bring, by kind and count.
 
     ``units_as_pieces`` names the units no unit here matched, which the
     imported stock is counted in as pieces. ``taken`` names the kinds a
-    switched-on module brings (:mod:`app.core.move_contributors`).
+    switched-on module brings (:mod:`app.core.move_contributors`);
+    ``failed`` the kinds whose module's part failed, listed as staying and
+    marked so.
     """
     products = _active_products(grocy)
     counts: dict[str, int] = {
         'inactive_products': sum(1 for p in grocy.products.values() if not p.active),
+        'inactive_locations': sum(1 for x in grocy.locations.values() if not x.active),
+        'inactive_product_groups': sum(
+            1 for g in grocy.groups.values() if not g.active
+        ),
+        'inactive_stores': sum(1 for s in grocy.stores.values() if not s.active),
         'extra_barcodes': sum(max(0, len(p.barcodes) - 1) for p in products),
         'default_best_before_days': sum(1 for p in products if p.has_default_days),
         'pictures': sum(1 for p in products if p.has_picture),
@@ -159,9 +175,10 @@ def left_behind(
             'what': kind,
             'count': counts[kind],
             'names': units_as_pieces if kind == 'units_as_pieces' else [],
+            'failed': kind in failed,
         }
         for kind in _LEFT_BEHIND_ORDER
-        if counts.get(kind, 0) > 0 and kind not in taken
+        if counts.get(kind, 0) > 0 and (kind not in taken or kind in failed)
     ]
 
 
@@ -737,7 +754,7 @@ class _Run:
         await self.db.flush()
         self.templates[str(product.id)] = template_id
 
-    def result(self, total: int) -> dict[str, Any]:
+    def result(self, total: int, moved: MoveOutcome) -> dict[str, Any]:
         return {
             'total': total,
             'imported': self.imported,
@@ -750,9 +767,11 @@ class _Run:
             'created_categories': self.created_categories,
             'created_suppliers': self.created_suppliers,
             'left_behind': left_behind(
-                self.grocy, self.plan.units_as_pieces, self.plan.taken
+                self.grocy, self.plan.units_as_pieces, self.plan.taken, moved.failed
             ),
-            'brought_by_modules': [],
+            'brought_by_modules': [
+                {'module': b.module, 'sentence': b.sentence} for b in moved.brought
+            ],
         }
 
 
@@ -803,7 +822,7 @@ async def import_grocy_file_async(
         if on_batch is not None and step - reported >= _BATCH:
             await on_batch(step)
             reported = step
-    brought = await bring_async(
+    moved = await bring_async(
         SOURCE,
         db,
         user,
@@ -811,8 +830,4 @@ async def import_grocy_file_async(
         MoveMatches(products=dict(run.templates), units=dict(run.plan.unit_ids)),
         run.plan.enabled_modules,
     )
-    result = run.result(step)
-    result['brought_by_modules'] = [
-        {'module': b.module, 'sentence': b.sentence} for b in brought
-    ]
-    return result
+    return run.result(step, moved)

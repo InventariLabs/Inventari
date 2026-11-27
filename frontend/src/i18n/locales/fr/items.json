@@ -219,6 +219,9 @@
       "stays": "Reste dans Grocy",
       "leftBehind": {
         "inactive_products": "Produits désactivés dans Grocy",
+        "inactive_locations": "Emplacements désactivés dans Grocy",
+        "inactive_product_groups": "Groupes de produits désactivés dans Grocy",
+        "inactive_stores": "Magasins désactivés dans Grocy",
         "extra_barcodes": "Codes-barres supplémentaires (un produit en garde un ici)",
         "unit_conversions": "Conversions d'unités comme un paquet de six",
         "units_as_pieces": "Unités comptées en pièces",
@@ -228,6 +231,7 @@
         "parent_products": "Produits rattachés à un produit parent (chacun repris séparément)",
         "own_field_values": "Valeurs de vos propres champs",
         "shopping_list_entries": "Lignes des listes de courses (le module Listes de courses est désactivé)",
+        "shopping_list_entries_failed": "Lignes des listes de courses (leur reprise a échoué ; relancez le même fichier pour réessayer)",
         "recipes": "Recettes",
         "meal_plan": "Entrées du planning des repas",
         "chores": "Tâches ménagères",
