@@ -204,6 +204,8 @@ lint: ## Check code style with ruff
 	@python3 backend/scripts/check_docs_paths.py
 	@echo "$(BLUE)[INFO]$(NC) Checking the test worker budget (CPU and memory limits)..."
 	@python3 scripts/test_test_workers.py
+	@echo "$(BLUE)[INFO]$(NC) Checking the picker of the tests a change can affect..."
+	@python3 scripts/test_select_tests.py
 	@echo "$(BLUE)[INFO]$(NC) Checking for identifiers that point at private material..."
 	@python3 backend/scripts/check_internal_ids.py --public-tree
 	@echo "$(BLUE)[INFO]$(NC) Checking tests for dates that the clock will overtake..."

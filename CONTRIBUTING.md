@@ -197,6 +197,25 @@ docker compose exec backend uv run pytest -n 4 tests/integration/test_auth_api.p
 docker compose exec -T frontend npx vitest run src/modules/recipes/components/AllergenPicker.test.tsx
 ```
 
+When a change reaches further than the file you are in,
+`scripts/select-tests.py` picks the tests it can affect, compared with
+`origin/dev` (`--base <ref>` for another start, `--files` for a list of your
+own):
+
+```bash
+python3 scripts/select-tests.py         # the plan: each test and why
+python3 scripts/select-tests.py --run   # the plan, run on your stack
+```
+
+A change inside a module picks that module's tests and the ones that import or
+name it. A change it cannot place — the core, a migration, a `conftest.py`, the
+test or build configuration, the Makefile, a compose file — runs the whole
+suite, and the plan says which file made it so. On the frontend it hands the
+changed files to Vitest's `related`; a translation or a component the test
+setup loads relates to every test. The selection is a shortcut for the rounds
+before a push, not the gate: it can miss a test, and the full suite still runs
+once.
+
 The pre-commit hook installs with `make setup-hooks` and, on every commit,
 **checks** the whole tree (`ruff format --check`/`ruff check`, the mypy
 baseline, prettier, eslint, the architecture and contract checks and the
