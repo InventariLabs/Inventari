@@ -409,7 +409,10 @@ function LineConflict({
           } else if (conflict.kind === "model_booking") {
             text = t("form.heldBy", {
               name: conflict.label,
-              count: conflict.reason ?? "",
+              // The count picks the plural form: i18next stops pluralising
+              // when the count is a string, and the API sends the number as
+              // one (a conflict's reason is text for the other kinds).
+              count: Number(conflict.reason ?? 0),
             });
           } else {
             text = t("form.busy", {

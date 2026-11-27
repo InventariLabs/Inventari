@@ -473,6 +473,48 @@ describe("rentals screens", () => {
     expect(screen.getByRole("button", { name: /Move to/ })).toBeInTheDocument();
   });
 
+  it("a unit line a model promise holds says so, with the count", async () => {
+    server.use(
+      http.post("/api/v1/rentals/bookings/check", () =>
+        HttpResponse.json({
+          ok: false,
+          lines: [
+            {
+              index: 0,
+              ok: false,
+              label: "Projektor 4K #1",
+              requested: 1,
+              available: 0,
+              conflicts: [
+                {
+                  item_id: ITEM_ID,
+                  item_name: "Projektor 4K #1",
+                  item_serial_number: "PRJ-1",
+                  kind: "model_booking",
+                  label: "Szkoła Podstawowa nr 3",
+                  starts_at: daysFromNow(5),
+                  ends_at: daysFromNow(7, 16),
+                  booking_id: BOOKING_ID,
+                  reason: "1",
+                },
+              ],
+              max_quantity: 0,
+              nearest_window: null,
+            },
+          ],
+        }),
+      ),
+    );
+    const user = renderPage(<NewBookingPage />);
+    await screen.findByRole("option", { name: "Szkoła Podstawowa nr 3" });
+    await user.selectOptions(screen.getByLabelText("Partner"), PARTNER_ID);
+    expect(
+      await screen.findByText(
+        "Projektor 4K #1 · PRJ-1: Held by a model booking: Szkoła Podstawowa nr 3 (1 unit)",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("pickup is confirmed only after every unit is chosen", async () => {
     let posted: { item_ids: string[] } | null = null;
     server.use(
