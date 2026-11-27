@@ -16,6 +16,7 @@ from pydantic import (
 from sqlalchemy import inspect as sa_inspect
 
 from app.core.exceptions import ServiceRejectionError
+from app.core.module_sdk import PRICE_MAX
 from app.core.money import line_amounts
 from app.schemas.pagination import PaginatedResponse
 
@@ -84,7 +85,9 @@ class PurchaseOrderLineCreate(BaseModel):
     product_template_id: UUID | None = None
     name: str | None = Field(default=None, max_length=255)
     quantity_ordered: Decimal = Field(gt=0)
-    unit_price: Decimal | None = Field(default=None, max_digits=12, decimal_places=2)
+    unit_price: Decimal | None = Field(
+        default=None, ge=0, le=PRICE_MAX, decimal_places=2
+    )
     uom_id: UUID | None = None
     tax_rate: Decimal | None = Field(default=None, max_digits=5, decimal_places=2)
     notes: str | None = None
