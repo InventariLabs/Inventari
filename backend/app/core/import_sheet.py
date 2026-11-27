@@ -685,43 +685,43 @@ class SheetColumns:
             return None
         assert column is not None
         if column not in self._dot_thousands:
-            votes = Counter(_dot_evidence(raw) for raw in self._df[column])
-            if votes[True] != votes[False]:
-                decided: bool | None = votes[True] > votes[False]
-            elif self._df.attrs.get(_TEXT_SHEET) and writes_decimal_comma(
-                get_current_lang()
-            ):
-                decided = True
-            else:
-                decided = None
-            self._dot_thousands[column] = decided
+            self._dot_thousands[column] = self._decide_dot(self._df[column])
         return self._dot_thousands[column]
+
+    def _decide_dot(self, values: Iterable[Any]) -> bool | None:
+        votes = Counter(_dot_evidence(raw) for raw in values)
+        if votes[True] != votes[False]:
+            return votes[True] > votes[False]
+        if self._df.attrs.get(_TEXT_SHEET) and writes_decimal_comma(get_current_lang()):
+            return True
+        return None
 
     def number(self, raw: Any, column: str | None) -> Decimal:
         """The cell as a number, or ``UnreadableCellError`` (a ``ValueError``) when it is not one."""
         return parse_sheet_number(raw, self.dot_thousands(column))
 
-    def restate(self, index: int, column: str) -> str | None:
-        """The cell of row *index* rewritten to read, in any other sheet, as
-        its column read it here; ``None`` when it may stay as typed.
+    def restate(self, raw: Any, column: str) -> str | None:
+        """A cell of *column* rewritten to read, in any other sheet, as the
+        column read it here; ``None`` when it may stay as typed.
 
         Only a column that was read as dates or numbers has anything to keep:
         a few rows taken out of the file no longer say whether the day comes
         first, or whether a dot groups thousands. A cell that reads the same
         on its own, or that does not read at all, stays.
         """
-        raw = self._df[column].iloc[index]
+        if column not in self._day_first and column not in self._dot_thousands:
+            return None
         text = cell_text(raw)
         if text is None:
             return None
-        alone = SheetColumns(self._df.iloc[[index]])
         try:
             if column in self._day_first and looks_like_numeric_date(text):
                 day = self.date(raw, column)
-                return None if alone.date(raw, column) == day else day.isoformat()
+                alone = parse_sheet_date(raw, column_day_first((raw,)))
+                return None if alone == day else day.isoformat()
             if column in self._dot_thousands:
                 number = self.number(raw, column)
-                if alone.number(raw, column) != number:
+                if parse_sheet_number(raw, self._decide_dot((raw,))) != number:
                     return _unambiguous(number)
         except ValueError:
             return None

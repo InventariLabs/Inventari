@@ -50,10 +50,15 @@ def refused_rows_file(
     # A file that already went round once has the column: it is written anew.
     columns = [column for column in df.columns if str(column) != reason_column]
     header = [str(column) for column in columns] + [reason_column]
+    refused = sorted(reasons)
+    cells = df[columns].iloc[refused].to_numpy(dtype=object)
     rows = [
-        [_cell(df, sheet, index, column) for column in columns]
+        [
+            _cell(sheet, column, value)
+            for column, value in zip(columns, values, strict=True)
+        ]
         + ['; '.join(reasons[index])]
-        for index in sorted(reasons)
+        for index, values in zip(refused, cells, strict=True)
     ]
 
     name = PurePath(filename or 'import.csv')
@@ -71,14 +76,11 @@ def refused_rows_file(
     ).model_dump()
 
 
-def _cell(
-    df: pd.DataFrame, sheet: SheetColumns | None, index: int, column: str
-) -> str | None:
-    restated = sheet.restate(index, column) if sheet else None
-    if restated is not None:
-        return restated
-    value = df[column].iloc[index]
-    return None if pd.isna(value) else str(value)
+def _cell(sheet: SheetColumns | None, column: str, value: Any) -> str | None:
+    if pd.isna(value):
+        return None
+    restated = sheet.restate(value, column) if sheet else None
+    return str(value) if restated is None else restated
 
 
 def _delimited(header: list[str], rows: list[list[Any]], delimiter: str) -> bytes:
