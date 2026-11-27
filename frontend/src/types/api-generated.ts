@@ -13425,6 +13425,8 @@ export interface components {
             item_id: string;
             /** Item Name */
             item_name: string;
+            /** Item Serial Number */
+            item_serial_number?: string | null;
             /** Model */
             model?: string | null;
             /**

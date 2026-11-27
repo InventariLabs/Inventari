@@ -195,6 +195,9 @@ export default function TodayPage() {
                       >
                         <span className="text-sm font-semibold">
                           {block.item_name}
+                          {block.item_serial_number
+                            ? ` · ${block.item_serial_number}`
+                            : ""}
                         </span>
                         <span className="text-sm text-zinc-500">
                           {t("today.until", {

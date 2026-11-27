@@ -257,6 +257,7 @@ class BlockSchema(BaseModel):
     id: UUID
     item_id: UUID
     item_name: str
+    item_serial_number: str | None = None
     model: str | None = None
     starts_at: datetime
     ends_at: datetime

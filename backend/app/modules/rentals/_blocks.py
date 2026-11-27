@@ -136,6 +136,7 @@ def block_schema(
         id=block.id,
         item_id=block.item_id,
         item_name=asset.name if asset is not None else '',
+        item_serial_number=asset.serial_number if asset is not None else None,
         model=asset.model if asset is not None else None,
         starts_at=block.starts_at,
         ends_at=block.ends_at,

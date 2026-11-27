@@ -47931,6 +47931,17 @@
             "type": "string",
             "title": "Item Name"
           },
+          "item_serial_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Serial Number"
+          },
           "model": {
             "anyOf": [
               {

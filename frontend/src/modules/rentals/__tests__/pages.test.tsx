@@ -138,6 +138,7 @@ const today = {
       id: "77777777-7777-4777-8777-777777777777",
       item_id: ITEM_ID,
       item_name: "Wiertarka udarowa #2",
+      item_serial_number: "WIER-2",
       model: "Wiertarka udarowa",
       starts_at: daysFromNow(-2, 0),
       ends_at: daysFromNow(4, 0),
@@ -303,6 +304,8 @@ describe("rentals screens", () => {
     expect(screen.getByText(/Aparat A7 #1/)).toBeInTheDocument();
     expect(screen.getByText(/was due/)).toBeInTheDocument();
     expect(screen.getByText(/wymiana szczotek/)).toBeInTheDocument();
+    // Two units of one model in service are told apart by their serial.
+    expect(screen.getByText(/WIER-2/)).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Calendar" })).toBeInTheDocument();
   });
 
@@ -321,6 +324,47 @@ describe("rentals screens", () => {
       screen.getAllByText(/Szkoła Podstawowa nr 3/).length,
     ).toBeGreaterThan(0);
     expect(screen.getByText(/3 units/)).toBeInTheDocument();
+  });
+
+  it("the calendar stacks bars that overlap in time", async () => {
+    const unit = calendar.groups[0].units[0];
+    server.use(
+      http.get("/api/v1/rentals/calendar", () =>
+        HttpResponse.json({
+          ...calendar,
+          groups: [
+            {
+              ...calendar.groups[0],
+              units: [
+                {
+                  ...unit,
+                  bars: [
+                    {
+                      kind: "returned",
+                      label: "Oddane przed terminem",
+                      starts_at: daysFromNow(5),
+                      ends_at: daysFromNow(6),
+                      booking_id: BOOKING_ID,
+                    },
+                    {
+                      kind: "reserved",
+                      label: "Nowa rezerwacja",
+                      starts_at: daysFromNow(5, 12),
+                      ends_at: daysFromNow(7, 16),
+                      booking_id: BOOKING_ID,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      ),
+    );
+    renderPage(<CalendarPage />);
+    const returned = await screen.findByText("Oddane przed terminem");
+    const reserved = screen.getByText("Nowa rezerwacja");
+    expect(returned.style.top).not.toBe(reserved.style.top);
   });
 
   it("a booking whose lines fit enables Save and posts model lines", async () => {

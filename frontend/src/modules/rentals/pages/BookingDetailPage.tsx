@@ -366,7 +366,8 @@ function ReturnForm({
         });
         setMoveChecked((current) => {
           const next = { ...current };
-          for (const conflict of found) next[conflict.booking_id] = true;
+          for (const conflict of found)
+            next[conflict.booking_id] = conflict.free_units.length > 0;
           return next;
         });
         setError(null);

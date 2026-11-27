@@ -337,16 +337,37 @@ function Row({
   timezone?: string;
 }) {
   const { t } = useTranslation("rentals");
+  // Bars that overlap in time are stacked instead of drawn over each other:
+  // a returned stretch beside a new reservation is two facts, not one label.
+  const laidOut = useMemo(() => {
+    const laneEnds: number[] = [];
+    return bars.map((bar) => {
+      const start = new Date(bar.starts_at).getTime();
+      const end = new Date(bar.ends_at).getTime();
+      let lane = laneEnds.findIndex((until) => start >= until);
+      if (lane === -1) {
+        lane = laneEnds.length;
+        laneEnds.push(end);
+      } else {
+        laneEnds[lane] = end;
+      }
+      return { bar, lane };
+    });
+  }, [bars]);
+  const lanes = Math.max(1, ...laidOut.map((entry) => entry.lane + 1));
+  const height = 44 + (lanes - 1) * 30;
+
   return (
     <div className="flex border-b border-zinc-100">
       <div
-        className={`flex h-11 w-[210px] flex-none items-center px-4 text-sm ${
+        className={`flex w-[210px] flex-none items-center px-4 text-sm ${
           italic ? "italic text-zinc-500" : "text-zinc-900"
         }`}
+        style={{ height }}
       >
         {name}
       </div>
-      <div className="relative h-11 flex-1">
+      <div className="relative flex-1" style={{ height }}>
         <div
           className="absolute inset-0 grid"
           style={{
@@ -357,7 +378,7 @@ function Row({
             <div key={day} className="border-l border-zinc-100" />
           ))}
         </div>
-        {bars.map((bar, index) => {
+        {laidOut.map(({ bar, lane }, index) => {
           const left =
             ((new Date(bar.starts_at).getTime() - startMs) / span) * 100;
           const width =
@@ -375,10 +396,14 @@ function Row({
             <div
               key={`${bar.kind}-${index}`}
               title={`${label} · ${formatDateInZone(bar.starts_at, timezone)}`}
-              className={`absolute top-2 flex h-7 items-center overflow-hidden whitespace-nowrap rounded-md border px-2 text-xs font-medium ${
+              className={`absolute flex h-7 items-center overflow-hidden whitespace-nowrap rounded-md border px-2 text-xs font-medium ${
                 BAR_STYLES[bar.kind] ?? BAR_STYLES.reserved
               }`}
-              style={{ left: `${left}%`, width: `${width}%` }}
+              style={{
+                left: `${left}%`,
+                width: `${width}%`,
+                top: 8 + lane * 30,
+              }}
             >
               {label}
             </div>
