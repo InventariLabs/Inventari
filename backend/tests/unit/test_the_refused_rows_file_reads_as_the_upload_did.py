@@ -85,14 +85,14 @@ def test_a_formula_in_a_csv_cell_is_defused_and_reads_back_unchanged() -> None:
 def test_dates_the_whole_sheet_decided_keep_their_day() -> None:
     set_current_lang('pl')
     # 06/25 says the month comes first; alone, 05/06 would read as 5 June.
-    df = read_rows(b'Name,Expiry\nA,05/06/2027\nB,06/25/2027\n', 'x.csv')
+    df = read_rows(b'Name,Expiry\nA,05/06/2020\nB,06/25/2020\n', 'x.csv')
     sheet = SheetColumns(df)
-    assert sheet.date('05/06/2027', 'Expiry').isoformat() == '2027-05-06'
+    assert sheet.date('05/06/2020', 'Expiry').isoformat() == '2020-05-06'
 
     answer = refused_rows_file(df, _refusals(1), 'x.csv', sheet)
 
     assert answer is not None
-    assert read_rows(_decoded(answer), 'x.csv')['Expiry'][0] == '2027-05-06'
+    assert read_rows(_decoded(answer), 'x.csv')['Expiry'][0] == '2020-05-06'
 
 
 @pytest.mark.parametrize(
