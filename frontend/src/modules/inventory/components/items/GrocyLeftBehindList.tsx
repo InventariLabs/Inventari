@@ -29,13 +29,6 @@ const LABELS: Record<LeftBehind["what"], string> = {
   equipment: "items:import.grocyMove.leftBehind.equipment",
 };
 
-/** The words for a kind whose module was to bring it and failed: its usual
- *  words would give another reason for its staying behind. */
-const FAILED_LABELS: Partial<Record<LeftBehind["what"], string>> = {
-  shopping_list_entries:
-    "items:import.grocyMove.leftBehind.shopping_list_entries_failed",
-};
-
 interface Props {
   entries: LeftBehind[];
 }
@@ -56,10 +49,13 @@ export function GrocyLeftBehindList({ entries }: Props) {
         {entries.map((entry) => (
           <li key={entry.what} className="flex justify-between gap-4">
             <span>
-              {t(
-                (entry.failed && FAILED_LABELS[entry.what]) ||
-                  LABELS[entry.what],
-              )}
+              {/* A part that failed has words of its own: the usual ones
+                  give another reason for the entries staying behind. */}
+              {entry.failed && entry.what === "shopping_list_entries"
+                ? t(
+                    "items:import.grocyMove.leftBehind.shopping_list_entries_failed",
+                  )
+                : t(LABELS[entry.what])}
               {entry.names.length > 0 && `: ${entry.names.join(", ")}`}
             </span>
             <span className="tabular-nums text-on-secondary">
