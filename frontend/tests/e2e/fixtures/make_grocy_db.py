@@ -9,17 +9,17 @@ either, from the repository root, and commit the result::
 
 from __future__ import annotations
 
-import sys
+import runpy
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
-sys.path.insert(0, str(ROOT / 'backend' / 'tests' / 'integration'))
 
-from _grocy import GrocyDb  # noqa: E402
+#: The backend tests' builder of a Grocy database, loaded from its file.
+BUILDER = ROOT / 'backend' / 'tests' / 'integration' / '_grocy.py'
 
 
-def household() -> GrocyDb:
-    g = GrocyDb()
+def household() -> bytes:
+    g = runpy.run_path(str(BUILDER))['GrocyDb']()
     pantry = g.location('E2E-Grocy pantry')
     freezer = g.location('E2E-Grocy freezer', is_freezer=True)
     g.location('E2E-Grocy old cellar', active=False)
@@ -43,8 +43,9 @@ def household() -> GrocyDb:
     g.product('E2E-Grocy retired jam', location=pantry, unit=piece, active=False)
     g.recipe('Cheesecake')
     g.chore('Vacuum')
-    return g
+    content: bytes = g.content()
+    return content
 
 
 if __name__ == '__main__':
-    Path(__file__).with_name('grocy.db').write_bytes(household().content())
+    Path(__file__).with_name('grocy.db').write_bytes(household())
