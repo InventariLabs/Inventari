@@ -1,3 +1,6 @@
+import "@/modules/stock_takes/module";
+import "@/modules/nutrition/module";
+import "@/modules/announcements/module";
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";

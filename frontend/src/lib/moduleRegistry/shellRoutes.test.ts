@@ -1,3 +1,9 @@
+import "@/modules/shopping_lists/module";
+import "@/modules/stats/module";
+import "@/modules/stock_takes/module";
+import "@/modules/nutrition/module";
+import "@/modules/announcements/module";
+import "@/modules/equipment/module";
 import { describe, it, expect, vi } from "vitest";
 import { Package } from "lucide-react";
 

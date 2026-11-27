@@ -14,11 +14,6 @@ vi.mock("@/lib/api/client", () => ({
   api: { post: (...a: unknown[]) => post(...a) },
 }));
 
-// No `vi.mock("sonner")` here: the size gate the modal calls was loaded by the
-// test setup before a mock in this file could reach it, so a mocked toast would
-// never see the gate's own. The real toast is what both the gate and the modal
-// call, and it is the one spied on below.
-
 /** The mapping grid is a Radix Select per field; what this spec needs from it
  *  is one mapped column, so it says so directly. */
 vi.mock("./ColumnMappingForm", () => ({

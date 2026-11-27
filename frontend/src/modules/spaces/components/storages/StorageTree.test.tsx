@@ -1,3 +1,6 @@
+import "@/modules/shopping_lists/module";
+import "@/modules/nutrition/module";
+import "@/modules/announcements/module";
 import { useState } from "react";
 import { render, screen, fireEvent } from "@/test/utils";
 import { describe, it, expect, vi } from "vitest";

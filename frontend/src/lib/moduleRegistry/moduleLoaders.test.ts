@@ -10,14 +10,11 @@ import { registerModules } from "./moduleLoaders";
  * switched off. The loaders make it a per-module act, and these tests pin
  * the act itself.
  *
- * The shared test setup (`src/test/setup.ts`) imports a handful of modules
- * for every test file, so the registry never starts empty here. What these
- * tests assert is the delta: a module the setup does not touch arrives when
- * asked for and stays out when it is not — and nothing is registered twice.
+ * Nothing registers a module here but the loaders themselves, so what these
+ * tests assert is what a call brings in: a module arrives when asked for and
+ * stays out when it is not — and nothing is registered twice.
  */
 
-// Neither name is among the setup file's imports, and no setup module
-// transitively imports their `module.ts`.
 const IMPORTED = "recipes";
 const NOT_IMPORTED = "webhooks";
 const BROKEN = "api_keys";
