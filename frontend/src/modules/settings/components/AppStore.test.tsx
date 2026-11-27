@@ -1,3 +1,4 @@
+import "@/modules/shopping_lists/module";
 import {
   render,
   screen,

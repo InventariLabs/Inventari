@@ -1,3 +1,6 @@
+import "@/modules/shopping_lists/module";
+import "@/modules/stock_takes/module";
+import "@/modules/equipment/module";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { render, screen, waitFor, within } from "@testing-library/react";

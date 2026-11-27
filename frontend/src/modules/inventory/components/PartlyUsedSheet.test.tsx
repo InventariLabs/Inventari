@@ -1,3 +1,6 @@
+import "@/modules/shopping_lists/module";
+import "@/modules/nutrition/module";
+import "@/modules/announcements/module";
 import { http, HttpResponse } from "msw";
 import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";

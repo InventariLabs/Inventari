@@ -211,10 +211,12 @@ A change inside a module picks that module's tests and the ones that import or
 name it. A change it cannot place — the core, a migration, a `conftest.py`, the
 test or build configuration, the Makefile, a compose file — runs the whole
 suite, and the plan says which file made it so. On the frontend it hands the
-changed files to Vitest's `related`; a translation or a component the test
-setup loads relates to every test. The selection is a shortcut for the rounds
-before a push, not the gate: it can miss a test, and the full suite still runs
-once.
+changed files to Vitest's `related`; a translation catalog relates to every
+test, because the tests render real text, and so does a mock the test setup
+loads. The setup registers no module: a test that reads a module's
+registration imports its `module.ts`. The selection is a shortcut for the
+rounds before a push, not the gate: it can miss a test, and the full suite
+still runs once.
 
 The pre-commit hook installs with `make setup-hooks` and, on every commit,
 **checks** the whole tree (`ruff format --check`/`ruff check`, the mypy

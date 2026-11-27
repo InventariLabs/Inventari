@@ -1,3 +1,6 @@
+import "@/modules/shopping_lists/module";
+import "@/modules/nutrition/module";
+import "@/modules/announcements/module";
 import { useState } from "react";
 import { render, screen, waitFor, within } from "@/test/utils";
 import { render as renderAt } from "@testing-library/react";

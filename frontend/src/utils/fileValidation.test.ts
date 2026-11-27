@@ -2,8 +2,6 @@ import { describe, expect, it, vi } from "vitest";
 import { toast } from "sonner";
 import { validateFileSize } from "./fileValidation";
 
-// No `vi.mock("sonner")`: this module is loaded by the test setup, before a
-// mock in a test file could reach it, so the toast it raises is the real one.
 describe("validateFileSize", () => {
   const fileOfSize = (bytes: number) => {
     const file = new File(["x"], "sheet.csv");
