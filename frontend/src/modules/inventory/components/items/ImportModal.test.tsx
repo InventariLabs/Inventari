@@ -285,6 +285,52 @@ describe("ImportModal (products)", () => {
       expect(screen.getByText("Stays in Grocy")).toBeInTheDocument();
     });
 
+    it("draws a database, not a spreadsheet, while the file is moved", async () => {
+      grocyMutateAsync.mockReturnValue(new Promise(() => {}));
+      await reviewGrocyFile();
+
+      fireEvent.click(screen.getByRole("button", { name: /Move in/ }));
+
+      const waiting = (await screen.findByText("Importing Data…")).closest(
+        "div.flex-col",
+      ) as HTMLElement;
+      expect(waiting.querySelector(".lucide-database")).toBeInTheDocument();
+      expect(waiting.querySelector(".lucide-file-spreadsheet")).toBeNull();
+    });
+
+    it("says which part of the move failed, and counts a refused batch without a sheet's row note", async () => {
+      grocyMutateAsync.mockResolvedValue({
+        total: 2,
+        imported: 1,
+        joined_existing: 0,
+        updated: 0,
+        skipped: 0,
+        failed: 1,
+        errors: [{ row: 2, error: "Milk: refused" }],
+        created_locations: [],
+        created_categories: [],
+        created_suppliers: [],
+        left_behind: [
+          { what: "inactive_locations", count: 2, names: [], failed: false },
+          { what: "shopping_list_entries", count: 5, names: [], failed: true },
+        ],
+        brought_by_modules: [],
+      });
+      await reviewGrocyFile();
+
+      fireEvent.click(screen.getByRole("button", { name: /Move in/ }));
+
+      expect(await screen.findByText("Milk: refused")).toBeInTheDocument();
+      expect(
+        screen.getByText("Locations switched off in Grocy"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/Shopping list entries \(bringing them failed/),
+      ).toBeInTheDocument();
+      expect(screen.queryByText(/module is off/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/header row/)).not.toBeInTheDocument();
+    });
+
     it("refuses a file that is not Grocy's with the server's reason and stays at the tiles", async () => {
       analyzeGrocy.mockRejectedValue({
         isAxiosError: true,

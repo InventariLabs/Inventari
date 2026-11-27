@@ -41,54 +41,74 @@ export function ImportUploadStep({
       .getElementById(ownPicker ? "import-file-secondary" : "import-file")
       ?.click();
 
+  // Said of a spreadsheet only: beside a source that is not one, it stands
+  // under the sheet's tile rather than under both.
+  const sheetNote = (
+    <div className="bg-amber-50 p-6 rounded-3xl border border-amber-100 flex items-start gap-4">
+      <AlertCircle className="text-amber-500 shrink-0 mt-1" size={20} />
+      <div className="text-sm text-amber-800 leading-relaxed">
+        <p className="font-medium mb-1 uppercase tracking-tight text-[10px]">
+          {t("common:import.noteTitle")}
+        </p>
+        {t("common:import.noteBody")}
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-8 py-10">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Generic upload button */}
-        <Button
-          size="content"
-          variant="outline"
-          onClick={openFilePicker}
-          className="p-8 border border-dashed flex-col items-center gap-4"
-        >
-          <div className="w-16 h-16 bg-surface text-on-muted rounded-2xl flex items-center justify-center group-hover:bg-primary-600 group-hover:text-white transition-all">
-            <Upload size={32} />
-          </div>
-          <div>
-            <p className="font-semibold text-on">
-              {t("common:import.genericFormat")}
-            </p>
-            <p className="text-xs text-on-muted font-medium mt-1">
-              {t("common:import.genericFormatHint")}
-            </p>
-          </div>
-        </Button>
-
-        {secondaryUpload && (
+        <div className="flex flex-col gap-4">
+          {/* Generic upload button */}
           <Button
             size="content"
             variant="outline"
-            onClick={openSecondaryPicker}
-            className="p-8 border border-dashed border-primary-100 flex-col items-center gap-4"
+            onClick={openFilePicker}
+            className="p-8 border border-dashed flex-col items-center gap-4"
           >
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center transition-all bg-primary-50 text-primary-400 group-hover:bg-primary-600 group-hover:text-white">
-              <Database size={32} />
+            <div className="w-16 h-16 bg-surface text-on-muted rounded-2xl flex items-center justify-center group-hover:bg-primary-600 group-hover:text-white transition-all">
+              <Upload size={32} />
             </div>
             <div>
-              <p className="font-semibold text-primary-600">
-                {secondaryUpload.label}
+              <p className="font-semibold text-on">
+                {t("common:import.genericFormat")}
               </p>
               <p className="text-xs text-on-muted font-medium mt-1">
-                {secondaryUpload.hint}
+                {t("common:import.genericFormatHint")}
               </p>
             </div>
           </Button>
+          {ownPicker && sheetNote}
+        </div>
+
+        {secondaryUpload && (
+          <div className="flex flex-col gap-4">
+            <Button
+              size="content"
+              variant="outline"
+              onClick={openSecondaryPicker}
+              className="p-8 border border-dashed border-primary-100 flex-col items-center gap-4"
+            >
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center transition-all bg-primary-50 text-primary-400 group-hover:bg-primary-600 group-hover:text-white">
+                <Database size={32} />
+              </div>
+              <div>
+                <p className="font-semibold text-primary-600">
+                  {secondaryUpload.label}
+                </p>
+                <p className="text-xs text-on-muted font-medium mt-1">
+                  {secondaryUpload.hint}
+                </p>
+              </div>
+            </Button>
+            {secondaryUpload.note && (
+              <p className="text-sm text-on-secondary">
+                {secondaryUpload.note}
+              </p>
+            )}
+          </div>
         )}
       </div>
-
-      {secondaryUpload?.note && (
-        <p className="text-sm text-on-secondary">{secondaryUpload.note}</p>
-      )}
 
       {/* Hidden file input */}
       <input
@@ -115,16 +135,7 @@ export function ImportUploadStep({
         />
       )}
 
-      {/* Info box */}
-      <div className="bg-amber-50 p-6 rounded-3xl border border-amber-100 flex items-start gap-4">
-        <AlertCircle className="text-amber-500 shrink-0 mt-1" size={20} />
-        <div className="text-sm text-amber-800 leading-relaxed">
-          <p className="font-medium mb-1 uppercase tracking-tight text-[10px]">
-            {t("common:import.noteTitle")}
-          </p>
-          {t("common:import.noteBody")}
-        </div>
-      </div>
+      {!ownPicker && sheetNote}
     </div>
   );
 }

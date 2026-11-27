@@ -137,6 +137,8 @@ export function ImportWizardSheet<R extends ImportOutcome>({
   const [mapping, setMapping] = useState<ImportMapping>({});
   const [importResult, setImportResult] = useState<R | null>(null);
   const [progress, setProgress] = useState<ImportProgress | null>(null);
+  /** The run under way, or its report, is the file source's, not a sheet's. */
+  const [ranSource, setRanSource] = useState(false);
 
   const handleFileUpload = async (selectedFile: File) => {
     setFile(selectedFile);
@@ -168,6 +170,7 @@ export function ImportWizardSheet<R extends ImportOutcome>({
     if (!file) return;
     if (!fromSource && (!mapping[requiredField] || !canRun)) return;
     setProgress(null);
+    setRanSource(fromSource);
     setStep("processing");
     try {
       setImportResult(
@@ -268,6 +271,7 @@ export function ImportWizardSheet<R extends ImportOutcome>({
             addedText={texts.added}
             summaryText={summaryText}
             progress={progress}
+            fromSheet={!ranSource}
           >
             {importResult && resultExtras?.(importResult)}
           </ImportProgressStep>

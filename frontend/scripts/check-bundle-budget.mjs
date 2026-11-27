@@ -691,6 +691,19 @@ const dist = join(root, "dist");
  * theirs (login 419.9 of 420, launcher 434.9 of 435, start 654.9 of 655,
  * receive 492.3 of 495, issue 601.3 of 605, history 626.3 of 630, products
  * 634.4 of 640, initial 194.5 of 245).
+ *
+ * Re-measured 2026-11-27 on the branch that says what a Grocy move leaves
+ * behind, merged with the development line at 08f70b234c: login measures
+ * 420.1 KiB gz against its 420, launcher 435.0 against 435 and start 655.1
+ * against 655, where the line alone stands at 420.0, 434.9 and 654.9. The
+ * branch adds four sentences in six languages (the switched-off kinds, and
+ * shopping list entries that could not be brought) to the language chunk
+ * every first paint loads, the Polish one growing from 162.1 to 162.2; the App
+ * chunk stays at 58.4 and no import walked into the startup path. Those three
+ * phone budgets move a step of five, to 425, 440 and 660; the other screens
+ * stand under theirs (app first paint 415.2 of 420, receive 492.5 of 495,
+ * issue 601.5 of 605, history 626.6 of 630, products 634.8 of 640, initial
+ * 194.6 of 245).
  */
 const BUDGETS = {
   initial: 245,

@@ -59854,6 +59854,9 @@
             "type": "string",
             "enum": [
               "inactive_products",
+              "inactive_locations",
+              "inactive_product_groups",
+              "inactive_stores",
               "extra_barcodes",
               "unit_conversions",
               "units_as_pieces",
@@ -59883,6 +59886,11 @@
             "type": "array",
             "title": "Names",
             "default": []
+          },
+          "failed": {
+            "type": "boolean",
+            "title": "Failed",
+            "default": false
           }
         },
         "type": "object",

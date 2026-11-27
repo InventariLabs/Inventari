@@ -102,7 +102,10 @@ says what the release does rather than what changed since them.
   opened piece used down to the half. A unit Grocy names in any of the six
   languages is recognised; one that is not counts pieces and is named.
   With *Shopping lists* on, Grocy's shopping lists come across as well, each
-  entry linked to the product the move made. Running the same file again adds
+  entry linked to the product the move made; if that part fails, the rest
+  still moves and the summary counts the entries as staying in Grocy, saying
+  so. Rows switched off in Grocy — products, locations, product groups and
+  stores — are counted among what stays. Running the same file again adds
   only batches that are new.
 - Module authors: the frontend SDK (`@/module-sdk`) exports
   `useReturnTarget`, which reads where a screen entered from another module
