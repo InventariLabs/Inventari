@@ -2,8 +2,11 @@ import { useTranslation } from "react-i18next";
 import type { ImportMapping, MappingField } from "./types";
 
 interface ImportPreviewTableProps {
-  /** The first rows of the source, as the server read them. */
+  /** The first rows of the source, a date-shaped column written as the day
+   *  it will be stored. Shown for a field that stores a date. */
   rows: Record<string, unknown>[];
+  /** The same rows as the file writes them, shown for every other field. */
+  rowsAsWritten?: Record<string, unknown>[];
   /** The fields the mapping step offers, in the order it offers them. */
   fields: MappingField[];
   /** Which sheet column feeds which field. */
@@ -19,11 +22,16 @@ interface ImportPreviewTableProps {
  * the file's own, because the question this answers is not "what is in the
  * file" but "is *this* the column I just called Quantity".
  *
+ * Each field shows the reading its import takes: a date field the day it
+ * will be stored, every other field the text as written — a batch or a
+ * serial number that reads like a date is not turned into one on screen.
+ *
  * Rows are numbered as the refusals are: data rows from 1, the header not
  * counted, so "row 3" names the same row on both screens.
  */
 export function ImportPreviewTable({
   rows,
+  rowsAsWritten = rows,
   fields,
   mapping,
 }: ImportPreviewTableProps) {
@@ -58,11 +66,16 @@ export function ImportPreviewTable({
             {rows.map((row, index) => (
               <tr key={index} className="border-t border-border">
                 <td className="px-2 py-1.5 text-on-muted">{index + 1}</td>
-                {mapped.map((field) => (
-                  <td key={field.key} className="px-2 py-1.5 text-on">
-                    {String(row[mapping[field.key]] ?? "")}
-                  </td>
-                ))}
+                {mapped.map((field) => {
+                  const source = field.date
+                    ? row
+                    : (rowsAsWritten[index] ?? row);
+                  return (
+                    <td key={field.key} className="px-2 py-1.5 text-on">
+                      {String(source[mapping[field.key]] ?? "")}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>

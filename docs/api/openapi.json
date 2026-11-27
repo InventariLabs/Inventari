@@ -51676,6 +51676,13 @@
             "type": "array",
             "title": "Preview Rows"
           },
+          "preview_rows_as_written": {
+            "items": {
+              "$ref": "#/components/schemas/ImportPreviewRow"
+            },
+            "type": "array",
+            "title": "Preview Rows As Written"
+          },
           "total_rows": {
             "type": "integer",
             "title": "Total Rows"
@@ -51685,6 +51692,7 @@
         "required": [
           "headers",
           "preview_rows",
+          "preview_rows_as_written",
           "total_rows"
         ],
         "title": "DocumentImportAnalyzeResponse"
@@ -57163,6 +57171,14 @@
             "type": "array",
             "title": "Preview Rows"
           },
+          "preview_rows_as_written": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Preview Rows As Written"
+          },
           "total_rows": {
             "type": "integer",
             "title": "Total Rows"
@@ -57179,6 +57195,7 @@
         "required": [
           "headers",
           "preview_rows",
+          "preview_rows_as_written",
           "total_rows"
         ],
         "title": "ImportAnalyzeResult"
@@ -83580,6 +83597,29 @@
             "type": "array",
             "title": "Preview Rows"
           },
+          "preview_rows_as_written": {
+            "items": {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Preview Rows As Written"
+          },
           "total_rows": {
             "type": "integer",
             "title": "Total Rows"
@@ -83596,6 +83636,7 @@
         "required": [
           "headers",
           "preview_rows",
+          "preview_rows_as_written",
           "total_rows",
           "filled_counts"
         ],

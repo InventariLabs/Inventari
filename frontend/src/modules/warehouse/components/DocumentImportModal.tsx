@@ -77,6 +77,14 @@ const EMPTY_MAPPING: ColumnMapping = {
   expiry_date: "",
 };
 
+/** The analyze answer before one has arrived: no rows to preview. */
+const EMPTY_ANALYSIS: AnalyzeResponse = {
+  headers: [],
+  preview_rows: [],
+  preview_rows_as_written: [],
+  total_rows: 0,
+};
+
 /** Header names a spreadsheet uses for each field, in the languages it arrives in. */
 const HEADER_ALIASES: Record<keyof ColumnMapping, string[]> = {
   name: [
@@ -220,6 +228,7 @@ export function guessMapping(headers: string[]): ColumnMapping {
 interface AnalyzeResponse {
   headers: string[];
   preview_rows: PreviewRow[];
+  preview_rows_as_written: PreviewRow[];
   total_rows: number;
 }
 
@@ -252,9 +261,15 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
   const [sourceMode, setSourceMode] = useState<SourceMode>("file");
   const [file, setFile] = useState<File | null>(null);
   const [pasteText, setPasteText] = useState<string>("");
-  const [headers, setHeaders] = useState<string[]>([]);
-  const [previewRows, setPreviewRows] = useState<PreviewRow[]>([]);
-  const [totalRows, setTotalRows] = useState(0);
+  // One answer from the analyze step, kept whole: the headers, the rows in
+  // both readings, and the count are always the same response's.
+  const [analysis, setAnalysis] = useState<AnalyzeResponse | null>(null);
+  const {
+    headers,
+    preview_rows: previewRows,
+    preview_rows_as_written: previewRowsAsWritten,
+    total_rows: totalRows,
+  } = analysis ?? EMPTY_ANALYSIS;
   const [mapping, setMapping] = useState<ColumnMapping>(EMPTY_MAPPING);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -265,18 +280,14 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
   // permission would actually serve.
   const canCreateStubs = useHasPermission("items:write");
 
-  const resetPreview = () => {
-    setHeaders([]);
-    setPreviewRows([]);
-    setTotalRows(0);
+  const clearAnalysis = () => {
+    setAnalysis(null);
     setMapping(EMPTY_MAPPING);
     setImportResult(null);
   };
 
-  const applyAnalyzeResponse = (data: AnalyzeResponse) => {
-    setHeaders(data.headers);
-    setPreviewRows(data.preview_rows);
-    setTotalRows(data.total_rows);
+  const showAnalysis = (data: AnalyzeResponse) => {
+    setAnalysis(data);
     setMapping(guessMapping(data.headers));
     setImportResult(null);
   };
@@ -289,7 +300,7 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
       setFile(selectedFile);
       setPasteText("");
       setIsAnalyzing(true);
-      resetPreview();
+      clearAnalysis();
       try {
         const formData = new FormData();
         formData.append("file", selectedFile);
@@ -297,7 +308,7 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
           `/warehouse/import/analyze`,
           formData,
         );
-        applyAnalyzeResponse(response.data);
+        showAnalysis(response.data);
       } catch (error) {
         // The file was not read: dropping it keeps "<name> — 0 rows" from
         // passing for an analysis of an empty file.
@@ -315,14 +326,14 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
       setPasteText(text);
       setFile(null);
       setIsAnalyzing(true);
-      resetPreview();
+      clearAnalysis();
       try {
         const response = await api.post<AnalyzeResponse>(
           `/warehouse/import/parse-paste`,
           { text },
           { readOnly: true },
         );
-        applyAnalyzeResponse(response.data);
+        showAnalysis(response.data);
       } catch (error) {
         setPasteText("");
         toast.error(extractApiError(error, t("import.parseError")));
@@ -531,6 +542,7 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
             headers={headers}
             mapping={mapping}
             previewRows={previewRows}
+            previewRowsAsWritten={previewRowsAsWritten}
             onChangeMapping={handleMappingChange}
             columnMappingForm={
               <ColumnMappingForm

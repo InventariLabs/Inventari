@@ -390,7 +390,7 @@ class TestParsePastedLines:
 
 @pytest.mark.unit
 class TestAnalyzePastedText:
-    """5.1a — analyze endpoint shape: headers + preview_rows + total_rows.
+    """5.1a — analyze endpoint shape: headers + preview rows + total_rows.
 
     The response must match :func:`analyze_import_file` so the frontend
     can reuse the same preview UI for both file upload and paste.
@@ -400,10 +400,16 @@ class TestAnalyzePastedText:
     async def test_analyze_returns_same_shape_as_file(self) -> None:
         text = 'name,quantity\nWidget A,10\nWidget B,5\nWidget C,3'
         result = await analyze_pasted_text(text)
-        assert set(result.keys()) == {'headers', 'preview_rows', 'total_rows'}
+        assert set(result.keys()) == {
+            'headers',
+            'preview_rows',
+            'preview_rows_as_written',
+            'total_rows',
+        }
         assert result['headers'] == ['name', 'quantity']
         assert result['total_rows'] == 3
         assert len(result['preview_rows']) == 3
+        assert result['preview_rows_as_written'] == result['preview_rows']
 
     @pytest.mark.asyncio
     async def test_analyze_preview_capped_at_5(self) -> None:
@@ -418,3 +424,26 @@ class TestAnalyzePastedText:
         assert result['headers'] == []
         assert result['total_rows'] == 0
         assert result['preview_rows'] == []
+        assert result['preview_rows_as_written'] == []
+
+    @pytest.mark.asyncio
+    async def test_a_date_column_rides_in_both_readings(self) -> None:
+        """The dialog shows the stored day for expiry and the paste for text."""
+        from app.i18n.service import set_current_lang
+
+        set_current_lang('pl')
+        try:
+            result = await analyze_pasted_text(
+                'name\texpiry\nA\t05.11.2026\nB\t28.02.2025\n'
+            )
+        finally:
+            set_current_lang('en')
+
+        assert [row['expiry'] for row in result['preview_rows']] == [
+            '5 lis 2026',
+            '28 lut 2025',
+        ]
+        assert [row['expiry'] for row in result['preview_rows_as_written']] == [
+            '05.11.2026',
+            '28.02.2025',
+        ]

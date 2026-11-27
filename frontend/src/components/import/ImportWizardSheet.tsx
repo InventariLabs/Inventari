@@ -131,6 +131,9 @@ export function ImportWizardSheet<R extends ImportOutcome>({
   const [file, setFile] = useState<File | null>(null);
   const [headers, setHeaders] = useState<string[]>([]);
   const [previewRows, setPreviewRows] = useState<ImportPreviewRow[]>([]);
+  const [previewRowsAsWritten, setPreviewRowsAsWritten] = useState<
+    ImportPreviewRow[]
+  >([]);
   const [filledCounts, setFilledCounts] = useState<
     SheetAnalysis["filled_counts"]
   >({});
@@ -144,6 +147,7 @@ export function ImportWizardSheet<R extends ImportOutcome>({
       const analysis = await analyze(selectedFile);
       setHeaders(analysis.headers);
       setPreviewRows(analysis.preview_rows);
+      setPreviewRowsAsWritten(analysis.preview_rows_as_written);
       setFilledCounts(analysis.filled_counts);
       setMapping(suggest(analysis.headers));
       setStep("mapping");
@@ -251,6 +255,7 @@ export function ImportWizardSheet<R extends ImportOutcome>({
             fields={fields}
             mapping={mapping}
             previewRows={previewRows}
+            previewRowsAsWritten={previewRowsAsWritten}
             onMappingChange={setMapping}
             headerExtras={mappingHeaderExtras?.(ctx)}
           >

@@ -109,7 +109,7 @@ from app.core.file_reference import (
 )
 from app.core.grocy_file import GrocyFile, GrocyShoppingListEntry
 from app.core.held_back_locations import register_held_back_locations
-from app.core.import_sheet import cell_text, read_sheet
+from app.core.import_sheet import SheetColumns, cell_text, read_sheet
 from app.core.interceptors import InterceptorPipeline, interceptor_pipeline
 from app.core.location_path import join_location_path
 from app.core.logging import get_logger
@@ -208,6 +208,7 @@ __all__ = [
     'ScanProvider',
     'ScannedCode',
     'ServiceRejectionError',
+    'SheetColumns',
     'StockUnavailableError',
     'StorageInterceptor',
     'SystemEvent',

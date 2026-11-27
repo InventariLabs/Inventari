@@ -254,16 +254,23 @@ says what the release does rather than what changed since them.
   add the host.
 - Spreadsheet imports read numbers and dates the way the sheet's country
   writes them — products, opening stock, document lines, order lines and
-  equipment alike. A decimal comma ("12,5"), thousands separated by a space or
-  a dot, a currency symbol or code ("1 289,00 zł", "$1,289.00", "€ 4,50") are
-  numbers; a day-first date such as "05.11.2026" is 5 November, not 11 May. A
-  column of dates is read from the whole file (a day above 12 settles the
-  order), and a column that is ambiguous throughout follows the language of
-  the person importing: month-first for English, day-first for the others.
-  The mapping preview shows each date column as it will be stored. Document
-  lines and opening stock now refuse a date they cannot read, as the product
-  import does, instead of importing the row without it, and order lines
-  refuse an unreadable price or tax rate instead of dropping it.
+  equipment alike. A decimal comma ("12,5"), thousands separated by a space
+  or a dot, a currency symbol or code ("1 289,00 zł", "$1,289.00",
+  "€ 4,50") are numbers, and a currency code is the one ISO 4217 spells in
+  capitals, so "2 cup" is refused with its cell named rather than read as 2.
+  A day-first date such as "05.11.2026" is 5 November, not 11 May, and a
+  time after it, AM or PM included, belongs to that day. A column of dates
+  is read from the whole file (a day above 12 settles the order), and a
+  column that is ambiguous throughout follows the language of the person
+  importing: month-first for English, day-first for the others. The mapping
+  preview shows a date column as the day it will be stored where it feeds a
+  date field, and the text as written where it feeds a text field such as a
+  batch or serial number; the document lines' preview shows the expiry it
+  will store. The ingredient dictionary reads its nutrient numbers the same
+  way every other sheet does. Document lines and opening stock now refuse a
+  date they cannot read, as the product import does, instead of importing
+  the row without it, and order lines refuse an unreadable price or tax
+  rate instead of dropping it.
 - *Rebuilding on a new server* (DEPLOYMENT.md) brings the backup back from the
   off-host copy. It pulls `<BACKUP_RCLONE_REMOTE>/backups/last`, where the copy
   puts the backups since that variable names the parent, and then gives the

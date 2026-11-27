@@ -49,7 +49,10 @@ def dates_as_stored(full_df: pd.DataFrame, preview: pd.DataFrame) -> pd.DataFram
     the way the import will read it — day-first or month-first, decided from
     the whole column — and each preview cell shows that day in words in the
     reader's language ("5 lis 2026"), so a day swapped with its month is seen
-    before the rows are written, not after.
+    before the rows are written, not after. Only the column mapped to a date
+    field should show this reading; the cells as the file writes them travel
+    beside it (:func:`analyze_import_file`), for a column the reader maps to
+    a text field such as a batch or a serial number.
     """
     shown = preview.copy()
     sheet = SheetColumns(full_df)
@@ -84,16 +87,25 @@ async def analyze_import_file(file_content: bytes, filename: str) -> dict[str, A
     somebody uploaded. When that second read failed the count silently
     stayed at five, which is the other reason it is gone: a wrong total is
     worse than a refusal, because the reader acts on it.
+
+    Two readings of the preview travel together: ``preview_rows`` with a
+    date column written as the day it will be stored, and
+    ``preview_rows_as_written`` with every cell as the file writes it. The
+    mapping step shows the first for a date field and the second for
+    everything else, so a batch number that reads like a date keeps its
+    characters.
     """
     full_df = read_sheet(file_content, filename)
 
     preview = full_df.head(PREVIEW_ROWS)
     preview = preview.where(pd.notnull(preview), None)
+    as_written = preview.fillna('').to_dict(orient='records')
     preview = dates_as_stored(full_df, preview)
 
     return {
         'headers': list(full_df.columns),
         'preview_rows': preview.fillna('').to_dict(orient='records'),
+        'preview_rows_as_written': as_written,
         'total_rows': len(full_df),
         'filled_counts': _filled_counts(full_df),
     }

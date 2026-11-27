@@ -33,7 +33,13 @@ class SheetAnalysisResponse(BaseModel):
     """
 
     headers: list[str]
+    #: The first rows with a date-shaped column written as the day the import
+    #: will store it, in words. Shown for a column mapped to a date field.
     preview_rows: list[dict[str, SheetPreviewValue]]
+    #: The same rows with every cell as the file writes it. Shown for a
+    #: column mapped to a text field — a batch or a serial number that reads
+    #: like a date keeps its characters.
+    preview_rows_as_written: list[dict[str, SheetPreviewValue]]
     total_rows: int
     #: Per header, how many of the file's rows carry a non-empty value in
     #: it — counted over the whole sheet, because the preview stops at five

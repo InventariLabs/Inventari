@@ -55,7 +55,7 @@ class TestNumbers:
             ('R$ 4,50', '4.50'),
             ('R$1.289,00', '1289.00'),
             ('PLN 12,5', '12.5'),
-            ('12,5 eur', '12.5'),
+            ('12,5 EUR', '12.5'),
             ("1'289.50", '1289.50'),
             ('-5,5', '-5.5'),
             ('0,125', '0.125'),
@@ -199,6 +199,19 @@ class TestNumbers:
         with pytest.raises(ValueError):
             parse_sheet_number(cell)
 
+    @pytest.mark.parametrize('cell', ['2 cup', '3 top', '5 all', '1 bob'])
+    def test_a_unit_word_after_the_number_is_not_a_currency_code(
+        self, cell: str
+    ) -> None:
+        """``CUP`` is the Cuban peso as a code, ``cup`` is a cup.
+
+        An ISO 4217 code is written in capitals; a lowercase word after a
+        quantity is that language's word for the thing measured, and the cell
+        is refused rather than read as a bare number with its unit dropped.
+        """
+        with pytest.raises(ValueError):
+            parse_sheet_number(cell)
+
 
 class TestDates:
     def test_a_day_first_date_is_not_swapped(self) -> None:
@@ -220,6 +233,18 @@ class TestDates:
     def test_unambiguous_shapes_read_the_same_both_ways(self, cell: str) -> None:
         assert parse_sheet_date(cell, True) == date(2026, 11, 5)
         assert parse_sheet_date(cell, False) == date(2026, 11, 5)
+
+    def test_a_twelve_hour_time_follows_the_order_its_column_decided(self) -> None:
+        """``AM`` after the time is part of the time, not a reason to guess.
+
+        Without the suffix in the pattern the value falls through to pandas,
+        which reads the month first whatever the column decided: an expiry
+        term moves by months with no word.
+        """
+        assert parse_sheet_date('05/11/2026 10:30 AM', True) == date(2026, 11, 5)
+        assert parse_sheet_date('05/11/2026 10:30 AM', False) == date(2026, 5, 11)
+        assert parse_sheet_date('05/11/2026 10:30:15 pm', True) == date(2026, 11, 5)
+        assert parse_sheet_date('05.11.2026 10:30 a.m.', True) == date(2026, 11, 5)
 
     @pytest.mark.parametrize(
         'cell', ['end of March', 'tomorrow-ish', '31.02.2026', '99']
@@ -244,6 +269,13 @@ class TestDates:
         set_current_lang('en')
         dates = SheetColumns(sheet)
         assert dates.date('05.11.2026', 'expiry') == date(2026, 11, 5)
+
+    def test_a_time_on_the_date_does_not_hide_it_from_its_column(self) -> None:
+        sheet = read_rows(
+            b'name;at\nA;05/11/2026 10:30 AM\nB;28/02/2025\n', 'sheet.csv'
+        )
+        dates = SheetColumns(sheet)
+        assert dates.date('05/11/2026 10:30 AM', 'at') == date(2026, 11, 5)
 
 
 class TestThePreviewShowsTheDateAsItWillBeStored:
@@ -276,3 +308,34 @@ class TestThePreviewShowsTheDateAsItWillBeStored:
         )
 
         assert report['preview_rows'][0]['note'] == '05.11.2026'
+
+    async def test_a_date_with_a_time_is_shown_as_its_stored_day(self) -> None:
+        from app.core.file_import import analyze_import_file
+
+        report = await analyze_import_file(
+            b'name;expiry\nA;05/11/2026 10:30 AM\nB;28/02/2025\n', 'sheet.csv'
+        )
+
+        assert report['preview_rows'][0]['expiry'] == '5 lis 2026'
+
+    async def test_the_cells_as_written_ride_along_for_a_text_field(self) -> None:
+        """A date-shaped column is a batch number as often as an expiry.
+
+        The mapping step shows the stored day for a date field and the text
+        as written for a text field, so the analysis carries both readings;
+        rewriting the only preview would move a batch number's date.
+        """
+        from app.core.file_import import analyze_import_file
+
+        report = await analyze_import_file(
+            b'name;batch\nA;05.11.2026\nB;28.02.2025\n', 'sheet.csv'
+        )
+
+        assert [row['batch'] for row in report['preview_rows']] == [
+            '5 lis 2026',
+            '28 lut 2025',
+        ]
+        assert [row['batch'] for row in report['preview_rows_as_written']] == [
+            '05.11.2026',
+            '28.02.2025',
+        ]

@@ -46,6 +46,10 @@ export interface MappingField {
   key: string;
   label: string;
   required?: boolean;
+  /** The field stores a date: the preview shows a date-shaped column as the
+   *  day it will be stored, where every other field shows the text as
+   *  written, so a batch number that reads like a date keeps its characters. */
+  date?: boolean;
 }
 
 /** What the analyze step tells the mapping step about the uploaded sheet.

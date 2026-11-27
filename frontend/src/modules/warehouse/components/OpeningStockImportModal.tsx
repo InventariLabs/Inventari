@@ -62,6 +62,7 @@ export default function OpeningStockImportModal({ onClose }: Props) {
     key,
     label: t(LABEL_KEYS[key]),
     required: key === "name",
+    date: key === "expiry_date",
   }));
 
   const openDraft = (id: string) => {

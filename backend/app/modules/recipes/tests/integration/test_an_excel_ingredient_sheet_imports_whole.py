@@ -27,6 +27,7 @@ RECIPE_URL = '/api/v1/recipes'
 SEMICOLON = b'name;calories_kcal\nKasza gryczana;343\n'
 CP1250 = 'name,calories_kcal\nKasza gryczana żółta,343\n'.encode('cp1250')
 DECIMAL_COMMA = b'name;calories_kcal;protein_g\nKasza gryczana;343;12,5\n'
+THOUSANDS = b'name;calories_kcal;protein_g\nKasza gryczana;1 289,5;1.234,5\n'
 
 
 def _import(
@@ -106,3 +107,25 @@ def test_a_decimal_comma_reads_as_the_decimal_it_names(
     ).json()
     assert lookup['found'] is True
     assert Decimal(lookup['protein_g']) == Decimal('12.5')
+
+
+def test_the_nutrient_columns_read_numbers_the_way_every_door_does(
+    client: TestClient, auth_headers: dict[str, str]
+) -> None:
+    """A space groups thousands and the last separator is the decimal one.
+
+    The nutrition sheet kept a rule of its own — a comma replaced by a dot —
+    so a value grouped with a space or written "1.234,5" was not read the way
+    the same value is read in every other import.
+    """
+    body = _import(client, auth_headers, 'defaults.csv', THOUSANDS)
+
+    assert body['created'] == 1
+    assert body['errors'] == 0
+    lookup = client.get(
+        f'{RECIPE_URL}/ingredient-defaults/lookup',
+        params={'name': 'Kasza gryczana', 'lang': 'en'},
+        headers=auth_headers,
+    ).json()
+    assert Decimal(lookup['calories_kcal']) == Decimal('1289.5')
+    assert Decimal(lookup['protein_g']) == Decimal('1234.5')
