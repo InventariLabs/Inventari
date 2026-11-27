@@ -77,7 +77,8 @@
     "inService_one": "{{count}} en servicio",
     "inService_other": "{{count}} en servicio",
     "anyUnit": "cualquier unidad",
-    "anyUnitLabel": "{{name}} · {{quantity}} unidades"
+    "anyUnitLabel_one": "{{name}} · {{quantity}} unidad",
+    "anyUnitLabel_other": "{{name}} · {{quantity}} unidades"
   },
   "form": {
     "newTitle": "Nueva reserva",

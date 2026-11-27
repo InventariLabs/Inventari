@@ -284,16 +284,22 @@ function Group({
         <Row
           name={t("calendar.anyUnit")}
           italic
-          bars={group.any_unit.map((entry) => ({
-            kind: entry.status === "RESERVED" ? "reserved" : "out",
-            label: t("calendar.anyUnitLabel", {
-              name: entry.borrower_name,
-              quantity: formatQuantityLocale(entry.quantity),
-            }),
-            starts_at: entry.starts_at,
-            ends_at: entry.ends_at,
-            booking_id: entry.booking_id,
-          }))}
+          bars={group.any_unit.map((entry) => {
+            // `count` picks the plural form; `quantity` carries the number
+            // in the reader's format, so a raw field never reaches the label.
+            const units = entry.quantity;
+            return {
+              kind: entry.status === "RESERVED" ? "reserved" : "out",
+              label: t("calendar.anyUnitLabel", {
+                name: entry.borrower_name,
+                count: units,
+                quantity: formatQuantityLocale(units),
+              }),
+              starts_at: entry.starts_at,
+              ends_at: entry.ends_at,
+              booking_id: entry.booking_id,
+            };
+          })}
           days={days}
           startMs={startMs}
           span={span}

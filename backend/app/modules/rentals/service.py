@@ -32,10 +32,12 @@ from ._availability import (
     DisplacedBooking,
     Slot,
     World,
+    add_picked_up_units,
     build_calendar,
     checks_for_lines,
     displaced_bookings,
     item_busy_conflicts,
+    item_promise_conflicts,
     load_world,
     model_pool,
     organization_today,
@@ -560,6 +562,9 @@ async def pickup_booking(
         )
 
     await db.flush()
+    # The scans are rows now: put them into the world the checks read, so the
+    # booking is not a promise still waiting *and* its unit not free at once.
+    add_picked_up_units(world, booking, new_units)
     units_by_id = {unit.id: unit for line in booking.lines for unit in line.units}
     for unit in new_units:
         units_by_id[unit.id] = unit
@@ -667,7 +672,8 @@ def _blocked_units(
         ]
         if unit.id in resolved:
             # A model line becomes this unit at pickup; taking it must leave
-            # every other model line enough units for its own whole window.
+            # every other model line enough units for its own whole window,
+            # this booking's buffer included.
             reasons.extend(
                 {
                     'kind': 'model_booking',
@@ -676,7 +682,7 @@ def _blocked_units(
                     'ends_at': displaced.booking.ends_at.isoformat(),
                     'booking_id': str(displaced.booking.id),
                 }
-                for displaced in promise_conflicts(
+                for displaced in item_promise_conflicts(
                     world,
                     unit.item_id,
                     booking.starts_at,

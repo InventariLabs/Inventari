@@ -77,7 +77,8 @@
     "inService_one": "{{count}} in service",
     "inService_other": "{{count}} in service",
     "anyUnit": "any unit",
-    "anyUnitLabel": "{{name}} · {{quantity}} units"
+    "anyUnitLabel_one": "{{name}} · {{quantity}} unit",
+    "anyUnitLabel_other": "{{name}} · {{quantity}} units"
   },
   "form": {
     "newTitle": "New booking",

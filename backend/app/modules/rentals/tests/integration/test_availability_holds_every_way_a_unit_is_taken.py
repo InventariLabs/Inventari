@@ -772,6 +772,94 @@ class TestAReturnWithAServiceDateInThePast:
         assert response.status_code == 422, response.text
 
 
+class TestAPickupThatResolvesItsOwnLine:
+    def test_a_resolution_does_not_count_the_same_unit_against_the_booking(
+        self,
+        client: TestClient,
+        rental_auth: dict[str, str],
+        racks,
+    ) -> None:
+        # Two bookings exactly fill the model: one unit for a day inside a
+        # week, one for the week. Pinning the day's unit satisfies the day's
+        # own promise; the week must still see one unit free, rather than the
+        # day being read as a promise still waiting *and* its unit as taken.
+        week = _create(
+            client,
+            rental_auth,
+            model='Rack 42U',
+            quantity=1,
+            starts_at=START + timedelta(days=12),
+            ends_at=START + timedelta(days=16),
+            name='Week',
+        )
+        assert week.status_code == 201, week.text
+        day = _create(
+            client,
+            rental_auth,
+            model='Rack 42U',
+            quantity=1,
+            starts_at=START + timedelta(days=13, hours=1),
+            ends_at=START + timedelta(days=13, hours=3),
+            name='Day',
+        )
+        assert day.status_code == 201, day.text
+
+        picked_day = _pickup(client, rental_auth, day.json()['id'], [racks[0].id])
+        assert picked_day.status_code == 200, picked_day.text
+        picked_week = _pickup(client, rental_auth, week.json()['id'], [racks[1].id])
+        assert picked_week.status_code == 200, picked_week.text
+
+
+class TestAUnitBookingsOwnBuffer:
+    def test_a_before_buffer_counts_against_a_model_promise(
+        self,
+        client: TestClient,
+        rental_auth: dict[str, str],
+        projectors,
+    ) -> None:
+        rule = _buffer_rule(
+            client, rental_auth, model='Projektor 4K', hours_before=4, hours_after=0
+        )
+        assert rule.status_code == 200, rule.text
+
+        week = START + timedelta(days=12)
+        promised = _create(
+            client,
+            rental_auth,
+            model='Projektor 4K',
+            quantity=1,
+            starts_at=week,
+            ends_at=week + timedelta(days=4, hours=8),
+        )
+        assert promised.status_code == 201, promised.text
+
+        for index, day in ((0, 1), (1, 2)):
+            inside = _create(
+                client,
+                rental_auth,
+                item_id=projectors[index].id,
+                starts_at=week + timedelta(days=day, hours=1),
+                ends_at=week + timedelta(days=day, hours=3),
+            )
+            assert inside.status_code == 201, inside.text
+
+        # The last unit is booked after the promise ends, but its four-hour
+        # before-buffer starts inside the promised window.
+        last = _create(
+            client,
+            rental_auth,
+            item_id=projectors[2].id,
+            starts_at=week + timedelta(days=4, hours=9),
+            ends_at=week + timedelta(days=4, hours=11),
+        )
+        assert last.status_code == 409, last.text
+        conflicts = last.json()['detail']['lines'][0]['conflicts']
+        assert any(
+            conflict.get('booking_id') == promised.json()['id']
+            for conflict in conflicts
+        ), conflicts
+
+
 class TestTwoLinesOfOneRequest:
     def test_two_lines_of_one_model_cannot_promise_more_units_than_the_fleet_has(
         self,

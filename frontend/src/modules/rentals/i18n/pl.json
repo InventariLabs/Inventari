@@ -83,7 +83,10 @@
     "inService_many": "{{count}} w serwisie",
     "inService_other": "{{count}} w serwisie",
     "anyUnit": "dowolna sztuka",
-    "anyUnitLabel": "{{name}} · {{quantity}} szt."
+    "anyUnitLabel_one": "{{name}} · {{quantity}} szt.",
+    "anyUnitLabel_few": "{{name}} · {{quantity}} szt.",
+    "anyUnitLabel_many": "{{name}} · {{quantity}} szt.",
+    "anyUnitLabel_other": "{{name}} · {{quantity}} szt."
   },
   "form": {
     "newTitle": "Nowa rezerwacja",

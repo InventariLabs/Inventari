@@ -326,6 +326,28 @@ describe("rentals screens", () => {
     expect(screen.getByText(/3 units/)).toBeInTheDocument();
   });
 
+  it("the calendar's any-unit bar counts a single unit in the singular", async () => {
+    const group = calendar.groups[0];
+    server.use(
+      http.get("/api/v1/rentals/calendar", () =>
+        HttpResponse.json({
+          ...calendar,
+          groups: [
+            {
+              ...group,
+              any_unit: [{ ...group.any_unit[0], quantity: 1 }],
+            },
+          ],
+        }),
+      ),
+    );
+    renderPage(<CalendarPage />);
+    await screen.findAllByText("Projektor 4K");
+    expect(
+      screen.getByText("Szkoła Podstawowa nr 3 · 1 unit"),
+    ).toBeInTheDocument();
+  });
+
   it("the calendar stacks bars that overlap in time", async () => {
     const unit = calendar.groups[0].units[0];
     server.use(

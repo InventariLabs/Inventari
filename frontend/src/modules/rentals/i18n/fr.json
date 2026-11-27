@@ -77,7 +77,8 @@
     "inService_one": "{{count}} en service",
     "inService_other": "{{count}} en service",
     "anyUnit": "n’importe quel bien",
-    "anyUnitLabel": "{{name}} · {{quantity}} biens"
+    "anyUnitLabel_one": "{{name}} · {{quantity}} bien",
+    "anyUnitLabel_other": "{{name}} · {{quantity}} biens"
   },
   "form": {
     "newTitle": "Nouvelle réservation",

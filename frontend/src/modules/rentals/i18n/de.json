@@ -77,7 +77,8 @@
     "inService_one": "{{count}} im Service",
     "inService_other": "{{count}} im Service",
     "anyUnit": "beliebiges Gerät",
-    "anyUnitLabel": "{{name}} · {{quantity}} Geräte"
+    "anyUnitLabel_one": "{{name}} · {{quantity}} Gerät",
+    "anyUnitLabel_other": "{{name}} · {{quantity}} Geräte"
   },
   "form": {
     "newTitle": "Neue Buchung",

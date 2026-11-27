@@ -352,6 +352,37 @@ def _add_booking_slots(
                 _add_buffer_slots(world, booking, unit.item_id, held_asset)
 
 
+def add_picked_up_units(
+    world: World, booking: RentalBooking, units: list[RentalBookingUnit]
+) -> None:
+    """Make a pickup's own scans part of the world before it is checked.
+
+    The world is read before the scans are pinned, so the booking still reads
+    as a promise waiting for its count while the unit it resolves reads free.
+    Asking another promise about that unit would count the same resolution
+    twice — once as still promised, once as taken. A scan resolves its line
+    and holds the unit here, as the stored rows will.
+    """
+    lines = {line.id: line for line in booking.lines}
+    for unit in units:
+        line = lines.get(unit.line_id)
+        if line is not None:
+            line.units.append(unit)
+        booking.units.append(unit)
+        world.slots_by_item.setdefault(unit.item_id, []).append(
+            Slot(
+                kind='reserved',
+                starts_at=booking.starts_at,
+                ends_at=booking.ends_at,
+                label=booking.borrower_name,
+                booking_id=booking.id,
+            )
+        )
+        asset = world.assets_by_id.get(unit.item_id)
+        if asset is not None:
+            _add_buffer_slots(world, booking, unit.item_id, asset)
+
+
 def _add_block_slots(world: World, blocks: list[RentalBlock]) -> None:
     for block in blocks:
         if block.item_id not in world.assets_by_id:
@@ -630,6 +661,33 @@ def promise_conflicts(
     ]
 
 
+def item_promise_conflicts(
+    world: World,
+    item_id: UUID,
+    starts_at: datetime,
+    ends_at: datetime,
+    *,
+    exclude_booking_id: UUID | None = None,
+) -> list[DisplacedBooking]:
+    """Promises a booking of this unit for this window would leave short.
+
+    The unit is held for its buffer on both sides of the window as well as the
+    window itself, so a stretch that reaches a promised unit only through that
+    buffer still takes it. Blocks carry no buffer and the extension adds its
+    after-buffer itself, which is why the widening lives here rather than in
+    ``displaced_bookings``.
+    """
+    asset = world.assets_by_id.get(item_id)
+    before, after = world.buffer_for(asset) if asset is not None else (0, 0)
+    return promise_conflicts(
+        world,
+        item_id,
+        starts_at - timedelta(hours=before),
+        ends_at + timedelta(hours=after),
+        exclude_booking_id=exclude_booking_id,
+    )
+
+
 def _slot_detail(slot: Slot, asset: EquipmentAssetDTO | None = None) -> ConflictDetail:
     return ConflictDetail(
         item_id=asset.id if asset is not None else None,
@@ -683,8 +741,8 @@ def check_line(
         )
         conflicts.extend(_slot_detail(slot, asset) for slot in own)
         # The unit may be idle and still be the one a model line is counting
-        # on for a window that reaches past this booking.
-        for displaced in promise_conflicts(
+        # on for a window that reaches past this booking, buffer included.
+        for displaced in item_promise_conflicts(
             world,
             asset.id,
             starts_at,
