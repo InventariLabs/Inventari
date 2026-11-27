@@ -680,10 +680,21 @@ const dist = join(root, "dist");
  * and 630; the other screens stand under theirs (app first paint 414.3 of
  * 415, login 419.2 of 420, launcher 434.2 of 435, start 654.1 of 655,
  * products 633.4 of 640, initial 194.6 of 245).
+ *
+ * Re-measured 2026-11-27 on the rentals branch, merged with the development
+ * line at 6fcdfd3a2: app first paint measures 415.0 KiB gz and no longer fits
+ * its 415, where the line alone stands at 411.1. The difference is the
+ * module's own: its copy in six languages, of which the Polish catalogue loads
+ * with every first paint (158.7 to 162.1), and its registration in the App
+ * chunk (58.1 to 58.4); no import walked into the startup path. The first
+ * paint budget moves a step of five, to 420. The phone screens stand under
+ * theirs (login 419.9 of 420, launcher 434.9 of 435, start 654.9 of 655,
+ * receive 492.3 of 495, issue 601.3 of 605, history 626.3 of 630, products
+ * 634.4 of 640, initial 194.5 of 245).
  */
 const BUDGETS = {
   initial: 245,
-  appFirstPaint: 415,
+  appFirstPaint: 420,
 };
 
 /**
