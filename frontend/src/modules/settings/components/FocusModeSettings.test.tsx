@@ -1,3 +1,5 @@
+import "@/modules/shopping_lists/module";
+import "@/modules/equipment/module";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";

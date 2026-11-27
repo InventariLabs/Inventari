@@ -1,3 +1,6 @@
+import "@/modules/shopping_lists/module";
+import "@/modules/nutrition/module";
+import "@/modules/announcements/module";
 import { render, screen, waitFor, within } from "@/test/utils";
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { useState } from "react";

@@ -1,3 +1,5 @@
+import "@/modules/stats/module";
+import "@/modules/announcements/module";
 import { describe, expect, it } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";

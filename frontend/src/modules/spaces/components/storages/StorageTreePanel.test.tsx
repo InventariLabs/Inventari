@@ -1,3 +1,6 @@
+import "@/modules/shopping_lists/module";
+import "@/modules/nutrition/module";
+import "@/modules/announcements/module";
 import { render, screen, waitFor } from "@/test/utils";
 import { describe, it, expect, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
