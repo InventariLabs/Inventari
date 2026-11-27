@@ -691,6 +691,18 @@ const dist = join(root, "dist");
  * theirs (login 419.9 of 420, launcher 434.9 of 435, start 654.9 of 655,
  * receive 492.3 of 495, issue 601.3 of 605, history 626.3 of 630, products
  * 634.4 of 640, initial 194.5 of 245).
+ *
+ * Re-measured 2026-11-27 on the branch that reads a sheet's times, units and
+ * the preview's two readings, merged with the development line at 08f70b234c:
+ * the start screen measures 655.1 KiB gz against its 655, where the line
+ * alone stands at 654.9. The branch adds the document import dialog's second
+ * preview reading and its expiry column to the chunk the start screen opens
+ * with, and the second reading's key to the empty analyze answer the items
+ * and partners clients give above it; no import walked in. That one phone
+ * budget moves a step of five, to 660; the other screens stand under theirs
+ * (app first paint 415.1 of 420, login 420.0 of 420, launcher 434.9 of 435,
+ * receive 492.4 of 495, issue 601.4 of 605, history 626.5 of 630, products
+ * 634.7 of 640, initial 194.5 of 245).
  */
 const BUDGETS = {
   initial: 245,
