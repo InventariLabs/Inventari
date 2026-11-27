@@ -8884,6 +8884,56 @@
         ]
       }
     },
+    "/api/v1/items/import/check": {
+      "post": {
+        "tags": [
+          "Items"
+        ],
+        "summary": "Check Import",
+        "description": "What an import in 'add' mode would add to stock that is already here.\n\nNothing is written. The mapping step asks before the import runs, so a\nsheet uploaded a second time says so while its quantities are still\nsingle.",
+        "operationId": "check_import_api_v1_items_import_check_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_check_import_api_v1_items_import_check_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemImportCheckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/v1/items/import/grocy": {
       "post": {
         "tags": [
@@ -46937,6 +46987,30 @@
         "type": "object",
         "title": "Body_block_user_api_v1_users__user_id__block_post"
       },
+      "Body_check_import_api_v1_items_import_check_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "mapping_json": {
+            "type": "string",
+            "title": "Mapping Json"
+          },
+          "count_as_one": {
+            "type": "boolean",
+            "title": "Count As One",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "mapping_json"
+        ],
+        "title": "Body_check_import_api_v1_items_import_check_post"
+      },
       "Body_execute_equipment_import_endpoint_api_v1_equipment_import_execute_post": {
         "properties": {
           "file": {
@@ -51877,6 +51951,16 @@
             },
             "type": "array",
             "title": "Errors"
+          },
+          "refused_file": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RefusedRowsFile"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "no_stock": {
             "items": {
@@ -57255,6 +57339,16 @@
             "title": "Errors",
             "default": []
           },
+          "refused_file": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RefusedRowsFile"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "skipped": {
             "type": "integer",
             "title": "Skipped",
@@ -60136,6 +60230,25 @@
         "title": "ItemHistorySchema",
         "description": "Schema for item history entry"
       },
+      "ItemImportCheckResponse": {
+        "properties": {
+          "rows": {
+            "type": "integer",
+            "title": "Rows"
+          },
+          "rows_in_stock": {
+            "type": "integer",
+            "title": "Rows In Stock"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rows",
+          "rows_in_stock"
+        ],
+        "title": "ItemImportCheckResponse",
+        "description": "How many of a sheet's rows would add to stock that is already here.\n\nBoth counts are zero for a sheet that carries no stock."
+      },
       "ItemImportJobResponse": {
         "properties": {
           "id": {
@@ -60229,6 +60342,16 @@
             "type": "array",
             "title": "Errors",
             "default": []
+          },
+          "refused_file": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RefusedRowsFile"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "created_locations": {
             "items": {
@@ -65142,6 +65265,16 @@
             },
             "type": "array",
             "title": "Errors"
+          },
+          "refused_file": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RefusedRowsFile"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "matched": {
             "type": "integer",
@@ -70232,6 +70365,16 @@
             "type": "array",
             "title": "Errors",
             "default": []
+          },
+          "refused_file": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RefusedRowsFile"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -81454,6 +81597,25 @@
           "price_volatility"
         ],
         "title": "RecurringProduct"
+      },
+      "RefusedRowsFile": {
+        "properties": {
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "content_base64": {
+            "type": "string",
+            "title": "Content Base64"
+          }
+        },
+        "type": "object",
+        "required": [
+          "filename",
+          "content_base64"
+        ],
+        "title": "RefusedRowsFile",
+        "description": "The rows an import refused, as a file to correct and upload alone."
       },
       "RegisterCurrencyTotal": {
         "properties": {

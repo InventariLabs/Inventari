@@ -29,6 +29,7 @@ import type {
 } from "@/types";
 type SheetAnalysis = components["schemas"]["SheetAnalysisResponse"];
 type ItemImportJob = components["schemas"]["ItemImportJobResponse"];
+export type ItemImportCheck = components["schemas"]["ItemImportCheckResponse"];
 type ItemExportJob = components["schemas"]["ItemExportJobResponse"];
 export type GrocyFileAnalysis = components["schemas"]["GrocyFileAnalysis"];
 
@@ -370,13 +371,32 @@ export const itemsApi = {
     return response.data;
   },
 
+  /** How many of a sheet's rows would add to stock already here; nothing is
+   * written. Asked before an import in "add" mode. */
+  checkImport: async (
+    file: File,
+    mapping: unknown,
+    countAsOne: boolean,
+  ): Promise<ItemImportCheck> => {
+    assertFileSize(file);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("mapping_json", JSON.stringify(mapping));
+    formData.append("count_as_one", String(countAsOne));
+    const response = await api.post<ItemImportCheck>(
+      "/items/import/check",
+      formData,
+    );
+    return response.data;
+  },
+
   /** The two creation flags travel separately: the backend gates founding
    * locations on `locations:write` and founding categories on
    * `categories:write`, so one switch wired to both left an account holding
    * only one of the keys no setting under which its permission worked.
-   * `onLabelMatch` decides what a row whose Label Code names a product
-   * already here does: add it anyway ("add", the default), leave the
-   * product alone ("skip") or write the row onto it ("overwrite").
+   * `onLabelMatch` decides what a row naming stock already here (by label
+   * code, SKU or barcode) does: add it anyway ("add", the default), leave
+   * it alone ("skip") or write the row onto it ("overwrite").
    * `onProgress` is told how far a background import has got. */
   importItems: async (
     file: File,

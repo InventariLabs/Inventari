@@ -179,20 +179,22 @@
     "foundedCategories_one": "{{count}} Kategorie angelegt",
     "foundedCategories_other": "{{count}} Kategorien angelegt",
     "labelMatch": {
-      "label": "Zeilen mit Etikettencode",
-      "hint": "Die Spalte „Label Code\" einer exportierten Tabelle nennt das Produkt, um das es in der Zeile geht.",
+      "label": "Zeilen zu Bestand, der schon da ist",
+      "hint": "Eine Zeile benennt vorhandenen Bestand über Etikettencode, SKU oder Barcode.",
       "modes": {
         "add": "Trotzdem anlegen",
         "skip": "Unverändert lassen",
         "overwrite": "Überschreiben"
       },
       "notes": {
-        "add": "Jede Zeile wird ein neues Produkt; der Etikettencode wird ignoriert.",
-        "skip": "Eine Zeile, deren Etikettencode ein vorhandenes Produkt nennt, bleibt unverändert. Eine Zeile ohne Code oder mit unbekanntem Code wird angelegt.",
-        "overwrite": "Eine Zeile, deren Etikettencode ein vorhandenes Produkt nennt, überschreibt dessen Daten. Die Menge wird nie überschrieben — Bestand ändert sich über einen Wareneingang oder eine Zählung."
+        "add": "Jede Zeile wird hinzugefügt, vorhandener Bestand wächst also.",
+        "skip": "Eine Zeile, die vorhandenen Bestand benennt, bleibt außen vor. Alle anderen werden hinzugefügt.",
+        "overwrite": "Eine Zeile, die vorhandenen Bestand benennt, schreibt ihre Spalten auf diesen Datensatz. Die Menge wird nie überschrieben – Bestand ändert sich durch Wareneingang oder Zählung."
       },
-      "needsColumn": "Ordnen Sie zuerst die Spalte „Label Code\" zu, sonst gibt es nichts zuzuordnen und jede Zeile wird angelegt.",
-      "noCodesInFile": "Die Spalte „Label Code“ ist zugeordnet, aber keine Zeile trägt einen Code — Codes entstehen erst mit dem gedruckten Etikett. In diesem Modus wird jede Zeile genauso wie im Anlegen-Modus als neuer Datensatz hinzugefügt."
+      "needsColumn": "Ordnen Sie zuerst die Spalte mit Etikettencode, SKU oder Barcode zu, sonst gibt es nichts zum Abgleichen und jede Zeile wird hinzugefügt.",
+      "noCodesInFile": "Keine einzige Zeile enthält Etikettencode, SKU oder Barcode, daher wird jede Zeile hinzugefügt, genau wie beim Hinzufügen.",
+      "allInStock_one": "Die {{count}} Zeile dieser Datei benennt ein Produkt, das bereits auf Lager ist. Der Import in diesem Modus bucht die Menge erneut hinzu.",
+      "allInStock_other": "Alle {{count}} Zeilen dieser Datei benennen Produkte, die bereits auf Lager sind. Der Import in diesem Modus bucht die Mengen erneut hinzu."
     },
     "matchedUpdated_one": "{{count}} Produkt aktualisiert",
     "matchedUpdated_other": "{{count}} Produkte aktualisiert",

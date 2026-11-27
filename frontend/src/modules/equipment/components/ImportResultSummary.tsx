@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { AlertCircle, AlertTriangle, Check, Info } from "lucide-react";
 import { Card } from "@/components/ui/Card";
-import { ImportFoundedList } from "@/module-sdk";
+import { ImportFoundedList, RefusedRows } from "@/module-sdk";
 import type { ImportExecuteResult } from "@/modules/equipment/api/equipment";
 
 /**
@@ -107,6 +107,13 @@ export function ImportResultSummary({
                 {t("import.error_row", { row: err.row, error: err.error })}
               </div>
             ))}
+          </div>
+          <div className="mt-3">
+            <RefusedRows
+              failed={result.failed}
+              shown={result.errors.length}
+              file={result.refused_file}
+            />
           </div>
         </Card>
       )}

@@ -580,6 +580,8 @@ ERRORS_ES: ErrorMessages = {
     'partner_name_exists': 'Ya existe un socio con el nombre "{name}" y el tipo "{partner_type}".',
     'partner_code_exists': 'Ya existe un socio con el código "{code}".',
     'partner_delete_open_purchase_orders': 'No se puede eliminar el socio: {count} órdenes de compra abiertas hacen referencia a él',
+    'import_reason_column': 'Motivo del rechazo',
+    'import_overwrite_several_records': 'El producto «{name}» tiene varios registros de existencias ({count}): indique la ubicación o el código de etiqueta para saber cuál sobrescribir',
     'partner_import_name_missing': 'Falta el nombre del socio',
     'partner_import_duplicate': 'Socio duplicado: "{twin}" ya tiene este nombre o este identificador fiscal',
     'partner_import_company_missing': 'Persona de contacto de «{company}»: este archivo no añade ningún socio con ese nombre',

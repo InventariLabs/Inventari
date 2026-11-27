@@ -24,6 +24,7 @@ from app.core.import_sheet import (
     sku_from_cell,
 )
 from app.core.logging import get_logger
+from app.core.module_sdk import refused_rows_file
 from app.core.public_api import core_api
 from app.core.uom_resolver import UomResolverAsync
 from app.i18n.service import get_current_lang
@@ -33,6 +34,9 @@ from ._import_line_builder import _build_document_line, _extract_string
 from .models import Document, DocumentLine
 
 logger = get_logger(__name__)
+
+#: The name the refused rows of pasted text come back under.
+_PASTED_FILENAME = 'pasted-rows.csv'
 
 
 def parse_pasted_text(text: str) -> pd.DataFrame:
@@ -127,6 +131,7 @@ def _build_import_response(
     errors: list[dict[str, Any]],
     created_lines: list[DocumentLine],
     no_stock: list[dict[str, Any]],
+    refused_file: dict[str, str] | None,
 ) -> dict[str, Any]:
     """Compose the response body for the import call.
 
@@ -140,6 +145,7 @@ def _build_import_response(
         'stubs_created': stubs_created,
         'failed': len(errors),
         'errors': errors[:10],
+        'refused_file': refused_file,
         'no_stock': no_stock,
         'lines': [
             {
@@ -291,11 +297,13 @@ async def _lines_from_rows(
     create_stubs_for_unmatched: bool,
     stubs_need_barcode: bool = True,
     user_id: UUID | None,
+    filename: str,
 ) -> dict[str, Any]:
     """Build a line from every row and report what became of each.
 
     With *doc_id* the lines join that document's session; without one they
-    are only read back, for a form that has no document yet.
+    are only read back, for a form that has no document yet. A refused row
+    leaves nothing behind and comes back in a file named after *filename*.
     """
     uom_resolver = UomResolverAsync(db, org_id)
     sheet = SheetColumns(df)
@@ -310,48 +318,53 @@ async def _lines_from_rows(
 
     line_number = first_line_number
     for index, row in df.iterrows():
+        founded = False
+        without_stock = False
         try:
-            barcode_value = _extract_string(row, column_mapping.get('barcode'))
-            sku_value = _extract_string(row, column_mapping.get('sku'))
-            line, was_matched = await _build_document_line(
-                db,
-                org_id,
-                doc_id,
-                row,
-                line_number,
-                column_mapping,
-                uom_resolver,
-                sheet,
-                allow_negative_quantity=dt.allows_negative_quantity(doc_type),
-            )
-            if was_matched:
-                await _refuse_a_unit_the_product_cannot_take(db, org_id, line)
-            elif sku_value and create_stubs_for_unmatched:
-                # The row founds a product: its code takes the shape the
-                # product form holds, or the row is refused.
-                sku_value = sku_from_cell(sku_value, column_mapping['sku'])
-            if doc_id is not None:
-                db.add(line)
-            created_lines.append(line)
-            imported += 1
-            if was_matched:
-                matched += 1
-            else:
-                if create_stubs_for_unmatched and await _maybe_create_stub_for_line(
+            # The row is one savepoint: a refusal met late, while its product
+            # is being founded, takes the line and the product with it.
+            async with db.begin_nested():
+                barcode_value = _extract_string(row, column_mapping.get('barcode'))
+                sku_value = _extract_string(row, column_mapping.get('sku'))
+                line, was_matched = await _build_document_line(
                     db,
                     org_id,
-                    line,
-                    barcode_value,
-                    user_id,
-                    sku=sku_value,
-                    need_barcode=stubs_need_barcode,
-                ):
-                    stubs_created += 1
-                else:
-                    unmatched += 1
-            if needs_stock_row and not await _name_the_stock_record(
-                db, org_id, line, source_location_id
-            ):
+                    doc_id,
+                    row,
+                    line_number,
+                    column_mapping,
+                    uom_resolver,
+                    sheet,
+                    allow_negative_quantity=dt.allows_negative_quantity(doc_type),
+                )
+                if was_matched:
+                    await _refuse_a_unit_the_product_cannot_take(db, org_id, line)
+                elif sku_value and create_stubs_for_unmatched:
+                    # The row founds a product: its code takes the shape the
+                    # product form holds, or the row is refused.
+                    sku_value = sku_from_cell(sku_value, column_mapping['sku'])
+                if doc_id is not None:
+                    db.add(line)
+                if not was_matched and create_stubs_for_unmatched:
+                    founded = await _maybe_create_stub_for_line(
+                        db,
+                        org_id,
+                        line,
+                        barcode_value,
+                        user_id,
+                        sku=sku_value,
+                        need_barcode=stubs_need_barcode,
+                    )
+                if needs_stock_row:
+                    without_stock = not await _name_the_stock_record(
+                        db, org_id, line, source_location_id
+                    )
+            created_lines.append(line)
+            imported += 1
+            matched += was_matched
+            stubs_created += founded
+            unmatched += not (was_matched or founded)
+            if without_stock:
                 no_stock.append({'row': _row_number(index), 'name': line.name})
             line_number += 1
         except (ValueError, SQLAlchemyError, InvalidOperation) as e:
@@ -379,7 +392,14 @@ async def _lines_from_rows(
         await db.flush()
 
     return _build_import_response(
-        imported, matched, unmatched, stubs_created, errors, created_lines, no_stock
+        imported,
+        matched,
+        unmatched,
+        stubs_created,
+        errors,
+        created_lines,
+        no_stock,
+        refused_rows_file(df, errors, filename, sheet),
     )
 
 
@@ -393,6 +413,7 @@ async def import_lines_from_dataframe(
     create_stubs_for_unmatched: bool = False,
     stubs_need_barcode: bool = True,
     user_id: UUID | None = None,
+    filename: str = _PASTED_FILENAME,
 ) -> dict[str, Any]:
     """Import lines from an already-parsed DataFrame into a DRAFT document.
 
@@ -422,6 +443,7 @@ async def import_lines_from_dataframe(
         create_stubs_for_unmatched=create_stubs_for_unmatched,
         stubs_need_barcode=stubs_need_barcode,
         user_id=user_id,
+        filename=filename,
     )
 
 
@@ -435,6 +457,7 @@ async def read_lines_for_new_document(
     source_location_id: UUID | None,
     create_stubs_for_unmatched: bool = False,
     user_id: UUID | None = None,
+    filename: str = _PASTED_FILENAME,
 ) -> dict[str, Any]:
     """Read the rows into lines for a document still being written.
 
@@ -460,6 +483,7 @@ async def read_lines_for_new_document(
         first_line_number=1,
         create_stubs_for_unmatched=create_stubs_for_unmatched,
         user_id=user_id,
+        filename=filename,
     )
 
 
@@ -484,6 +508,7 @@ async def import_lines_from_file(
         org_id,
         create_stubs_for_unmatched=create_stubs_for_unmatched,
         user_id=user_id,
+        filename=filename,
     )
 
 

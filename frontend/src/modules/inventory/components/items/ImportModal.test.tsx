@@ -12,6 +12,7 @@ import {
 } from "@/test/factories/storage";
 
 const analyzeImport = vi.fn();
+const checkImport = vi.fn();
 const analyzeGrocy = vi.fn();
 const mutateAsync = vi.fn();
 const grocyMutateAsync = vi.fn();
@@ -20,6 +21,7 @@ const toastError = vi.fn();
 vi.mock("@/lib/api/items", () => ({
   itemsApi: {
     analyzeImport: (file: File) => analyzeImport(file),
+    checkImport: (...args: unknown[]) => checkImport(...args),
     analyzeGrocy: (file: File) => analyzeGrocy(file),
   },
 }));
@@ -72,6 +74,8 @@ async function reachMappingStep() {
 
 describe("ImportModal (products)", () => {
   beforeEach(() => {
+    checkImport.mockReset();
+    checkImport.mockResolvedValue({ rows: 0, rows_in_stock: 0 });
     inventoryValue.shown = true;
     storages.list = [];
   });
@@ -181,7 +185,7 @@ describe("ImportModal (products)", () => {
       }),
     ).toBeChecked();
     expect(
-      screen.getByText(/Every row becomes a new product/),
+      screen.getByText(/Every row is added, so stock already here grows/),
     ).toBeInTheDocument();
   });
 
@@ -342,7 +346,7 @@ describe("ImportModal (products)", () => {
     // The mapper suggests by header name, so Label Code lands on label_code.
     fireEvent.click(screen.getByRole("radio", { name: "Overwrite" }));
     expect(
-      await screen.findByText(/not a single row carries a code/),
+      await screen.findByText(/not a single row carries a label code/i),
     ).toBeInTheDocument();
     unmount();
 
@@ -366,7 +370,7 @@ describe("ImportModal (products)", () => {
     await screen.findByText(/File analyzed/);
     fireEvent.click(screen.getByRole("radio", { name: "Overwrite" }));
     expect(
-      screen.queryByText(/not a single row carries a code/),
+      screen.queryByText(/not a single row carries a label code/i),
     ).not.toBeInTheDocument();
   });
 
@@ -582,7 +586,9 @@ describe("ImportModal (products)", () => {
     await reachMappingStep();
 
     fireEvent.click(screen.getByRole("radio", { name: "Overwrite" }));
-    expect(screen.getByText(/writes its columns onto it/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/writes its columns onto that record/),
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Process Import/ }));
 
     // The first line carries what overwrite did; the count the stats grid
@@ -659,7 +665,50 @@ describe("ImportModal (products)", () => {
     ).toBeInTheDocument();
   });
 
-  it("warns when the update mode has no Label Code column to match on", async () => {
+  it("warns that a sheet whose every row finds stock will add it again, in add mode only", async () => {
+    analyzeImport.mockResolvedValue({
+      headers: ["Name", "Quantity", "SKU"],
+      preview_rows: [],
+      total_rows: 3,
+      filled_counts: { Name: 3, Quantity: 3, SKU: 3 },
+    });
+    checkImport.mockResolvedValue({ rows: 3, rows_in_stock: 3 });
+    await reachMappingStep();
+
+    expect(
+      await screen.findByText(/All 3 rows of this file name products/),
+    ).toBeInTheDocument();
+    expect(checkImport).toHaveBeenLastCalledWith(
+      expect.any(File),
+      expect.objectContaining({ name: "Name", sku: "SKU" }),
+      false,
+    );
+
+    fireEvent.click(screen.getByRole("radio", { name: "Leave alone" }));
+    expect(
+      screen.queryByText(/All 3 rows of this file name products/),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Map the label code, SKU or barcode column/),
+    ).not.toBeInTheDocument();
+  });
+
+  it("says nothing when some rows are new", async () => {
+    analyzeImport.mockResolvedValue({
+      headers: ["Name", "Quantity"],
+      preview_rows: [],
+      total_rows: 3,
+      filled_counts: {},
+    });
+    checkImport.mockResolvedValue({ rows: 3, rows_in_stock: 2 });
+    await reachMappingStep();
+
+    await waitFor(() => expect(checkImport).toHaveBeenCalled());
+    await act(() => new Promise((resolve) => setTimeout(resolve, 20)));
+    expect(screen.queryByText(/rows of this file/)).not.toBeInTheDocument();
+  });
+
+  it("warns when the update mode has no column to match on", async () => {
     analyzeImport.mockResolvedValue({
       headers: ["Name", "Quantity"],
       preview_rows: [],
@@ -671,7 +720,7 @@ describe("ImportModal (products)", () => {
     fireEvent.click(screen.getByRole("radio", { name: "Leave alone" }));
 
     expect(
-      screen.getByText(/Map the Label Code column first/),
+      screen.getByText(/Map the label code, SKU or barcode column/),
     ).toBeInTheDocument();
   });
 

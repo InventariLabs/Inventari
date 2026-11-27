@@ -15,6 +15,7 @@ from pydantic import (
 
 from app.core.exceptions import ServiceRejectionError
 from app.core.open_package import effective_expiry, use_by_of
+from app.schemas._common import RefusedRowsFile
 from app.schemas.category import Category
 from app.schemas.pagination import KeysetPaginatedResponse, PaginatedResponse
 from app.schemas.product_template import ProductTemplate
@@ -401,6 +402,8 @@ class ItemImportResponse(BaseModel):
     skipped: int = 0
     failed: int
     errors: list[dict[str, Any]] = []
+    #: Every refused row of a sheet, to correct and upload alone.
+    refused_file: RefusedRowsFile | None = None
     created_locations: list[str] = []
     created_categories: list[str] = []
     created_suppliers: list[str] = []
@@ -408,6 +411,16 @@ class ItemImportResponse(BaseModel):
     #: What switched-on modules brought from the same file (a Grocy move's
     #: shopping lists); empty for a sheet.
     brought_by_modules: list[ImportBrought] = []
+
+
+class ItemImportCheckResponse(BaseModel):
+    """How many of a sheet's rows would add to stock that is already here.
+
+    Both counts are zero for a sheet that carries no stock.
+    """
+
+    rows: int
+    rows_in_stock: int
 
 
 class GrocyFileAnalysis(BaseModel):

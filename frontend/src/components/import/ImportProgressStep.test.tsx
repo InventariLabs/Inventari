@@ -204,4 +204,27 @@ describe("ImportProgressStep", () => {
       "text-on-danger",
     );
   });
+
+  it("counts every refusal beside the few it lists", () => {
+    render(
+      <ImportProgressStep
+        isProcessing={false}
+        importResult={{
+          total: 30,
+          imported: 18,
+          failed: 12,
+          errors: [{ row: 2, error: "Unknown unit" }],
+          refused_file: { filename: "a-refused.csv", content_base64: "" },
+        }}
+        {...texts}
+      />,
+    );
+
+    expect(
+      screen.getByText("Showing 1 of 12 refused rows."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Download refused rows" }),
+    ).toBeInTheDocument();
+  });
 });

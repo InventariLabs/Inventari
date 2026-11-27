@@ -18,6 +18,8 @@ import type {
 } from "./types";
 
 export interface MappingStepContext {
+  /** The sheet being mapped, for a question only the server can answer. */
+  file: File | null;
   headers: string[];
   mapping: ImportMapping;
   setMapping: (mapping: ImportMapping) => void;
@@ -185,6 +187,7 @@ export function ImportWizardSheet<R extends ImportOutcome>({
   };
 
   const ctx: MappingStepContext = {
+    file,
     headers,
     mapping,
     setMapping,

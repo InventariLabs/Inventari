@@ -5,6 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from app.core.module_sdk import RefusedRowsFile
 from app.schemas.item import Item
 from app.schemas.pagination import PaginatedResponse
 
@@ -107,6 +108,8 @@ class ImportExecuteResult(BaseModel):
     imported: int
     failed: int
     errors: list[dict[str, object]] = []
+    # Every refused row, to correct and upload alone.
+    refused_file: RefusedRowsFile | None = None
     # duplicate handling outcome — skipped (create_only) and
     # updated (update mode) rows.
     skipped: int = 0

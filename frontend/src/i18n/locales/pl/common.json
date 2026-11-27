@@ -1401,7 +1401,13 @@
     "firstErrors": "Pierwsze błędy",
     "rowsCountedNote": "Wiersze liczone są od pierwszego wiersza danych; nagłówek się nie liczy, więc numer wiersza to numer w arkuszu minus jeden.",
     "previewTitle": "Podgląd",
-    "previewHint": "Pierwsze wiersze źródła, odczytane według mapowania powyżej."
+    "previewHint": "Pierwsze wiersze źródła, odczytane według mapowania powyżej.",
+    "refusedShown_one": "Pokazano {{shown}} z {{count}} odrzuconego wiersza.",
+    "refusedShown_few": "Pokazano {{shown}} z {{count}} odrzuconych wierszy.",
+    "refusedShown_many": "Pokazano {{shown}} z {{count}} odrzuconych wierszy.",
+    "refusedShown_other": "Pokazano {{shown}} z {{count}} odrzuconych wierszy.",
+    "refusedDownload": "Pobierz odrzucone wiersze",
+    "refusedHint": "Popraw je i wgraj tylko ten plik: doda wyłącznie odrzucone wiersze."
   },
   "optional": "Opcjonalne",
   "remove": "Usuń",

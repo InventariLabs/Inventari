@@ -583,6 +583,8 @@ ERRORS_DE: ErrorMessages = {
     'partner_name_exists': 'Ein Partner mit dem Namen "{name}" und dem Typ "{partner_type}" existiert bereits.',
     'partner_code_exists': 'Ein Partner mit dem Code "{code}" existiert bereits.',
     'partner_delete_open_purchase_orders': 'Der Partner kann nicht gelöscht werden: {count} offene Bestellungen verweisen auf ihn',
+    'import_reason_column': 'Ablehnungsgrund',
+    'import_overwrite_several_records': 'Das Produkt „{name}“ hat mehrere Bestandssätze ({count}): Nennen Sie den Lagerort oder den Etikettencode, damit klar ist, welcher überschrieben wird',
     'partner_import_name_missing': 'Partnername fehlt',
     'partner_import_duplicate': 'Doppelter Partner: "{twin}" hat diesen Namen oder diese Steuer-ID bereits',
     'partner_import_company_missing': 'Ansprechperson von „{company}“: Diese Datei legt keinen Partner mit diesem Namen an',

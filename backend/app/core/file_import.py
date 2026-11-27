@@ -203,6 +203,7 @@ async def resolve_storage_location_async(
     *,
     founder: UserContextDTO | None = None,
     founded: list[str] | None = None,
+    context_tag: str | None = None,
 ) -> str | None:
     """Async: look up a storage location by name or path from an import row.
 
@@ -222,7 +223,8 @@ async def resolve_storage_location_async(
     With a *founder*, a place the organization has not got is created in
     their name: the steps that name an existing place are kept, the ones
     after them are founded inside it, and each new place's path is appended
-    to *founded*. Without one an unknown place resolves to ``None``.
+    to *founded*. A founded place carries *context_tag*, the module's own.
+    Without a founder an unknown place resolves to ``None``.
     """
     from app.core.public_api import core_api
 
@@ -262,7 +264,12 @@ async def resolve_storage_location_async(
     parent_id: UUID | None = parent.id if parent else None
     for name in segments[kept:]:
         place = await core_api.locations.create_async(
-            db, org_id, name=name, user_id=founder.id, parent_id=parent_id
+            db,
+            org_id,
+            name=name,
+            user_id=founder.id,
+            parent_id=parent_id,
+            context_tag=context_tag,
         )
         by_id[place.id] = place
         parent_id = place.id

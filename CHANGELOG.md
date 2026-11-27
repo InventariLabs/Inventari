@@ -88,9 +88,25 @@ says what the release does rather than what changed since them.
   `useReturnTarget`, which reads where a screen entered from another module
   sends its back arrow (`state={{ backTo }}` on the link), and `listedFields`,
   which tells a category's fields apart from the flags stored beside them.
+- A second attempt at an import: every import of a sheet (products, partners,
+  equipment, document lines, opening stock, and purchase order lines through
+  the API) hands the refused rows back as a file in the uploaded format, the
+  original columns plus the reason, to correct and upload on its own; the
+  result says how many rows were refused when it lists only some. The product
+  import's **Leave alone** and **Overwrite** modes also find a product already
+  in stock by its SKU or barcode, not only by its Label Code, so a corrected
+  sheet can be uploaded whole without doubling stock, and **Add anyway** warns
+  before importing a file whose every row finds stock already here
+  (`POST /items/import/check`).
 
 ### Fixed
 
+- A document or opening-stock row refused while its product was being founded
+  leaves no line on the draft and is not counted as imported.
+- The equipment import reads Shelf's `Asset ID` as the asset tag and
+  `Description` as the notes, gives the places it founds to the equipment
+  module, so its location pickers offer them, and its title no longer runs
+  under the close button on a phone.
 - A SKU read off the opening-stock sheet is stored trimmed and in upper case,
   and a code with a character a SKU cannot hold refuses its row, so a product
   founded from a sheet can be saved in its form.

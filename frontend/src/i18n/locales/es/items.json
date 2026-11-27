@@ -179,20 +179,23 @@
     "foundedCategories_one": "{{count}} categoría creada",
     "foundedCategories_other": "{{count}} categorías creadas",
     "labelMatch": {
-      "label": "Filas con código de etiqueta",
-      "hint": "La columna «Label Code» de una hoja exportada indica de qué producto trata la fila.",
+      "label": "Filas sobre existencias que ya están aquí",
+      "hint": "Una fila identifica existencias ya registradas por su código de etiqueta, su SKU o su código de barras.",
       "modes": {
         "add": "Añadir igualmente",
         "skip": "Dejar sin cambios",
         "overwrite": "Sobrescribir"
       },
       "notes": {
-        "add": "Cada fila se convierte en un producto nuevo; el código de etiqueta se ignora.",
-        "skip": "Una fila cuyo código de etiqueta nombra un producto existente se deja sin cambios. Una fila sin código, o con uno desconocido, se añade.",
-        "overwrite": "Una fila cuyo código de etiqueta nombra un producto existente sobrescribe sus datos. La cantidad nunca se sobrescribe: el stock cambia con una recepción o un recuento."
+        "add": "Se añaden todas las filas, así que las existencias actuales aumentan.",
+        "skip": "Una fila que identifica existencias ya registradas se deja como está. Las demás se añaden.",
+        "overwrite": "Una fila que identifica existencias ya registradas escribe sus columnas en ese registro. La cantidad nunca se sobrescribe: las existencias cambian con una recepción o un recuento."
       },
-      "needsColumn": "Asigna primero la columna «Label Code»; de lo contrario no hay nada que emparejar y cada fila se añade.",
-      "noCodesInFile": "La columna «Label Code» está asignada, pero ninguna fila trae un código — los códigos aparecen al imprimir una etiqueta. En este modo cada fila se añadirá como registro nuevo, igual que en el modo de añadir."
+      "needsColumn": "Asigna primero la columna de código de etiqueta, SKU o código de barras; si no, no hay con qué comparar y se añaden todas las filas.",
+      "noCodesInFile": "Ninguna fila lleva código de etiqueta, SKU ni código de barras, así que se añadirán todas, igual que en el modo de añadir.",
+      "allInStock_one": "La {{count}} fila de este archivo nombra un producto que ya tiene existencias. Importarla en este modo vuelve a sumar la cantidad.",
+      "allInStock_many": "Las {{count}} filas de este archivo nombran productos que ya tienen existencias. Importarlas en este modo vuelve a sumar las cantidades.",
+      "allInStock_other": "Las {{count}} filas de este archivo nombran productos que ya tienen existencias. Importarlas en este modo vuelve a sumar las cantidades."
     },
     "matchedUpdated_one": "{{count}} producto actualizado",
     "matchedUpdated_other": "{{count}} productos actualizados",

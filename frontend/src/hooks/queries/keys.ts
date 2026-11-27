@@ -39,6 +39,10 @@ export const queryKeys = {
      * invalidations, and an open item card would keep the stock from before the
      * write for the whole session. */
     detail: (id: string) => ["items", "detail", id] as const,
+    /** What an uploaded sheet would add to stock already here. Under the
+     * namespace root, so a write to stock asks again. */
+    importCheck: (file: string, mapping: string, countAsOne: boolean) =>
+      ["items", "import-check", file, mapping, countAsOne] as const,
     search: (q: string, storageId?: string) =>
       storageId
         ? (["items-search", q, storageId] as const)

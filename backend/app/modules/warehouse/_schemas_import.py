@@ -17,6 +17,8 @@ from pydantic import (
     field_validator,
 )
 
+from app.core.module_sdk import RefusedRowsFile
+
 ImportPreviewValue = str | int | float | None
 
 
@@ -132,6 +134,8 @@ class DocumentImportLinesResponse(BaseModel):
     # The server's count of refused rows; ``errors`` lists only the first few.
     failed: int = 0
     errors: list[DocumentImportErrorResponse]
+    # Every refused row, to correct and upload alone.
+    refused_file: RefusedRowsFile | None = None
     # Rows whose line found no stock record to take from; only a type that
     # takes goods off a shelf asks.
     no_stock: list[DocumentImportNoStockRow] = []
@@ -152,6 +156,7 @@ class OpeningStockImportResponse(BaseModel):
     imported: int
     failed: int
     errors: list[DocumentImportErrorResponse]
+    refused_file: RefusedRowsFile | None = None
     matched: int
     unmatched: int
     stubs_created: int

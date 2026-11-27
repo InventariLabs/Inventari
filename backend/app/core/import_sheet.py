@@ -154,6 +154,9 @@ def _header_is_text(header_line: str) -> bool:
 #: instead, which reading a number has to tell apart from typed text.
 _TEXT_SHEET = 'typed_text'
 
+#: The ``attrs`` key naming the delimiter a delimited upload was read with.
+CSV_DELIMITER_ATTR = 'csv_delimiter'
+
 
 def read_csv_sheet(
     content: bytes, delimiters: tuple[str, ...] = _CSV_DELIMITERS, **kwargs: Any
@@ -223,14 +226,16 @@ def read_csv_sheet(
                 )
             continue
         try:
+            delimiter = _pick_delimiter(probe, delimiters)
             frame = pd.read_csv(
                 BytesIO(content),
-                sep=_pick_delimiter(probe, delimiters),
+                sep=delimiter,
                 encoding=encoding,
                 dtype=str,
                 **kwargs,
             )
             frame.attrs[_TEXT_SHEET] = True
+            frame.attrs[CSV_DELIMITER_ATTR] = delimiter
             return frame
         except UnicodeDecodeError as e:
             # The header decoded but a later row did not: the next rung
@@ -695,6 +700,38 @@ class SheetColumns:
     def number(self, raw: Any, column: str | None) -> Decimal:
         """The cell as a number, or ``UnreadableCellError`` (a ``ValueError``) when it is not one."""
         return parse_sheet_number(raw, self.dot_thousands(column))
+
+    def restate(self, index: int, column: str) -> str | None:
+        """The cell of row *index* rewritten to read, in any other sheet, as
+        its column read it here; ``None`` when it may stay as typed.
+
+        Only a column that was read as dates or numbers has anything to keep:
+        a few rows taken out of the file no longer say whether the day comes
+        first, or whether a dot groups thousands. A cell that reads the same
+        on its own, or that does not read at all, stays.
+        """
+        raw = self._df[column].iloc[index]
+        text = cell_text(raw)
+        if text is None:
+            return None
+        alone = SheetColumns(self._df.iloc[[index]])
+        try:
+            if column in self._day_first and looks_like_numeric_date(text):
+                day = self.date(raw, column)
+                return None if alone.date(raw, column) == day else day.isoformat()
+            if column in self._dot_thousands:
+                number = self.number(raw, column)
+                if alone.number(raw, column) != number:
+                    return _unambiguous(number)
+        except ValueError:
+            return None
+        return None
+
+
+def _unambiguous(number: Decimal) -> str:
+    """*number* written so that no column reads its dot as a thousands mark."""
+    text = format(number, 'f')
+    return f'{text}0' if _lone_group(text.lstrip('-'), '.') else text
 
 
 def parse_sheet_date(raw: Any, day_first: bool) -> date:

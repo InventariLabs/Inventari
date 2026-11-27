@@ -579,6 +579,8 @@ ERRORS_FR: ErrorMessages = {
     'partner_name_exists': 'Un partenaire portant le nom « {name} » et le type « {partner_type} » existe déjà.',
     'partner_code_exists': 'Un partenaire portant le code « {code} » existe déjà.',
     'partner_delete_open_purchase_orders': 'Impossible de supprimer le partenaire : {count} bons de commande ouverts le référencent',
+    'import_reason_column': 'Motif du refus',
+    'import_overwrite_several_records': 'Le produit « {name} » a plusieurs enregistrements de stock ({count}) : indiquez l’emplacement ou le code d’étiquette pour savoir lequel écraser',
     'partner_import_name_missing': 'Nom du partenaire manquant',
     'partner_import_duplicate': 'Partenaire en double : « {twin} » a déjà ce nom ou cet identifiant fiscal',
     'partner_import_company_missing': 'Personne de contact de « {company} » : ce fichier n’ajoute aucun partenaire de ce nom',

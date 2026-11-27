@@ -74,4 +74,23 @@ describe("the import result headline", () => {
       screen.getByText("Skipped as duplicates: SN-A, SN-B, …"),
     ).toBeInTheDocument();
   });
+
+  it("counts every refusal and hands the refused rows over", () => {
+    render(
+      <ImportResultSummary
+        result={result({
+          failed: 25,
+          errors: [{ row: 3, error: "Invalid status: Banana" }],
+          refused_file: { filename: "a-refused.csv", content_base64: "" },
+        })}
+      />,
+    );
+
+    expect(
+      screen.getByText("Showing 1 of 25 refused rows."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Download refused rows" }),
+    ).toBeInTheDocument();
+  });
 });

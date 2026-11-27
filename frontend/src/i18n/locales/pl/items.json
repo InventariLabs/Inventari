@@ -194,20 +194,24 @@
     "foundedCategories_many": "Utworzono {{count}} kategorii",
     "foundedCategories_other": "Utworzono {{count}} kategorii",
     "labelMatch": {
-      "label": "Wiersze z kodem etykiety",
-      "hint": "Kolumna „Label Code” w wyeksportowanym arkuszu mówi, którego produktu dotyczy wiersz.",
+      "label": "Wiersze o stanie, który już tu jest",
+      "hint": "Wiersz wskazuje istniejący stan kodem etykiety, SKU albo kodem kreskowym.",
       "modes": {
         "add": "Dodaj mimo to",
         "skip": "Zostaw bez zmian",
         "overwrite": "Nadpisz"
       },
       "notes": {
-        "add": "Każdy wiersz staje się nowym produktem; kod etykiety jest pomijany.",
-        "skip": "Wiersz, którego kod etykiety wskazuje istniejący produkt, zostaje bez zmian. Wiersz bez kodu albo z nieznanym kodem zostaje dodany.",
-        "overwrite": "Wiersz, którego kod etykiety wskazuje istniejący produkt, nadpisuje jego dane. Ilość nigdy nie jest nadpisywana — stan zmienia przyjęcie albo spis."
+        "add": "Każdy wiersz zostaje dodany, więc istniejące stany rosną.",
+        "skip": "Wiersz wskazujący istniejący stan jest pomijany. Pozostałe są dodawane.",
+        "overwrite": "Wiersz wskazujący istniejący stan nadpisuje swoimi kolumnami ten zapis. Ilość nigdy nie jest nadpisywana — stan zmienia przyjęcie albo inwentaryzacja."
       },
-      "needsColumn": "Najpierw przypisz kolumnę „Label Code”, inaczej nie ma czego dopasować i każdy wiersz zostanie dodany.",
-      "noCodesInFile": "Kolumna „Label Code” jest zmapowana, ale żaden wiersz nie ma kodu — kody pojawiają się dopiero po wydrukowaniu etykiety. W tym trybie każdy wiersz zostanie dodany jako nowy, dokładnie jak w trybie dodawania."
+      "needsColumn": "Najpierw przypisz kolumnę z kodem etykiety, SKU albo kodem kreskowym — inaczej nie ma po czym dopasować i każdy wiersz zostanie dodany.",
+      "noCodesInFile": "Żaden wiersz nie ma kodu etykiety, SKU ani kodu kreskowego, więc każdy zostanie dodany, tak samo jak w trybie dodawania.",
+      "allInStock_one": "{{count}} wiersz tego pliku wskazuje produkt, który ma już stan. Import w tym trybie doda ilość jeszcze raz.",
+      "allInStock_few": "Wszystkie {{count}} wiersze tego pliku wskazują produkty, które mają już stan. Import w tym trybie doda ilości jeszcze raz.",
+      "allInStock_many": "Wszystkie {{count}} wierszy tego pliku wskazuje produkty, które mają już stan. Import w tym trybie doda ilości jeszcze raz.",
+      "allInStock_other": "Wszystkie {{count}} wiersza tego pliku wskazują produkty, które mają już stan. Import w tym trybie doda ilości jeszcze raz."
     },
     "matchedUpdated_one": "Zaktualizowano {{count}} produkt",
     "matchedUpdated_few": "Zaktualizowano {{count}} produkty",

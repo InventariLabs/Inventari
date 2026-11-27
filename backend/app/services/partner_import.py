@@ -31,6 +31,7 @@ from app.core.import_sheet import (
     read_rows,
     row_get,
 )
+from app.core.refused_rows import refused_rows_file
 from app.i18n._types import Language
 from app.i18n.service import get_current_lang, get_error_message
 from app.models.partner import Partner
@@ -256,10 +257,12 @@ async def import_partners(
             )
             errors.append({'row': index + 1, 'error': reason})
 
+    errors.sort(key=lambda e: e['row'])
     return {
         'total': len(df),
         'imported': imported,
         'contacts': folded,
         'failed': len(errors),
-        'errors': sorted(errors, key=lambda e: e['row'])[:10],
+        'errors': errors[:10],
+        'refused_file': refused_rows_file(df, errors, filename),
     }
