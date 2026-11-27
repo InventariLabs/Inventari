@@ -860,7 +860,105 @@ class TestAUnitBookingsOwnBuffer:
         ), conflicts
 
 
+class TestAnExtensionOfABookingThatHoldsTwoUnits:
+    def test_a_pair_extension_into_a_promised_window_is_refused(
+        self,
+        client: TestClient,
+        rental_auth: dict[str, str],
+        racks,
+    ) -> None:
+        # The promise needs one of the two units for its whole window. Each
+        # unit of the pair is free before that window, so the extension is
+        # judged on the stay it creates, not on the one stored.
+        week = START + timedelta(days=16)
+        promised = _create(
+            client,
+            rental_auth,
+            model='Rack 42U',
+            quantity=1,
+            starts_at=week,
+            ends_at=week + timedelta(days=4),
+            name='Studio Foto',
+        )
+        assert promised.status_code == 201, promised.text
+
+        pair_start = week - timedelta(days=2)
+        pair = client.post(
+            f'{RENTALS}/bookings',
+            headers=rental_auth,
+            json={
+                'borrower_name': 'Jan Wiśniewski',
+                'starts_at': pair_start.isoformat(),
+                'ends_at': (pair_start + timedelta(hours=2)).isoformat(),
+                'lines': [
+                    {'item_id': str(racks[0].id)},
+                    {'item_id': str(racks[1].id)},
+                ],
+            },
+        )
+        assert pair.status_code == 201, pair.text
+
+        response = client.post(
+            f'{RENTALS}/bookings/{pair.json()["id"]}/extend',
+            headers=rental_auth,
+            json={'ends_at': (week + timedelta(hours=3)).isoformat()},
+        )
+        assert response.status_code == 409, response.text
+        detail = response.json()['detail']
+        assert detail['code'] == 'RENTAL_EXTENSION_BLOCKED'
+        assert any(
+            conflict.get('booking_id') == promised.json()['id']
+            for conflict in detail['conflicts']
+        ), detail['conflicts']
+
+
 class TestTwoLinesOfOneRequest:
+    def test_two_unit_lines_cannot_together_take_a_promised_unit(
+        self,
+        client: TestClient,
+        rental_auth: dict[str, str],
+        racks,
+    ) -> None:
+        # Each line pins a unit the promise does not need that day; together
+        # they take both units the promise counts on for its whole window.
+        week = START + timedelta(days=12)
+        promised = _create(
+            client,
+            rental_auth,
+            model='Rack 42U',
+            quantity=1,
+            starts_at=week,
+            ends_at=week + timedelta(days=4),
+            name='Studio Foto',
+        )
+        assert promised.status_code == 201, promised.text
+
+        body = {
+            'starts_at': (week + timedelta(days=1, hours=1)).isoformat(),
+            'ends_at': (week + timedelta(days=1, hours=3)).isoformat(),
+            'lines': [
+                {'item_id': str(racks[0].id)},
+                {'item_id': str(racks[1].id)},
+            ],
+        }
+        check = client.post(f'{RENTALS}/bookings/check', headers=rental_auth, json=body)
+        assert check.status_code == 200, check.text
+        assert check.json()['ok'] is False, check.json()
+
+        response = client.post(
+            f'{RENTALS}/bookings',
+            headers=rental_auth,
+            json={**body, 'borrower_name': 'Jan Wiśniewski'},
+        )
+        assert response.status_code == 409, response.text
+        lines = response.json()['detail']['lines']
+        assert any(
+            conflict.get('booking_id') == promised.json()['id']
+            for line in lines
+            if not line['ok']
+            for conflict in line['conflicts']
+        ), lines
+
     def test_two_lines_of_one_model_cannot_promise_more_units_than_the_fleet_has(
         self,
         client: TestClient,

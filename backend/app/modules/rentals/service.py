@@ -32,6 +32,7 @@ from ._availability import (
     DisplacedBooking,
     Slot,
     World,
+    add_extended_booking,
     add_picked_up_units,
     build_calendar,
     checks_for_lines,
@@ -1212,6 +1213,10 @@ async def extend_booking(
         db, org_id, booking.starts_at, data.ends_at, cover_bookings=True
     )
     assets_by_id = {asset.id: asset for asset in assets}
+    # The longer stay is part of the world the checks read: an extension of a
+    # booking that holds several units must be judged as the whole stay, or
+    # each unit reads free on the days its siblings are taking.
+    add_extended_booking(world, booking, data.ends_at)
     conflicts = _extension_unit_conflicts(
         world, booking, data.ends_at, assets_by_id
     ) + _extension_model_conflicts(world, booking, data.ends_at)

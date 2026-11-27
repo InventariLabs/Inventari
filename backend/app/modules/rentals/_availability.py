@@ -383,6 +383,43 @@ def add_picked_up_units(
             _add_buffer_slots(world, booking, unit.item_id, asset)
 
 
+def add_extended_booking(
+    world: World, booking: RentalBooking, ends_at: datetime
+) -> None:
+    """Put a booking's longer stay into the world before its tail is judged.
+
+    The world was read with the window the booking is stored with, so its
+    units still read free on the days this extension wants. Judging the units
+    one at a time would let a pair of them take the units a model promise
+    needs for the whole of its own window.
+    """
+    kind = _booking_kind(booking, world.now)
+    for unit in booking.units:
+        asset = world.assets_by_id.get(unit.item_id)
+        if asset is None:
+            continue
+        world.slots_by_item.setdefault(unit.item_id, []).append(
+            Slot(
+                kind=kind,
+                starts_at=booking.ends_at,
+                ends_at=ends_at,
+                label=booking.borrower_name,
+                booking_id=booking.id,
+            )
+        )
+        _before, after = world.buffer_for(asset)
+        if after:
+            world.slots_by_item[unit.item_id].append(
+                Slot(
+                    kind='buffer',
+                    starts_at=ends_at,
+                    ends_at=ends_at + timedelta(hours=after),
+                    label=booking.borrower_name,
+                    booking_id=booking.id,
+                )
+            )
+
+
 def _add_block_slots(world: World, blocks: list[RentalBlock]) -> None:
     for block in blocks:
         if block.item_id not in world.assets_by_id:
@@ -574,8 +611,14 @@ def displaced_bookings(
     ends_at: datetime,
     *,
     exclude_booking_id: UUID | None = None,
+    taken: int = 0,
 ) -> list[DisplacedBooking]:
-    """Bookings that this busy stretch on one asset would break."""
+    """Bookings that this busy stretch on one asset would break.
+
+    ``taken`` counts units the same request already takes beside this one —
+    pinned by a sibling line or promised by a model line. They are not rows
+    yet, so no pool query sees them leave the promise below.
+    """
     asset = world.assets_by_id.get(item_id)
     if asset is None:
         return []
@@ -623,6 +666,7 @@ def displaced_bookings(
             booking.starts_at,
             booking.ends_at,
             exclude_booking_id=booking.id,
+            taken=taken,
         )
         # A unit that is already busy for this booking is not taken from it
         # by the new stretch; only a free unit is.
@@ -641,6 +685,7 @@ def promise_conflicts(
     ends_at: datetime,
     *,
     exclude_booking_id: UUID | None = None,
+    taken: int = 0,
 ) -> list[DisplacedBooking]:
     """Model-line promises this busy stretch on one asset would leave short.
 
@@ -656,6 +701,7 @@ def promise_conflicts(
             starts_at,
             ends_at,
             exclude_booking_id=exclude_booking_id,
+            taken=taken,
         )
         if displaced.unit is None
     ]
@@ -668,6 +714,7 @@ def item_promise_conflicts(
     ends_at: datetime,
     *,
     exclude_booking_id: UUID | None = None,
+    taken: int = 0,
 ) -> list[DisplacedBooking]:
     """Promises a booking of this unit for this window would leave short.
 
@@ -685,6 +732,7 @@ def item_promise_conflicts(
         starts_at - timedelta(hours=before),
         ends_at + timedelta(hours=after),
         exclude_booking_id=exclude_booking_id,
+        taken=taken,
     )
 
 
@@ -713,8 +761,10 @@ def check_line(
 ) -> LineCheck:
     """Whether one line fits the window, what is in the way, and the way out.
 
-    ``taken`` is what the request's sibling lines already promise of the same
-    model, which only the caller that sees all lines can count.
+    ``taken`` is what the request's sibling lines already take of the same
+    model — units they pin or promise — which only the caller that sees all
+    lines can count. A unit line needs it too: the unit it pins may be the one
+    a promise no longer has room for once the siblings are pinned beside it.
     """
     conflicts: list[ConflictDetail] = []
     if line.item_id is not None:
@@ -748,6 +798,7 @@ def check_line(
             starts_at,
             ends_at,
             exclude_booking_id=exclude_booking_id,
+            taken=taken,
         ):
             promised = displaced.booking
             conflicts.append(
@@ -883,8 +934,9 @@ def checks_for_lines(
     exclude_booking_id: UUID | None = None,
 ) -> list[LineCheck]:
     # A request's own lines compete for the same units: an asset line pins
-    # one, a model line promises its count. Each model line is judged against
-    # what its siblings leave, not against the whole fleet.
+    # one, a model line promises its count. Each line is judged against what
+    # its siblings leave, not against the whole fleet — a pinned unit line
+    # included, since two of them can take both units a promise counts on.
     need_by_model: dict[str, int] = {}
     for line in lines:
         if line.model is not None:
@@ -895,11 +947,15 @@ def checks_for_lines(
             need_by_model[asset.model] = need_by_model.get(asset.model, 0) + 1
     results: list[LineCheck] = []
     for index, line in enumerate(lines):
-        siblings = (
-            need_by_model.get(line.model, 0) - line.quantity
-            if line.model is not None
-            else 0
-        )
+        if line.model is not None:
+            siblings = need_by_model.get(line.model, 0) - line.quantity
+        else:
+            asset = world.assets_by_id.get(line.item_id) if line.item_id else None
+            siblings = (
+                need_by_model.get(asset.model, 0) - 1
+                if asset is not None and asset.model
+                else 0
+            )
         check = check_line(
             world,
             line,
