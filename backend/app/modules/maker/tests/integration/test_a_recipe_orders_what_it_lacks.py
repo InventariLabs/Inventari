@@ -142,6 +142,43 @@ def test_the_recipe_orders_what_its_batch_lacks(
     assert line.unit_price == Decimal('12.00')
 
 
+@pytest.mark.parametrize(
+    ('typed', 'ordered'),
+    [
+        ('4.1234', Decimal('4.12')),
+        ('4.1250', Decimal('4.13')),
+        # Too small for an order line to keep: left for the buyer to fill in
+        # rather than ordered as free.
+        ('0.0042', None),
+    ],
+)
+def test_a_typed_price_is_ordered_to_the_two_decimals_a_line_keeps(
+    typed: str,
+    ordered: Decimal | None,
+    client: TestClient,
+    headers: dict[str, str],
+    org: Organization,
+    db_session: Session,
+) -> None:
+    _lye, recipe_id = _soap_recipe(client, headers, db_session, org)
+    price = db_session.scalars(select(MakerIngredientPrice)).one()
+    price.unit_price = Decimal(typed)
+    db_session.commit()
+
+    response = client.post(
+        f'/api/v1/maker/recipes/{recipe_id}/shortages/purchase-order',
+        headers=headers,
+    )
+
+    assert response.status_code == 200, response.text
+    order = db_session.execute(
+        select(PurchaseOrder).where(
+            PurchaseOrder.id == response.json()['purchase_order_id']
+        )
+    ).scalar_one()
+    assert order.lines[0].unit_price == ordered
+
+
 def test_a_batch_the_records_cover_orders_nothing(
     client: TestClient,
     headers: dict[str, str],

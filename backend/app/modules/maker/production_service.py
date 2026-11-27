@@ -1946,7 +1946,7 @@ async def create_shortage_purchase_order(
         compute_shortage_list,
         resolve_check_location,
     )
-    from .ingredient_prices import typed_rates_async
+    from .ingredient_prices import order_line_price, typed_rates_async
 
     recipe = await bom_service.resolve_recipe(db, organization_id, recipe_id)
     check_location_id = await resolve_check_location(
@@ -2012,7 +2012,7 @@ async def create_shortage_purchase_order(
                     uoms.get(template.uom_id) if template.uom_id is not None else None,
                 ),
                 uom_id=template.uom_id,
-                unit_price=typed_prices.get(child_id),
+                unit_price=order_line_price(typed_prices.get(child_id)),
             )
         )
     if not lines:

@@ -44,6 +44,7 @@ from app.core.public_api import core_api
 from app.i18n import Language
 
 from . import planning_service
+from .ingredient_prices import order_line_price
 from .models import ProductionOrder
 
 NeedAction = Literal['buy', 'make']
@@ -503,7 +504,7 @@ async def order_missing(
                         name=row.name,
                         quantity_ordered=offer.quantity,
                         uom_id=offer.uom_id,
-                        unit_price=offer.unit_price,
+                        unit_price=order_line_price(offer.unit_price),
                     )
                     for row, offer in chosen
                 ],
