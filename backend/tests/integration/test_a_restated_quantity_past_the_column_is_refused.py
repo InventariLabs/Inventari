@@ -68,6 +68,7 @@ def test_an_edit_refuses_a_quantity_restated_past_the_ceiling(
     db_session: Session,
     test_storage_location: StorageLocation,
 ) -> None:
+    """Only an empty record can change unit; its edit holds the same ceiling."""
     h = ModuleTestHelper(db_session)
     template_id = _gram_card(client, auth_headers, h)
     created = client.post(
