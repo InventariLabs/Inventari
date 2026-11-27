@@ -24,14 +24,16 @@ says what the release does rather than what changed since them.
   returned time beside its service blocks and buffer hours, and keeps an
   "any unit" row for bookings a scan has not resolved yet. Handing out is a
   scan (or a choice) per unit, and the hand-out is confirmed only when every
-  line is covered; taking back records each unit's condition, and a unit that
-  needs service opens a block in the same step, moving a later booking to a
-  free unit of its model when one exists or ending the block before it. Today
-  opens the module with the loans past their window, the day's pickups and
-  returns and what is in service, and overdue is read from the window rather
-  than stored. The module needs the equipment register and is switched off on
-  its own; it ships in the six maintained languages with demo data and a
-  guide page.
+  line is covered. A unit handed out before its booking starts is taken from
+  that moment, so the hand-out is refused if somebody else has it before then,
+  and a booking whose window is over is extended before it is handed out.
+  Taking back records each unit's condition, and a unit that needs service
+  opens a block in the same step, moving a later booking to a free unit of its
+  model when one exists or ending the block before it. Today opens the module
+  with the loans past their window, the day's pickups and returns and what is
+  in service, and overdue is read from the window rather than stored. The
+  module needs the equipment register and is switched off on its own; it ships
+  in the six maintained languages with demo data and a guide page.
 - Inventari installs with one command, on a server with a domain or on a
   Linux computer at home:
   `curl -fsSL https://github.com/InventariLabs/Inventari/releases/latest/download/install.sh | sh -s -- vps`

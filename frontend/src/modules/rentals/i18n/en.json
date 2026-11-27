@@ -191,7 +191,7 @@
     "nothingFound": "No unit matches that code.",
     "alreadyPicked": "{{name}} is already on this hand-out.",
     "notOnThisBooking": "{{name}} is not part of this booking.",
-    "busyUnit": "{{name}} is not free for this booking window: {{reason}}.",
+    "busyUnit": "{{name}} is not free until this booking ends: {{reason}}.",
     "assetTaken": "{{name}} is taken: {{reason}}. Pick another unit.",
     "anyUnit": "any unit"
   },

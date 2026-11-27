@@ -70,6 +70,11 @@ class BookingCreate(BaseModel):
             raise ServiceRejectionError('rental_borrower_needs_name')
         if self.ends_at <= self.starts_at:
             raise ServiceRejectionError('rental_window_order')
+        # A unit named twice reads as free to both lines, and no hand-out can
+        # scan it twice.
+        units = [line.item_id for line in self.lines if line.item_id is not None]
+        if len(set(units)) != len(units):
+            raise ServiceRejectionError('rental_unit_on_two_lines')
         return self
 
 

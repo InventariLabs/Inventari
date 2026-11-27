@@ -1,10 +1,11 @@
 """What is free when — the one answer every screen and every check reads.
 
-Busy time of an asset is the window of every booking unit it is named in,
-widened by its buffer, plus its blocks and any hand-out the equipment module
-made outside a booking. Availability of a model is its units that are not
-retired, minus the busy ones, minus what other model bookings still hold as
-a count (a model line is a promise of *some* unit until pickup resolves it).
+Busy time of an asset is the window of every booking unit it is named in
+(starting earlier when it was handed out early, and widened by its buffer),
+plus its blocks and any hand-out the equipment module made outside a booking.
+Availability of a model is its units that are not retired, minus the busy
+ones, minus what other model bookings still hold as a count (a model line is a
+promise of *some* unit until pickup resolves it).
 
 Everything here is pure over one loaded ``World``: the write path loads it
 inside the transaction that holds the locks, checks, and writes; the check
@@ -175,17 +176,19 @@ async def load_world(
         default=0,
     )
     pad = timedelta(hours=max_buffer + 1)
+    # ``RentalBooking.held_from`` in SQL: LEAST skips a hand-out not yet made.
+    held_from = func.least(RentalBooking.starts_at, RentalBooking.picked_up_at)
     load_start, load_end = starts_at, ends_at
     if cover_bookings:
         span = (
             await db.execute(
                 select(
-                    func.min(RentalBooking.starts_at),
+                    func.min(held_from),
                     func.max(RentalBooking.ends_at),
                 ).where(
                     RentalBooking.organization_id == org_id,
                     RentalBooking.status.in_(ACTIVE_STATUSES),
-                    RentalBooking.starts_at < ends_at + pad,
+                    held_from < ends_at + pad,
                     RentalBooking.ends_at > starts_at - pad,
                 )
             )
@@ -226,7 +229,7 @@ async def load_world(
                     RentalBooking.status.in_(statuses),
                     or_(
                         and_(
-                            RentalBooking.starts_at < load_end + pad,
+                            held_from < load_end + pad,
                             RentalBooking.ends_at > load_start - pad,
                         ),
                         # A loan past its due date is still out, so it holds
@@ -285,8 +288,8 @@ def _add_buffer_slots(
         world.slots_by_item.setdefault(item_id, []).append(
             Slot(
                 kind='buffer',
-                starts_at=booking.starts_at - timedelta(hours=before),
-                ends_at=booking.starts_at,
+                starts_at=booking.held_from - timedelta(hours=before),
+                ends_at=booking.held_from,
                 label=booking.borrower_name,
                 booking_id=booking.id,
             )
@@ -317,12 +320,12 @@ def _add_booking_slots(
             if held_asset is None:
                 continue
             if open_ended:
-                # The promised window is drawn as handed out, and the late
-                # stretch from the due date to now as a hold of its own.
+                # The loan up to its due date is drawn as handed out, and the
+                # late stretch from there to now as a hold of its own.
                 slots = [
                     Slot(
                         kind='out',
-                        starts_at=booking.starts_at,
+                        starts_at=booking.held_from,
                         ends_at=booking.ends_at,
                         label=booking.borrower_name,
                         booking_id=booking.id,
@@ -340,7 +343,7 @@ def _add_booking_slots(
                 slots = [
                     Slot(
                         kind=kind,
-                        starts_at=booking.starts_at,
+                        starts_at=booking.held_from,
                         ends_at=booking.ends_at,
                         label=booking.borrower_name,
                         booking_id=booking.id,
@@ -352,16 +355,17 @@ def _add_booking_slots(
                 _add_buffer_slots(world, booking, unit.item_id, held_asset)
 
 
-def add_picked_up_units(
+def add_picked_up_booking(
     world: World, booking: RentalBooking, units: list[RentalBookingUnit]
 ) -> None:
-    """Make a pickup's own scans part of the world before it is checked.
+    """Put a booking being handed out into the world as it will be stored.
 
     The world is read before the scans are pinned, so the booking still reads
-    as a promise waiting for its count while the unit it resolves reads free.
-    Asking another promise about that unit would count the same resolution
-    twice — once as still promised, once as taken. A scan resolves its line
-    and holds the unit here, as the stored rows will.
+    as a promise waiting for its count while the unit it resolves reads free,
+    and an early hand-out still reads as starting with the window. Asking
+    another promise about such a world would count one resolution twice and
+    miss the time before the window. Here each scan resolves its line, and
+    every unit is held from the hand-out on.
     """
     lines = {line.id: line for line in booking.lines}
     for unit in units:
@@ -369,18 +373,11 @@ def add_picked_up_units(
         if line is not None:
             line.units.append(unit)
         booking.units.append(unit)
-        world.slots_by_item.setdefault(unit.item_id, []).append(
-            Slot(
-                kind='reserved',
-                starts_at=booking.starts_at,
-                ends_at=booking.ends_at,
-                label=booking.borrower_name,
-                booking_id=booking.id,
-            )
-        )
-        asset = world.assets_by_id.get(unit.item_id)
-        if asset is not None:
-            _add_buffer_slots(world, booking, unit.item_id, asset)
+    for item_id, slots in world.slots_by_item.items():
+        world.slots_by_item[item_id] = [
+            slot for slot in slots if slot.booking_id != booking.id
+        ]
+    _add_booking_slots(world, [booking], world.now)
 
 
 def add_extended_booking(
@@ -522,13 +519,16 @@ def model_pool(
     busy_before: int | None = None,
     busy_after: int | None = None,
     taken: int = 0,
+    pinned_beside: frozenset[UUID] = frozenset(),
 ) -> PoolResult:
     """What a window of this model can promise, buffers included.
 
     ``busy_before``/``busy_after`` widen the window for the caller's own
     buffer when it differs from the model's (a specific unit's category).
     ``taken`` counts units already promised by the caller's own request (a
-    sibling line), which no pool query can see before the booking exists.
+    sibling model line), and ``pinned_beside`` names the units its sibling
+    lines pin. No pool query can see either before the booking exists. A
+    pinned unit that is busy for this window anyway takes nothing more.
     """
     model_before, model_after = world.buffer_for_model(model or '')
     before = model_before if busy_before is None else busy_before
@@ -565,6 +565,10 @@ def model_pool(
                 waiting.append((booking, line))
     physically_free = max(0, len(units) - len(busy))
     held = sum(line.unresolved_count for _booking, line in waiting)
+    busy_ids = {unit.id for unit, _slots in busy}
+    beside = sum(
+        1 for unit in units if unit.id in pinned_beside and unit.id not in busy_ids
+    )
     # The excluded booking's own pinned units are committed to its other
     # lines, so its remaining model promise cannot count on them.
     own_taken = 0
@@ -574,7 +578,6 @@ def model_pool(
             None,
         )
         if excluded is not None:
-            busy_ids = {unit.id for unit, _slots in busy}
             own_taken = sum(
                 1
                 for unit in excluded.units
@@ -587,7 +590,7 @@ def model_pool(
         busy=busy,
         waiting=waiting,
         physically_free=physically_free,
-        free=max(0, physically_free - held - own_taken - taken),
+        free=max(0, physically_free - held - own_taken - taken - beside),
     )
 
 
@@ -612,17 +615,18 @@ def displaced_bookings(
     *,
     exclude_booking_id: UUID | None = None,
     taken: int = 0,
+    pinned_beside: frozenset[UUID] = frozenset(),
 ) -> list[DisplacedBooking]:
     """Bookings that this busy stretch on one asset would break.
 
-    ``taken`` counts units the same request already takes beside this one —
-    pinned by a sibling line or promised by a model line. They are not rows
-    yet, so no pool query sees them leave the promise below.
+    ``taken`` and ``pinned_beside`` are what the same request takes beside this
+    unit (see ``model_pool``). A booking that names the unit is broken when the
+    stretch meets its hold: its window, its buffers, the time since an early
+    hand-out, and everything from the due date on while it is overdue.
     """
     asset = world.assets_by_id.get(item_id)
     if asset is None:
         return []
-    before, after = world.buffer_for(asset)
     model_before, model_after = world.buffer_for_model(asset.model or '')
     displaced: list[DisplacedBooking] = []
     for booking in world.bookings:
@@ -632,11 +636,9 @@ def displaced_bookings(
             continue
         pinned = next((unit for unit in booking.units if unit.item_id == item_id), None)
         if pinned is not None:
-            if _overlaps(
-                booking.starts_at - timedelta(hours=before),
-                booking.ends_at + timedelta(hours=after),
-                starts_at,
-                ends_at,
+            if any(
+                slot.booking_id == booking.id
+                for slot in item_conflicts(world, item_id, starts_at, ends_at)
             ):
                 line = next(
                     (line for line in booking.lines if line.id == pinned.line_id),
@@ -667,6 +669,7 @@ def displaced_bookings(
             booking.ends_at,
             exclude_booking_id=booking.id,
             taken=taken,
+            pinned_beside=pinned_beside,
         )
         # A unit that is already busy for this booking is not taken from it
         # by the new stretch; only a free unit is.
@@ -686,6 +689,7 @@ def promise_conflicts(
     *,
     exclude_booking_id: UUID | None = None,
     taken: int = 0,
+    pinned_beside: frozenset[UUID] = frozenset(),
 ) -> list[DisplacedBooking]:
     """Model-line promises this busy stretch on one asset would leave short.
 
@@ -702,6 +706,7 @@ def promise_conflicts(
             ends_at,
             exclude_booking_id=exclude_booking_id,
             taken=taken,
+            pinned_beside=pinned_beside,
         )
         if displaced.unit is None
     ]
@@ -715,6 +720,7 @@ def item_promise_conflicts(
     *,
     exclude_booking_id: UUID | None = None,
     taken: int = 0,
+    pinned_beside: frozenset[UUID] = frozenset(),
 ) -> list[DisplacedBooking]:
     """Promises a booking of this unit for this window would leave short.
 
@@ -733,6 +739,7 @@ def item_promise_conflicts(
         ends_at + timedelta(hours=after),
         exclude_booking_id=exclude_booking_id,
         taken=taken,
+        pinned_beside=pinned_beside,
     )
 
 
@@ -758,13 +765,15 @@ def check_line(
     *,
     exclude_booking_id: UUID | None = None,
     taken: int = 0,
+    pinned_beside: frozenset[UUID] = frozenset(),
 ) -> LineCheck:
     """Whether one line fits the window, what is in the way, and the way out.
 
-    ``taken`` is what the request's sibling lines already take of the same
-    model — units they pin or promise — which only the caller that sees all
-    lines can count. A unit line needs it too: the unit it pins may be the one
-    a promise no longer has room for once the siblings are pinned beside it.
+    ``taken`` and ``pinned_beside`` are what the request's sibling lines take
+    of the same model, which only the caller that sees all lines knows (see
+    ``model_pool``). A unit line needs them too: the unit it pins may be the
+    one a promise no longer has room for once the siblings are pinned beside
+    it.
     """
     conflicts: list[ConflictDetail] = []
     if line.item_id is not None:
@@ -799,6 +808,7 @@ def check_line(
             ends_at,
             exclude_booking_id=exclude_booking_id,
             taken=taken,
+            pinned_beside=pinned_beside,
         ):
             promised = displaced.booking
             conflicts.append(
@@ -838,6 +848,7 @@ def check_line(
         ends_at,
         exclude_booking_id=exclude_booking_id,
         taken=taken,
+        pinned_beside=pinned_beside,
     )
     for unit, slots in pool.busy:
         for slot in slots:
@@ -876,6 +887,7 @@ def attach_way_out(
     *,
     exclude_booking_id: UUID | None = None,
     taken: int = 0,
+    pinned_beside: frozenset[UUID] = frozenset(),
 ) -> LineCheck:
     """Fill the two ways out of a line that does not fit."""
     if check.ok:
@@ -887,6 +899,7 @@ def attach_way_out(
         ends_at,
         exclude_booking_id=exclude_booking_id,
         taken=taken,
+        pinned_beside=pinned_beside,
     )
     return check
 
@@ -899,6 +912,7 @@ def nearest_window(
     *,
     exclude_booking_id: UUID | None = None,
     taken: int = 0,
+    pinned_beside: frozenset[UUID] = frozenset(),
 ) -> WindowSuggestion | None:
     """The nearest window of the same length in which the line fits."""
     duration = ends_at - starts_at
@@ -917,6 +931,7 @@ def nearest_window(
             candidate_end,
             exclude_booking_id=exclude_booking_id,
             taken=taken,
+            pinned_beside=pinned_beside,
         )
         if check.ok:
             return WindowSuggestion(starts_at=cursor, ends_at=candidate_end)
@@ -937,32 +952,33 @@ def checks_for_lines(
     # one, a model line promises its count. Each line is judged against what
     # its siblings leave, not against the whole fleet — a pinned unit line
     # included, since two of them can take both units a promise counts on.
-    need_by_model: dict[str, int] = {}
+    promised: dict[str, int] = {}
+    pinned: dict[str, set[UUID]] = {}
     for line in lines:
         if line.model is not None:
-            need_by_model[line.model] = need_by_model.get(line.model, 0) + line.quantity
+            promised[line.model] = promised.get(line.model, 0) + line.quantity
             continue
         asset = world.assets_by_id.get(line.item_id) if line.item_id else None
         if asset is not None and asset.model:
-            need_by_model[asset.model] = need_by_model.get(asset.model, 0) + 1
+            pinned.setdefault(asset.model, set()).add(asset.id)
     results: list[LineCheck] = []
     for index, line in enumerate(lines):
         if line.model is not None:
-            siblings = need_by_model.get(line.model, 0) - line.quantity
+            model = line.model
+            taken = promised[model] - line.quantity
         else:
             asset = world.assets_by_id.get(line.item_id) if line.item_id else None
-            siblings = (
-                need_by_model.get(asset.model, 0) - 1
-                if asset is not None and asset.model
-                else 0
-            )
+            model = asset.model or '' if asset is not None else ''
+            taken = promised.get(model, 0)
+        beside = frozenset(pinned.get(model, set()) - {line.item_id})
         check = check_line(
             world,
             line,
             starts_at,
             ends_at,
             exclude_booking_id=exclude_booking_id,
-            taken=max(0, siblings),
+            taken=taken,
+            pinned_beside=beside,
         )
         check.index = index
         results.append(
@@ -973,7 +989,8 @@ def checks_for_lines(
                 starts_at,
                 ends_at,
                 exclude_booking_id=exclude_booking_id,
-                taken=max(0, siblings),
+                taken=taken,
+                pinned_beside=beside,
             )
         )
     return results

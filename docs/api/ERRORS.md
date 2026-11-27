@@ -632,10 +632,12 @@ apart.
 | `RENTAL_MOVE_TARGET_TAKEN` | The chosen unit is not free for that booking |
 | `RENTAL_PICKUP_DUPLICATE_SCAN` | The same unit was scanned twice |
 | `RENTAL_PICKUP_NOT_RESERVED` | Only a reserved booking can be handed out |
+| `RENTAL_PICKUP_WINDOW_PASSED` | This booking's window is over: extend the booking, then hand it out |
 | `RENTAL_RETURN_NEEDS_EVERY_UNIT` | The return lists every unit of the booking |
 | `RENTAL_RETURN_NOT_PICKED_UP` | Only a handed-out booking can be returned |
 | `RENTAL_SERVICE_NEEDS_REASON_AND_DATE` | A unit going to service says what happened and until when |
 | `RENTAL_SERVICE_UNTIL_IN_PAST` | The service ends after it starts |
+| `RENTAL_UNIT_ON_TWO_LINES` | The same unit is on two lines of the booking |
 | `RENTAL_WINDOW_ORDER` | The return comes after the pickup |
 | `REORDER_MAX_BELOW_MIN` | max_quantity ({max_quantity}) must be >= min_quantity ({min_quantity}) |
 | `REORDER_MIN_QUANTITY_NEGATIVE` | min_quantity must be >= 0, got {min_quantity} |

@@ -592,6 +592,8 @@ ERRORS_DE: ErrorMessages = {
     'rental_cancel_not_reserved': 'Nur eine noch nicht ausgegebene Buchung kann storniert werden',
     'rental_pickup_not_reserved': 'Nur eine reservierte Buchung kann ausgegeben werden',
     'rental_pickup_duplicate_scan': 'Dasselbe Gerät wurde zweimal gescannt',
+    'rental_pickup_window_passed': 'Der Zeitraum dieser Buchung ist abgelaufen: Verlängern Sie die Buchung und geben Sie sie dann aus',
+    'rental_unit_on_two_lines': 'Dasselbe Gerät steht in zwei Positionen der Buchung',
     'rental_return_not_picked_up': 'Nur eine ausgegebene Buchung kann zurückgenommen werden',
     'rental_return_needs_every_unit': 'Die Rückgabe nennt jedes Gerät der Buchung',
     'rental_extend_not_active': 'Nur eine reservierte oder ausgegebene Buchung kann verlängert werden',

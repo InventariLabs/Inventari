@@ -19,7 +19,7 @@ import {
   useOrganizationTimezone,
 } from "@/module-sdk";
 
-import type { AssetOption, CalendarBar } from "../api/rentals";
+import type { AssetOption, Booking, CalendarBar } from "../api/rentals";
 import { rentalsApi } from "../api/rentals";
 import {
   useBooking,
@@ -63,6 +63,48 @@ function takenUnit(error: unknown): TakenUnit | null {
   return detail.units?.[0] ?? null;
 }
 
+/**
+ * The units another booking, block or buffer holds before this booking ends.
+ * They are not a choice at pickup, and a scan of one is refused with what is in
+ * the way. A hand-out before the booking starts takes its units from now on, so
+ * the time up to the start counts as much as the window itself.
+ */
+function useUnitsBusyForHandOut(booking: Booking | undefined) {
+  const [openedAt] = useState(() => new Date().toISOString());
+  const startsAt = booking?.starts_at ?? "";
+  const from =
+    startsAt && new Date(startsAt) > new Date(openedAt) ? openedAt : startsAt;
+  const { data, isError, isLoading } = useCalendar(
+    from,
+    booking?.ends_at ?? "",
+    undefined,
+    undefined,
+    Boolean(booking),
+  );
+  const busy = useMemo(() => {
+    const found = new Map<string, CalendarBar>();
+    // While the calendar is loading or failed, the screen guesses nothing:
+    // the confirm is where a taken unit is named with what stands in the way.
+    if (!booking || isLoading || isError) return found;
+    const starts = new Date(from).getTime();
+    const ends = new Date(booking.ends_at).getTime();
+    for (const group of data?.groups ?? []) {
+      for (const unit of group.units) {
+        const bar = (unit.bars ?? []).find(
+          (entry) =>
+            entry.kind !== "returned" &&
+            entry.booking_id !== booking.id &&
+            new Date(entry.starts_at).getTime() < ends &&
+            starts < new Date(entry.ends_at).getTime(),
+        );
+        if (bar) found.set(unit.item_id, bar);
+      }
+    }
+    return found;
+  }, [booking, data, from, isError, isLoading]);
+  return { busy, isError };
+}
+
 export default function PickupPage() {
   const { t } = useTranslation("rentals");
   const { id } = useParams<{ id: string }>();
@@ -73,16 +115,8 @@ export default function PickupPage() {
   const booking = useBooking(id);
   const assets = useRentalAssets("");
   const pickup = usePickupBooking();
-  const {
-    data: calendarData,
-    isError: calendarFailed,
-    isLoading: calendarLoading,
-  } = useCalendar(
-    booking.data?.starts_at ?? "",
-    booking.data?.ends_at ?? "",
-    undefined,
-    undefined,
-    Boolean(booking.data),
+  const { busy, isError: calendarFailed } = useUnitsBusyForHandOut(
+    booking.data,
   );
   const [picked, setPicked] = useState<Record<string, string>>({});
   const [code, setCode] = useState("");
@@ -131,30 +165,6 @@ export default function PickupPage() {
     () => new Map((assets.data ?? []).map((asset) => [asset.id, asset])),
     [assets.data],
   );
-  // A unit another booking, block or buffer holds for this window is not a
-  // choice at pickup, and a scan of it is refused with what is in the way.
-  const busy = useMemo(() => {
-    const found = new Map<string, CalendarBar>();
-    // While the calendar is loading or failed, the screen guesses nothing:
-    // the confirm is where a taken unit is named with what stands in the way.
-    if (!booking.data || calendarLoading || calendarFailed) return found;
-    const starts = new Date(booking.data.starts_at).getTime();
-    const ends = new Date(booking.data.ends_at).getTime();
-    for (const group of calendarData?.groups ?? []) {
-      for (const unit of group.units) {
-        const bar = (unit.bars ?? []).find(
-          (entry) =>
-            entry.kind !== "returned" &&
-            entry.booking_id !== booking.data.id &&
-            new Date(entry.starts_at).getTime() < ends &&
-            starts < new Date(entry.ends_at).getTime(),
-        );
-        if (bar) found.set(unit.item_id, bar);
-      }
-    }
-    return found;
-  }, [booking.data, calendarData, calendarFailed, calendarLoading]);
-
   const busyReason = (bar: CalendarBar) =>
     bar.label || t(BAR_KIND_KEYS[bar.kind] ?? "calendar.legend.block");
 

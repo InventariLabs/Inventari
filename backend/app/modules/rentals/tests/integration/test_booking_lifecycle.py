@@ -11,7 +11,12 @@ from sqlalchemy.orm import Session
 
 from app.modules.equipment.models import EquipmentAssignment
 from app.modules.rentals.models import RentalBlock
-from app.modules.rentals.tests.conftest import END, START, booking_payload
+from app.modules.rentals.tests.conftest import (
+    END,
+    START,
+    booking_payload,
+    make_overdue,
+)
 
 pytestmark = pytest.mark.integration
 
@@ -437,9 +442,10 @@ class TestTodayView:
             rental_auth,
             item_id=projectors[0].id,
             starts_at=now - timedelta(days=3),
-            ends_at=now - timedelta(days=1),
+            ends_at=now + timedelta(hours=1),
         ).json()
         _pickup(client, rental_auth, late['id'], [projectors[0].id])
+        make_overdue(db_session, late['id'], now - timedelta(days=1))
 
         pickup_today = _create(
             client,
@@ -474,6 +480,7 @@ class TestTodayView:
         client: TestClient,
         rental_auth: dict[str, str],
         projectors,
+        db_session: Session,
     ) -> None:
         now = datetime.now(UTC)
         booking = _create(
@@ -481,13 +488,17 @@ class TestTodayView:
             rental_auth,
             item_id=projectors[0].id,
             starts_at=now - timedelta(days=2),
-            ends_at=now - timedelta(hours=1),
+            ends_at=now + timedelta(hours=1),
         ).json()
-        assert booking['is_late'] is False
         picked = _pickup(client, rental_auth, booking['id'], [projectors[0].id]).json()
+        assert picked['is_late'] is False
+        make_overdue(db_session, booking['id'], now - timedelta(hours=1))
         # No stored flag: the same row is late now because its window passed.
-        assert picked['is_late'] is True
-        assert picked['late_days'] >= 1
+        later = client.get(
+            f'{RENTALS}/bookings/{booking["id"]}', headers=rental_auth
+        ).json()
+        assert later['is_late'] is True
+        assert later['late_days'] >= 1
 
 
 class TestCalendar:

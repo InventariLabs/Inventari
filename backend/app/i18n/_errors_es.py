@@ -589,6 +589,8 @@ ERRORS_ES: ErrorMessages = {
     'rental_cancel_not_reserved': 'Solo se puede cancelar una reserva que no se ha entregado',
     'rental_pickup_not_reserved': 'Solo se puede entregar una reserva',
     'rental_pickup_duplicate_scan': 'El mismo equipo se escaneó dos veces',
+    'rental_pickup_window_passed': 'El periodo de esta reserva ha terminado: amplíe la reserva y después entregue el equipo',
+    'rental_unit_on_two_lines': 'El mismo equipo figura en dos líneas de la reserva',
     'rental_return_not_picked_up': 'Solo se puede devolver una reserva entregada',
     'rental_return_needs_every_unit': 'La devolución incluye todos los equipos de la reserva',
     'rental_extend_not_active': 'Solo se puede ampliar una reserva activa',

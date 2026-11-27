@@ -191,7 +191,7 @@
     "nothingFound": "Ninguna unidad coincide con ese código.",
     "alreadyPicked": "{{name}} ya está en esta entrega.",
     "notOnThisBooking": "{{name}} no forma parte de esta reserva.",
-    "busyUnit": "{{name}} no está libre en este periodo: {{reason}}.",
+    "busyUnit": "{{name}} no está libre hasta el final de esta reserva: {{reason}}.",
     "assetTaken": "{{name}} está ocupado: {{reason}}. Elige otra unidad.",
     "anyUnit": "cualquier unidad"
   },

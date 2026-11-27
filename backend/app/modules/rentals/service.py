@@ -9,7 +9,7 @@ the other's write (backend/AGENTS.md, and the test beside this file).
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
@@ -33,7 +33,7 @@ from ._availability import (
     Slot,
     World,
     add_extended_booking,
-    add_picked_up_units,
+    add_picked_up_booking,
     build_calendar,
     checks_for_lines,
     displaced_bookings,
@@ -42,7 +42,6 @@ from ._availability import (
     load_world,
     model_pool,
     organization_today,
-    promise_conflicts,
 )
 from ._blocks import block_schema
 from .exceptions import RentalConflictError
@@ -521,6 +520,12 @@ async def pickup_booking(
     booking = await _require_booking(db, org_id, booking_id)
     if booking.status != 'RESERVED':
         raise ServiceRejectionError('rental_pickup_not_reserved')
+    now = _now()
+    # A loan handed out past its own end is overdue from the first minute and
+    # holds its units against every later booking. Extending it first asks
+    # whether they are free for the time it will really be out.
+    if booking.ends_at <= now:
+        raise ServiceRejectionError('rental_pickup_window_passed')
 
     assets = await equipment_api.list_bookable_assets_async(db, org_id)
     by_id = {asset.id: asset for asset in assets}
@@ -543,11 +548,16 @@ async def pickup_booking(
             raise ServiceRejectionError('rental_asset_not_bookable')
 
     # The world is read before the scans are pinned: a unit this pickup
-    # resolves must be free for the booking's window *and* must not be the
+    # resolves must be free for the booking's hold *and* must not be the
     # last unit another model line is counting on. Reading it after the
     # write would count this pickup's own units as already busy elsewhere.
+    # The hold starts now when the hand-out comes before the window.
     world = await load_world(
-        db, org_id, booking.starts_at, booking.ends_at, cover_bookings=True
+        db,
+        org_id,
+        min(now, booking.starts_at),
+        booking.ends_at,
+        cover_bookings=True,
     )
 
     remaining = list(scanned)
@@ -562,10 +572,11 @@ async def pickup_booking(
             },
         )
 
+    booking.picked_up_at = now
     await db.flush()
-    # The scans are rows now: put them into the world the checks read, so the
-    # booking is not a promise still waiting *and* its unit not free at once.
-    add_picked_up_units(world, booking, new_units)
+    # The scans are rows now: put the booking into the world the checks read as
+    # it will be stored, its units resolved and held from this moment.
+    add_picked_up_booking(world, booking, new_units)
     units_by_id = {unit.id: unit for line in booking.lines for unit in line.units}
     for unit in new_units:
         units_by_id[unit.id] = unit
@@ -597,7 +608,6 @@ async def pickup_booking(
         unit.assignment_id = reference.assignment_id
 
     booking.status = 'PICKED_UP'
-    booking.picked_up_at = _now()
     await db.flush()
     await _journal(db, booking, AuditAction.UPDATE, user_id, extra={'action': 'PICKUP'})
     return booking
@@ -658,7 +668,7 @@ def _blocked_units(
         conflicts = item_busy_conflicts(
             world,
             unit.item_id,
-            booking.starts_at,
+            booking.held_from,
             booking.ends_at,
             exclude_booking_id=booking.id,
         )
@@ -668,13 +678,17 @@ def _blocked_units(
                 'label': slot.label,
                 'starts_at': slot.starts_at.isoformat(),
                 'ends_at': slot.ends_at.isoformat(),
+                'booking_id': str(slot.booking_id) if slot.booking_id else None,
             }
             for slot in conflicts
         ]
-        if unit.id in resolved:
-            # A model line becomes this unit at pickup; taking it must leave
-            # every other model line enough units for its own whole window,
-            # this booking's buffer included.
+        # A scanned unit is new to this booking for the whole hold. A booked
+        # unit's window was judged when it was booked, so only the time an
+        # early hand-out adds before it is asked about.
+        judged_to = booking.ends_at if unit.id in resolved else booking.starts_at
+        if booking.held_from < judged_to:
+            # Taking it must leave every model line enough units for its own
+            # whole window, this booking's buffer included.
             reasons.extend(
                 {
                     'kind': 'model_booking',
@@ -686,8 +700,8 @@ def _blocked_units(
                 for displaced in item_promise_conflicts(
                     world,
                     unit.item_id,
-                    booking.starts_at,
-                    booking.ends_at,
+                    booking.held_from,
+                    judged_to,
                     exclude_booking_id=booking.id,
                 )
             )
@@ -708,9 +722,25 @@ def _blocked_units(
 
 
 def _free_units_for_booking(
-    world: World, booking: RentalBooking, model: str | None
+    world: World, booking: RentalBooking, model: str | None, leaving: UUID
 ) -> list[EquipmentAssetDTO]:
-    """Units the booking could move to without starving another promise."""
+    """Units the booking could move to without starving another promise.
+
+    ``leaving`` is the unit it moves off. Its hold there ends with the move, so
+    it is taken out of the world first: the booking is judged where it goes,
+    buffer included, and not on both units at once.
+    """
+    world = replace(
+        world,
+        slots_by_item={
+            **world.slots_by_item,
+            leaving: [
+                slot
+                for slot in world.slots_by_item.get(leaving, [])
+                if slot.booking_id != booking.id
+            ],
+        },
+    )
     pool = model_pool(
         world,
         model,
@@ -733,7 +763,7 @@ def _free_units_for_booking(
             exclude_booking_id=booking.id,
         ):
             continue
-        if promise_conflicts(
+        if item_promise_conflicts(
             world,
             asset.id,
             booking.starts_at,
@@ -942,7 +972,7 @@ def _service_conflict(
     busy_start: datetime,
 ) -> dict:
     free_units = _free_units_for_booking(
-        world, later_booking, by_id[unit.item_id].model
+        world, later_booking, by_id[unit.item_id].model, unit.item_id
     )
     return {
         'booking_id': str(later_booking.id),
@@ -1004,7 +1034,10 @@ def _apply_move(
     if target.id not in {
         asset.id
         for asset in _free_units_for_booking(
-            world, later_booking, by_id[later_unit.item_id].model
+            world,
+            later_booking,
+            by_id[later_unit.item_id].model,
+            later_unit.item_id,
         )
     }:
         return None

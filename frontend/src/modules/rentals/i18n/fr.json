@@ -191,7 +191,7 @@
     "nothingFound": "Aucun bien ne correspond à ce code.",
     "alreadyPicked": "{{name}} figure déjà dans cette remise.",
     "notOnThisBooking": "{{name}} ne fait pas partie de cette réservation.",
-    "busyUnit": "{{name}} n'est pas libre sur ce créneau : {{reason}}.",
+    "busyUnit": "{{name}} n'est pas libre jusqu'à la fin de cette réservation : {{reason}}.",
     "assetTaken": "{{name}} est pris : {{reason}}. Choisissez un autre bien.",
     "anyUnit": "n’importe quel bien"
   },

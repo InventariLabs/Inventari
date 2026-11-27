@@ -12,8 +12,9 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
 
-from app.modules.rentals.tests.conftest import START, booking_payload
+from app.modules.rentals.tests.conftest import START, booking_payload, make_overdue
 
 pytestmark = pytest.mark.integration
 
@@ -91,6 +92,7 @@ class TestALateLoan:
         client: TestClient,
         rental_auth: dict[str, str],
         projectors,
+        db_session: Session,
     ) -> None:
         now = datetime.now(UTC)
         booking = _create(
@@ -98,11 +100,12 @@ class TestALateLoan:
             rental_auth,
             item_id=projectors[0].id,
             starts_at=now - timedelta(days=2),
-            ends_at=now - timedelta(hours=1),
+            ends_at=now + timedelta(hours=1),
         )
         assert booking.status_code == 201, booking.text
         picked = _pickup(client, rental_auth, booking.json()['id'], [projectors[0].id])
         assert picked.status_code == 200, picked.text
+        make_overdue(db_session, booking.json()['id'], now - timedelta(hours=1))
 
         tomorrow = (now + timedelta(days=1)).replace(
             hour=10, minute=0, second=0, microsecond=0
@@ -138,6 +141,7 @@ class TestALateLoan:
         client: TestClient,
         rental_auth: dict[str, str],
         projectors,
+        db_session: Session,
     ) -> None:
         now = datetime.now(UTC)
         booking = _create(
@@ -145,7 +149,7 @@ class TestALateLoan:
             rental_auth,
             item_id=projectors[0].id,
             starts_at=now - timedelta(days=2),
-            ends_at=now - timedelta(days=1),
+            ends_at=now + timedelta(hours=1),
         )
         assert booking.status_code == 201, booking.text
         assert (
@@ -154,6 +158,8 @@ class TestALateLoan:
             ).status_code
             == 200
         )
+        due = now - timedelta(days=1)
+        make_overdue(db_session, booking.json()['id'], due)
 
         response = client.get(
             f'{RENTALS}/calendar',
@@ -173,9 +179,9 @@ class TestALateLoan:
         )
         out = next(bar for bar in unit['bars'] if bar['kind'] == 'out')
         late = next(bar for bar in unit['bars'] if bar['kind'] == 'late')
-        due = datetime.fromisoformat(booking.json()['ends_at'].replace('Z', '+00:00'))
-        assert datetime.fromisoformat(out['ends_at'].replace('Z', '+00:00')) == due
-        assert datetime.fromisoformat(late['starts_at'].replace('Z', '+00:00')) == due
+        for instant in (out['ends_at'], late['starts_at']):
+            drawn = datetime.fromisoformat(instant.replace('Z', '+00:00'))
+            assert abs(drawn - due) < timedelta(seconds=1)
         late_end = datetime.fromisoformat(late['ends_at'].replace('Z', '+00:00'))
         assert late_end > now - timedelta(minutes=1)
         assert late_end <= now + timedelta(minutes=1)
@@ -959,6 +965,24 @@ class TestTwoLinesOfOneRequest:
             for conflict in line['conflicts']
         ), lines
 
+    def test_one_unit_cannot_be_on_two_lines(
+        self,
+        client: TestClient,
+        rental_auth: dict[str, str],
+        screen,
+    ) -> None:
+        response = client.post(
+            f'{RENTALS}/bookings',
+            headers=rental_auth,
+            json={
+                'borrower_name': 'Jan Wiśniewski',
+                'starts_at': START.isoformat(),
+                'ends_at': (START + timedelta(days=2)).isoformat(),
+                'lines': [{'item_id': str(screen.id)}, {'item_id': str(screen.id)}],
+            },
+        )
+        assert response.status_code == 422, response.text
+
     def test_two_lines_of_one_model_cannot_promise_more_units_than_the_fleet_has(
         self,
         client: TestClient,
@@ -981,3 +1005,136 @@ class TestTwoLinesOfOneRequest:
         assert response.status_code == 409, response.text
         lines = response.json()['detail']['lines']
         assert any(not line['ok'] for line in lines), lines
+
+    def test_a_sibling_already_busy_for_the_promise_is_not_counted_twice(
+        self,
+        client: TestClient,
+        rental_auth: dict[str, str],
+        projectors,
+    ) -> None:
+        # The first unit is booked inside the promised week, so the promise
+        # cannot use it anyway. Booking it again on another day, beside the
+        # second unit, leaves the third free for the whole week.
+        week = START + timedelta(days=12)
+        promised = _create(
+            client,
+            rental_auth,
+            model='Projektor 4K',
+            quantity=1,
+            starts_at=week,
+            ends_at=week + timedelta(days=4),
+            name='Studio Foto',
+        )
+        assert promised.status_code == 201, promised.text
+        thursday = _create(
+            client,
+            rental_auth,
+            item_id=projectors[0].id,
+            starts_at=week + timedelta(days=3, hours=1),
+            ends_at=week + timedelta(days=3, hours=3),
+        )
+        assert thursday.status_code == 201, thursday.text
+
+        body = {
+            'starts_at': (week + timedelta(days=1, hours=1)).isoformat(),
+            'ends_at': (week + timedelta(days=1, hours=3)).isoformat(),
+            'lines': [
+                {'item_id': str(projectors[0].id)},
+                {'item_id': str(projectors[1].id)},
+            ],
+        }
+        check = client.post(f'{RENTALS}/bookings/check', headers=rental_auth, json=body)
+        assert check.json()['ok'] is True, check.json()
+        response = client.post(
+            f'{RENTALS}/bookings',
+            headers=rental_auth,
+            json={**body, 'borrower_name': 'Jan Wiśniewski'},
+        )
+        assert response.status_code == 201, response.text
+
+
+class TestAReturnThatMovesALaterBooking:
+    def test_a_move_counts_the_buffer_of_the_unit_it_lands_on(
+        self,
+        client: TestClient,
+        rental_auth: dict[str, str],
+        projectors,
+    ) -> None:
+        rule = _buffer_rule(
+            client, rental_auth, model='Projektor 4K', hours_before=4, hours_after=0
+        )
+        assert rule.status_code == 200, rule.text
+        now = datetime.now(UTC)
+        day = now + timedelta(days=2)
+        promised = _create(
+            client,
+            rental_auth,
+            model='Projektor 4K',
+            quantity=1,
+            starts_at=day,
+            ends_at=day + timedelta(hours=8),
+            name='Studio Foto',
+        )
+        assert promised.status_code == 201, promised.text
+        inside = _create(
+            client,
+            rental_auth,
+            item_id=projectors[1].id,
+            starts_at=day + timedelta(hours=1),
+            ends_at=day + timedelta(hours=2),
+        )
+        assert inside.status_code == 201, inside.text
+        # The later booking starts after the promise ends; its buffer does not.
+        later = _create(
+            client,
+            rental_auth,
+            item_id=projectors[0].id,
+            starts_at=day + timedelta(hours=9),
+            ends_at=day + timedelta(hours=11),
+            name='Later',
+        )
+        assert later.status_code == 201, later.text
+        out = _create(
+            client,
+            rental_auth,
+            item_id=projectors[0].id,
+            starts_at=now - timedelta(hours=2),
+            ends_at=now + timedelta(hours=1),
+        )
+        assert out.status_code == 201, out.text
+        picked = _pickup(client, rental_auth, out.json()['id'], [projectors[0].id])
+        assert picked.status_code == 200, picked.text
+        unit = {
+            'unit_id': picked.json()['lines'][0]['units'][0]['id'],
+            'condition': 'NEEDS_REPAIR',
+            'service_reason': 'lamp',
+            'service_until': (day + timedelta(days=1)).isoformat(),
+        }
+
+        def move_to(item):
+            return [
+                {
+                    'line_id': later.json()['lines'][0]['id'],
+                    'from_item_id': str(projectors[0].id),
+                    'to_item_id': str(item.id),
+                }
+            ]
+
+        refused = _return_all(client, rental_auth, out.json()['id'], [unit])
+        assert refused.status_code == 409, refused.text
+        offered = {
+            conflict['booking_id']: [free['item_id'] for free in conflict['free_units']]
+            for conflict in refused.json()['detail']['conflicts']
+        }
+        # The third projector is the last one the promise can use.
+        assert offered[later.json()['id']] == [str(projectors[1].id)]
+
+        starving = _return_all(
+            client, rental_auth, out.json()['id'], [unit], move_to(projectors[2])
+        )
+        assert starving.status_code == 409, starving.text
+
+        moved = _return_all(
+            client, rental_auth, out.json()['id'], [unit], move_to(projectors[1])
+        )
+        assert moved.status_code == 200, moved.text

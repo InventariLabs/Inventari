@@ -102,6 +102,16 @@ class RentalBooking(CoreModelBase):
         """Late is read, never stored: a picked-up booking past its end."""
         return self.status == 'PICKED_UP' and self.ends_at < datetime.now(UTC)
 
+    @property
+    def held_from(self) -> datetime:
+        """When the booking starts holding its units.
+
+        A hand-out made before the window opens takes them from that moment.
+        """
+        if self.picked_up_at is not None:
+            return min(self.starts_at, self.picked_up_at)
+        return self.starts_at
+
 
 class RentalBookingLine(CoreModelBase):
     """A line of a booking: one asset, or a model and a count."""

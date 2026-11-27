@@ -20,9 +20,11 @@ from app.models.organization import Organization
 from app.models.partner import Partner
 from app.models.storage_location import StorageLocation
 from app.models.user import User
+from app.modules.rentals.models import RentalBooking
 
-START = datetime(2026, 12, 1, 9, 0, tzinfo=UTC)
-END = datetime(2026, 12, 3, 16, 0, tzinfo=UTC)
+# A window no clock reaches: a booking in it is always still to come.
+START = datetime(2099, 12, 1, 9, 0, tzinfo=UTC)
+END = datetime(2099, 12, 3, 16, 0, tzinfo=UTC)
 
 
 @pytest.fixture
@@ -202,6 +204,14 @@ def booking_payload(
     else:
         payload['borrower_name'] = name
     return payload
+
+
+def make_overdue(db: Session, booking_id: str, ends_at: datetime) -> None:
+    """Put a handed-out booking's due time in the past, as waiting would."""
+    booking = db.get(RentalBooking, UUID(booking_id))
+    assert booking is not None and booking.status == 'PICKED_UP'
+    booking.ends_at = ends_at
+    db.commit()
 
 
 @pytest.fixture

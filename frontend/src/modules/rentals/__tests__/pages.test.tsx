@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -558,6 +558,54 @@ describe("rentals screens", () => {
     expect((posted as unknown as { item_ids: string[] }).item_ids).toEqual([
       ITEM_ID,
     ]);
+  });
+
+  it("a hand-out before the start leaves out a unit busy until then", async () => {
+    let askedFrom = "";
+    server.use(
+      http.get("/api/v1/rentals/calendar", ({ request }) => {
+        askedFrom = new URL(request.url).searchParams.get("starts_at") ?? "";
+        const group = calendar.groups[0];
+        return HttpResponse.json({
+          ...calendar,
+          groups: [
+            {
+              ...group,
+              units: [
+                {
+                  ...group.units[0],
+                  bars: [
+                    {
+                      kind: "reserved",
+                      label: "Jan Wiśniewski",
+                      starts_at: daysFromNow(1),
+                      ends_at: daysFromNow(2),
+                      booking_id: PARTNER_ID,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        });
+      }),
+    );
+    renderPage(
+      <PickupPage />,
+      `/rentals/bookings/${BOOKING_ID}/pickup`,
+      "/rentals/bookings/:id/pickup",
+    );
+    const select = await screen.findByLabelText(
+      /Choose Projektor 4K · any unit/,
+    );
+    await waitFor(() => expect(askedFrom).not.toBe(""));
+    // The unit leaves now, so the calendar is read from now, not from the start.
+    expect(new Date(askedFrom).getTime()).toBeLessThanOrEqual(Date.now());
+    await waitFor(() =>
+      expect(
+        within(select).queryByRole("option", { name: /Projektor 4K #1/ }),
+      ).not.toBeInTheDocument(),
+    );
   });
 
   it("a return records the condition of every unit", async () => {

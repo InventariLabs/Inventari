@@ -89,6 +89,7 @@ async def _blocking_bookings(
             before, _after = world.buffer_for(asset)
         else:
             before, _after = world.buffer_for_model(asset.model or '')
+        free_until = booking.held_from - timedelta(hours=before)
         conflicts.append(
             {
                 'booking_id': str(booking.id),
@@ -97,9 +98,7 @@ async def _blocking_bookings(
                 'ends_at': booking.ends_at.isoformat(),
                 'item_id': str(item_id),
                 'item_name': asset.name,
-                'suggested_until': (
-                    booking.starts_at - timedelta(hours=before)
-                ).isoformat(),
+                'suggested_until': free_until.isoformat(),
             }
         )
     return conflicts

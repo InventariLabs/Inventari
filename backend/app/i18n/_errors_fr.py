@@ -588,6 +588,8 @@ ERRORS_FR: ErrorMessages = {
     'rental_cancel_not_reserved': 'Seule une réservation non encore remise peut être annulée',
     'rental_pickup_not_reserved': 'Seule une réservation peut être remise',
     'rental_pickup_duplicate_scan': 'Le même bien a été scanné deux fois',
+    'rental_pickup_window_passed': 'La période de cette réservation est terminée : prolongez la réservation, puis remettez le matériel',
+    'rental_unit_on_two_lines': 'Le même bien figure sur deux lignes de la réservation',
     'rental_return_not_picked_up': 'Seule une réservation remise peut être retournée',
     'rental_return_needs_every_unit': 'Le retour liste chaque bien de la réservation',
     'rental_extend_not_active': 'Seule une réservation active peut être prolongée',

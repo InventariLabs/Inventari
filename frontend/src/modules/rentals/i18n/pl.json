@@ -209,7 +209,7 @@
     "nothingFound": "Żadna sztuka nie pasuje do tego kodu.",
     "alreadyPicked": "{{name}} jest już w tym wydaniu.",
     "notOnThisBooking": "{{name}} nie należy do tej rezerwacji.",
-    "busyUnit": "{{name}} nie jest wolny w tym terminie: {{reason}}.",
+    "busyUnit": "{{name}} nie jest wolny do końca tej rezerwacji: {{reason}}.",
     "assetTaken": "{{name}} jest zajęty: {{reason}}. Wybierz inną sztukę.",
     "anyUnit": "dowolna sztuka"
   },

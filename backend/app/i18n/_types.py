@@ -48,6 +48,8 @@ class ErrorMessages(TypedDict):
     rental_cancel_not_reserved: str
     rental_pickup_not_reserved: str
     rental_pickup_duplicate_scan: str
+    rental_pickup_window_passed: str
+    rental_unit_on_two_lines: str
     rental_return_not_picked_up: str
     rental_return_needs_every_unit: str
     rental_extend_not_active: str

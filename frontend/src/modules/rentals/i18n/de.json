@@ -191,7 +191,7 @@
     "nothingFound": "Kein Gerät passt zu diesem Code.",
     "alreadyPicked": "{{name}} ist bereits in dieser Ausgabe.",
     "notOnThisBooking": "{{name}} gehört nicht zu dieser Buchung.",
-    "busyUnit": "{{name}} ist für dieses Zeitfenster nicht frei: {{reason}}.",
+    "busyUnit": "{{name}} ist nicht bis zum Ende dieser Buchung frei: {{reason}}.",
     "assetTaken": "{{name}} ist belegt: {{reason}}. Wählen Sie ein anderes Gerät.",
     "anyUnit": "beliebiges Gerät"
   },
