@@ -26,6 +26,22 @@ function at(value: Date): string {
   return value.toISOString();
 }
 
+/** Pick a day in the app's calendar field, stepping a month when needed. */
+async function pickDate(page: import("@playwright/test").Page, field: string, day: Date) {
+  await page.getByLabel(field).click();
+  const today = new Date();
+  if (
+    today.getFullYear() !== day.getFullYear() ||
+    today.getMonth() !== day.getMonth()
+  ) {
+    await page.getByRole("button", { name: "Next month" }).click();
+  }
+  const label = new Intl.DateTimeFormat("en-US", {
+    dateStyle: "long",
+  }).format(day);
+  await page.getByRole("button", { name: label, exact: true }).click();
+}
+
 test.describe("Rentals — booking sheet, phone hand-out and a service return", () => {
   test.describe.configure({ mode: "serial" });
 
@@ -53,16 +69,19 @@ test.describe("Rentals — booking sheet, phone hand-out and a service return", 
       context_tag: "equipment",
     });
     categoryId = category.id;
+    // The model of an asset is its product template, not a free-text field;
+    // one template and three records of it is one fleet of three units.
+    const template = await api.createProductTemplate(token, { name: model });
 
     for (let index = 1; index <= 3; index += 1) {
       const item = await api.createEquipmentItem(token, {
         name: `${model} #${index}`,
+        template_id: template.id,
         quantity: 1,
         location_id: storageId,
         category_id: categoryId,
         metadata: {
           equipment: {
-            model,
             serial_number: `RENT-${unique}-${index}`,
             equipment_status: "AVAILABLE",
           },
@@ -84,9 +103,10 @@ test.describe("Rentals — booking sheet, phone hand-out and a service return", 
     authenticatedPage,
   }) => {
     void authenticatedPage;
-    // Two of the three units are already promised for the window.
-    const starts = daysFromNow(20);
-    const ends = daysFromNow(22, 16);
+    // The sheet opens on tomorrow 09:00 through the day after tomorrow at
+    // 16:00. Two of the three units are already promised for that window.
+    const starts = daysFromNow(1, 9);
+    const ends = daysFromNow(3, 16);
     await api.createRentalBooking(token, {
       starts_at: at(starts),
       ends_at: at(ends),
@@ -97,52 +117,44 @@ test.describe("Rentals — booking sheet, phone hand-out and a service return", 
     const borrower = `E2E Sheet Borrower ${Date.now().toString(36)}`;
     await page.goto("/rentals/bookings/new");
     await expect(
-      page.getByRole("heading", { name: "New booking" }),
+      page.getByRole("heading", { name: "New booking" }).first(),
     ).toBeVisible();
 
     await page
       .getByRole("button", { name: "Someone outside the system" })
       .click();
-    await page.getByLabel("Name", { exact: true }).fill(borrower);
+    await page.getByLabel(/^Name/).fill(borrower);
     await page.getByLabel("E-mail").fill("sheet-borrower@example.com");
-
-    const pickupDate = page.getByLabel("Pickup: date");
-    const pickupTime = page.getByLabel("Pickup: time");
-    const returnDate = page.getByLabel("Return: date");
-    const returnTime = page.getByLabel("Return: time");
-    await pickupDate.fill(dateInput(starts));
-    await pickupTime.fill("09:00");
-    await returnDate.fill(dateInput(ends));
-    await returnTime.fill("16:00");
-
     await page
       .getByRole("combobox", { name: "Model" })
       .selectOption({ value: model });
 
+    const pickupDate = page.getByLabel("Pickup: date");
     await page.getByRole("button", { name: "More" }).click();
     // Three units, two promised: only one is free for a two-unit line.
     await expect(page.getByText(/Only 1 of 2 are free/)).toBeVisible({
       timeout: 15000,
     });
     const reduce = page.getByRole("button", { name: /Reduce to 1 unit/ });
-    const move = page.getByRole("button", { name: /Move to .*when enough are free/ });
+    const move = page.getByRole("button", {
+      name: /Move to .*when enough are free/,
+    });
     await expect(reduce).toBeVisible();
     await expect(move).toBeVisible();
 
-    // The first way out: the nearest window of the same length.
-    const before = await pickupDate.inputValue();
-    await move.click();
-    await expect(pickupDate).not.toHaveValue(before);
-    const moved = await pickupDate.inputValue();
-
-    // The second way out: fewer units. Ask for the original window again,
-    // which still does not fit two, then take the offered single unit.
-    await pickupDate.fill(dateInput(starts));
-    await pickupTime.fill("09:00");
-    await returnDate.fill(dateInput(ends));
-    await returnTime.fill("16:00");
-    await expect(reduce).toBeVisible({ timeout: 15000 });
+    // The first way out: fewer units.
     await reduce.click();
+    await expect(page.getByRole("button", { name: "Book" })).toBeEnabled({
+      timeout: 15000,
+    });
+
+    // The second way out: the nearest window of the same length. Asking for
+    // two again brings the conflict back, and the move keeps the count.
+    await page.getByRole("button", { name: "More" }).click();
+    await expect(move).toBeVisible({ timeout: 15000 });
+    const before = await pickupDate.textContent();
+    await move.click();
+    await expect(pickupDate).not.toHaveText(before ?? "");
     await expect(page.getByRole("button", { name: "Book" })).toBeEnabled({
       timeout: 15000,
     });
@@ -154,7 +166,13 @@ test.describe("Rentals — booking sheet, phone hand-out and a service return", 
       `search=${encodeURIComponent(borrower)}&limit=5`,
     );
     expect(listed.total).toBe(1);
-    expect(moved).not.toBe(before);
+    const saved = await api.getRentalBooking(
+      token,
+      String(listed.items[0].id),
+    );
+    const lines = saved.lines as Array<{ model: string; quantity: number }>;
+    // The move was not a way out by itself: the line still asks for two.
+    expect(lines[0]).toMatchObject({ model, quantity: 2 });
   });
 
   test("a phone scan hands the booking out", async ({
@@ -178,7 +196,7 @@ test.describe("Rentals — booking sheet, phone hand-out and a service return", 
     // Scanning the unit's serial fills the "any unit" line.
     await page.getByRole("textbox", { name: "Scan" }).fill(serials[2]);
     await page.getByRole("button", { name: "Scan" }).click();
-    await expect(page.getByText(/scanned/)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/assigned|scanned/)).toBeVisible({ timeout: 10000 });
 
     const confirm = page.getByRole("button", { name: "Confirm the hand-out" });
     await expect(confirm).toBeEnabled({ timeout: 10000 });
@@ -198,22 +216,42 @@ test.describe("Rentals — booking sheet, phone hand-out and a service return", 
   }, workerInfo) => {
     void authenticatedPage;
     const unique = `${workerInfo.project.name}-${Date.now().toString(36)}`;
+    // A model of its own: the earlier tests hold units from now on, and a
+    // specific-unit return here must not be judged against their promises.
+    const returnModel = `${model}-return`;
+    const template = await api.createProductTemplate(token, {
+      name: returnModel,
+    });
+    const returnUnits: string[] = [];
+    for (let index = 1; index <= 2; index += 1) {
+      const item = await api.createEquipmentItem(token, {
+        name: `${returnModel} #${index}`,
+        template_id: template.id,
+        quantity: 1,
+        location_id: storageId,
+        category_id: categoryId,
+        metadata: { equipment: { equipment_status: "AVAILABLE" } },
+      });
+      returnUnits.push(item.id);
+      items.push(item.id);
+    }
+
     const returning = await api.createRentalBooking(token, {
       starts_at: at(daysFromNow(10)),
       ends_at: at(daysFromNow(12, 16)),
       borrower_name: `E2E Returning ${unique}`,
-      lines: [{ item_id: items[0], quantity: 1 }],
+      lines: [{ item_id: returnUnits[0], quantity: 1 }],
     });
     const returningId = String(returning.id);
     await api.pickupRentalBooking(token, returningId, {
-      item_ids: [items[0]],
+      item_ids: [returnUnits[0]],
     });
 
     const later = await api.createRentalBooking(token, {
       starts_at: at(daysFromNow(14)),
       ends_at: at(daysFromNow(16, 16)),
       borrower_name: `E2E Later ${unique}`,
-      lines: [{ item_id: items[0], quantity: 1 }],
+      lines: [{ item_id: returnUnits[0], quantity: 1 }],
     });
     const laterId = String(later.id);
 
@@ -223,9 +261,7 @@ test.describe("Rentals — booking sheet, phone hand-out and a service return", 
     ).toBeVisible();
     await page.getByRole("button", { name: "Needs service" }).click();
     await page.getByLabel("What happened").fill("Lens cracked");
-    await page
-      .getByLabel("Unavailable until: date")
-      .fill(dateInput(daysFromNow(15)));
+    await pickDate(page, "Unavailable until: date", daysFromNow(15));
     await page.getByLabel("Unavailable until: time").fill("16:00");
 
     await page.getByRole("button", { name: "Confirm the return" }).click();
@@ -245,7 +281,7 @@ test.describe("Rentals — booking sheet, phone hand-out and a service return", 
 
     const moved = await api.getRentalBooking(token, laterId);
     const lines = moved.lines as Array<{ item_id: string }>;
-    expect(lines[0].item_id).toBe(items[1]);
+    expect(lines[0].item_id).toBe(returnUnits[1]);
 
     const returned = await api.getRentalBooking(token, returningId);
     expect(returned.status).toBe("RETURNED");

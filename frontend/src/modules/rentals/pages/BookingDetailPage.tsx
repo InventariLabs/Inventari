@@ -216,8 +216,7 @@ function BookingHeader({
 }
 
 function PrintButtons({ booking }: { booking: Booking }) {
-  const { t } = useTranslation("rentals");
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation("rentals");
   const [error, setError] = useState(false);
   const [printing, setPrinting] = useState<"pick" | "handover" | null>(null);
   const lang = i18n.language;

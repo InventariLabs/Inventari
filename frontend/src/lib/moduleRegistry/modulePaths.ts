@@ -166,6 +166,7 @@ export const MODULE_PATHS: Readonly<Record<string, ModulePaths>> = {
       "/rentals/bookings/new",
       "/rentals/bookings/:id",
       "/rentals/bookings/:id/pickup",
+      "/rentals/kits",
       "/rentals/blocks",
       "/rentals/guide",
     ],

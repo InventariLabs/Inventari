@@ -574,6 +574,7 @@ export class ApiHelper {
       "partners",
       "maker",
       "vision",
+      "rentals",
     ];
     for (const mod of modulesToEnable) {
       await this.toggleModule(token, mod, true);
