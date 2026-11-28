@@ -32,7 +32,7 @@ from app.models.item import Item
 from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
 from app.models.stock_move import StockMove
-from app.models.stock_valuation_layer import StockValuationLayer
+from app.models.stock_valuation_layer import CostBasis, StockValuationLayer
 from app.models.storage_location import StorageLocation
 from app.models.user import User
 from app.modules.warehouse.models.document import Document, DocumentLine
@@ -147,6 +147,47 @@ def _seed_completed_in(
             quantity=quantity,
             expected_quantity=quantity,
             done_quantity=quantity,
+            line_number=1,
+        )
+    )
+    db_session.flush()
+    return doc
+
+
+def _seed_completed_out(
+    db_session: Session,
+    org_id: UUID,
+    user_id: UUID,
+    *,
+    item: Item,
+    source_location_id: UUID,
+    quantity: Decimal,
+    unit_price: Decimal,
+) -> Document:
+    """An original dispatch for a correction to lean on.
+
+    Its record had no card, so the dispatch posted no outflow layer: the
+    books never said what these goods cost. The line carries the sales price
+    a correction copies onto its own line.
+    """
+    doc = Document(
+        organization_id=org_id,
+        type='OUT',
+        number=f'OUT/SEED/{uuid4().hex[:8]}',
+        status='COMPLETED',
+        source_location_id=source_location_id,
+        created_by=user_id,
+    )
+    db_session.add(doc)
+    db_session.flush()
+    db_session.add(
+        DocumentLine(
+            document_id=doc.id,
+            item_id=item.id,
+            quantity=quantity,
+            expected_quantity=quantity,
+            done_quantity=quantity,
+            unit_price=unit_price,
             line_number=1,
         )
     )
@@ -504,4 +545,70 @@ class TestTheCorrectionDoorsAdoptTheCard:
             ledger_org.id,
             corrected_carded.template_id,
             [ledger_shelf.id],
+        )
+
+    def test_a_dispatch_without_an_outflow_comes_back_without_its_sales_price(
+        self,
+        client: TestClient,
+        ledger_headers: dict[str, str],
+        ledger_shelf: StorageLocation,
+        db_session: Session,
+        ledger_org: Organization,
+        ledger_user: User,
+    ) -> None:
+        """Goods back from a dispatch nobody costed say unknown, not the price.
+
+        The dispatch left a record that had no card, so it posted no outflow
+        and the books never said what the goods cost. The correction adopts
+        the record, brings two of the five back, and its line carries the
+        dispatch's sales price. That price is what the goods sold for, not
+        what they cost: with no outflow to read and no rate to borrow, the
+        layer marks the cost unknown instead of stating the sale as one.
+        """
+        record = _cardless_record(
+            db_session,
+            ledger_org.id,
+            name=f'Cardless Dispatch {uuid4().hex[:6]}',
+            location_id=ledger_shelf.id,
+            quantity=Decimal('10'),
+        )
+        original = _seed_completed_out(
+            db_session,
+            ledger_org.id,
+            ledger_user.id,
+            item=record,
+            source_location_id=ledger_shelf.id,
+            quantity=Decimal('5'),
+            unit_price=Decimal('7.00'),
+        )
+        db_session.commit()
+
+        complete_status, doc_id, body = _run_correction(
+            client, ledger_headers, original=original, quantity_delta=-2
+        )
+        assert complete_status == status.HTTP_200_OK, body
+
+        db_session.expire_all()
+        corrected = db_session.get(Item, record.id)
+        assert corrected is not None and corrected.template_id is not None
+        assert corrected.quantity == Decimal('12'), 'the record took the goods back'
+
+        correction = db_session.get(Document, UUID(doc_id))
+        assert correction is not None
+        layer = db_session.scalars(
+            select(StockValuationLayer).where(
+                StockValuationLayer.document_line_id == correction.lines[0].id,
+                StockValuationLayer.direction == 'IN',
+            )
+        ).one()
+        assert layer.quantity == Decimal('2')
+        assert layer.unit_cost == Decimal('0'), (
+            'what the goods sold for is not what they cost'
+        )
+        assert layer.cost_basis == CostBasis.UNKNOWN, (
+            'nobody ever costed these goods, so the layer says so'
+        )
+        assert layer.total_value == Decimal('0')
+        _the_register_agrees(
+            db_session, ledger_org.id, corrected.template_id, [ledger_shelf.id]
         )

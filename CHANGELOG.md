@@ -128,6 +128,17 @@ says what the release does rather than what changed since them.
   clean the picture — about one label in a hundred — so a second reader now
   reads the frames it reports it cannot, a few times a second. Labels printed
   before this change scan too.
+- A stock correction or an adjustment written in a smaller unit than the
+  product keeps values its cost layer in the product's own unit: half a
+  kilogram entered in grams carries half a kilogram's value, not a
+  thousandth of it, so the shelf and its value stop drifting apart. A dispatch
+  corrected downwards brings the goods back at what they cost when they left,
+  and where the books never recorded that cost the layer falls back to the
+  organization's rate, or to unknown when it has none, instead of taking the
+  price the goods sold for. A receipt,
+  a cost put on a batch after it was posted, or a production run whose figure
+  outgrows what a cost layer or a stock record can store is refused with the
+  product, the amount and the limit named, instead of ending in a server error.
 - A receipt written in another unit than the product is kept in records the
   price per the product's unit: 500 g at 0.02 opens a record at 20.00 a
   kilogram, not 0.02. A price, or a share of the delivery's costs, that comes

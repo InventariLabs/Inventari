@@ -413,6 +413,26 @@ def _executed_quantity(line: DocumentLine) -> Decimal:
     return line.done_quantity
 
 
+def _price_per_stock_unit(
+    line: DocumentLine, stock_quantity: Decimal
+) -> Decimal | None:
+    """The line's price restated per stock unit — the unit every layer keeps.
+
+    A line names its quantity and its price in the unit it was written in; a
+    cost layer is kept in the product's own unit. 500 g at 0.02 is 10.00 for
+    half a kilogram, not 0.02 per kilogram, so the per-unit figure is the
+    line's total value spread over the converted quantity. ``None`` stays
+    ``None``: a line nobody priced is not a price of zero.
+    """
+    unit_cost = line.unit_price
+    if unit_cost is None or stock_quantity <= 0:
+        return unit_cost
+    line_quantity = _executed_quantity(line)
+    if line_quantity == stock_quantity:
+        return unit_cost
+    return (line_quantity * unit_cost) / stock_quantity
+
+
 def line_source_shelf(
     line: DocumentLine, doc: Document, item: Any | None
 ) -> UUID | None:
