@@ -359,6 +359,8 @@ ERRORS_FR: ErrorMessages = {
     'stock_record_not_found': "L'enregistrement {item} est introuvable.",
     'stock_product_not_found': 'Le produit {product} est introuvable.',
     'stock_insufficient_record': 'Stock insuffisant pour « {item} » : disponible {available}, demandé {requested}.',
+    'stock_layer_unit_cost_above_ceiling': 'Le coût de {product} atteint {cost} par unité de stock, et une couche de coût contient au plus {ceiling}.',
+    'stock_layer_value_above_ceiling': 'La valeur de {product} sur cette réception atteint {value}, et une couche de coût contient au plus {ceiling}.',
     'receipt_needs_target_location': "Le document de réception n'a pas d'emplacement de destination.",
     'receipt_needs_quarantine_location': "La réception contient des marchandises endommagées ou bloquées pour la qualité, mais le profil des documents n'indique aucun emplacement de quarantaine. Indiquez-en un dans les paramètres des documents.",
     'transfer_needs_target_location': "Le document de transfert n'a pas d'emplacement de destination.",
@@ -536,6 +538,11 @@ ERRORS_FR: ErrorMessages = {
     'production_overproduction_disabled': (
         'La surproduction est désactivée dans les paramètres — cet ordre ne '
         'peut pas produire plus que prévu.'
+    ),
+    'production_unit_cost_above_ceiling': (
+        'Le lot coûte {cost} par unité de {product}, et un enregistrement de stock '
+        'contient au plus {ceiling}. Enregistrez plus de production ou corrigez ce '
+        'que le lot a coûté avant de le clôturer.'
     ),
     'production_ingredient_unmeasurable': (
         "L'unité d'un ingrédient ne peut pas être comparée à son stock : on ne sait "

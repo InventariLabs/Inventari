@@ -27,6 +27,7 @@ from ._stock_executor_helpers import (
     _get_item_or_raise,
     _locked_quantity,
     _post_opening_balance_async,
+    _price_per_stock_unit,
     _resolve_lot,
     line_source_shelf,
 )
@@ -404,8 +405,10 @@ async def execute_correction(
                         doc.organization_id,
                         stock_template_id,
                         effective_delta,
-                        # No price is the unpriced policy, not a zero.
-                        line.unit_price,
+                        # The line's price is per its own unit, and the layer
+                        # is kept per the stock unit: 500 g at 0.02 is half a
+                        # kilogram at 20, not at 0.02.
+                        _price_per_stock_unit(line, effective_delta),
                         document_line_id=line.id,
                         currency=line.currency or doc.currency,
                         # Goods coming back onto the shelf because a dispatch
@@ -539,7 +542,9 @@ async def execute_adjustment(
                         doc.organization_id,
                         stock_template_id,
                         delta,
-                        line.unit_price,
+                        # The line's price is per its own unit; the layer is
+                        # kept per the stock unit the shelf speaks.
+                        _price_per_stock_unit(line, delta),
                         document_line_id=line.id,
                         currency=line.currency or doc.currency,
                     )

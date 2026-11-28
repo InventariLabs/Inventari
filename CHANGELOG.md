@@ -114,6 +114,13 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A stock correction or an adjustment written in a smaller unit than the
+  product keeps values its cost layer in the product's own unit: half a
+  kilogram counted in grams is worth what a kilogram is worth, not a
+  thousandth of it, so the shelf and its value stop drifting apart. A receipt,
+  a cost put on a batch after it was posted, or a production run whose figure
+  outgrows what a cost layer or a stock record can store is refused with the
+  product, the amount and the limit named, instead of ending in a server error.
 - When saving a product's edit form is refused — for example a unit changed
   while the product holds stock — the form scrolls to the sentence that says
   why and screen readers announce it. It stood above the fields, out of sight

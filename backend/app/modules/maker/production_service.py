@@ -41,6 +41,7 @@ from app.core.cost_estimates import UnitCostEstimate
 from app.core.db_utils import paginate_async
 from app.core.exceptions import EntityNotFoundError, ServiceRejectionError
 from app.core.logging import get_logger
+from app.core.module_sdk import PRICE_MAX
 from app.core.money import quantise
 from app.core.public_api import core_api
 from app.i18n import Language
@@ -731,6 +732,33 @@ async def _batch_overheads_and_recipe(
     return total_fixed_cost, total_labour_cost, recipe
 
 
+async def _refuse_a_unit_cost_a_record_cannot_keep_async(
+    db: AsyncSession,
+    organization_id: UUID,
+    order: ProductionOrder,
+    unit_cost: Decimal,
+) -> None:
+    """Refuse a run whose cost per output unit no record or snapshot can keep.
+
+    The output's record states the run's cost as its purchase price, and the
+    order keeps the same figure in its unit-cost snapshot; both columns stop at
+    ``PRICE_MAX``. Past it the driver answered with a server error after the
+    ingredients had been drawn, so the run is refused here, with its own
+    figures, before anything is written.
+    """
+    if unit_cost <= PRICE_MAX:
+        return
+    template = await core_api.product_templates.get_async(
+        db, organization_id, order.output_template_id
+    )
+    raise ServiceRejectionError(
+        'production_unit_cost_above_ceiling',
+        product=template.name if template is not None else order.output_template_id,
+        cost=stated_quantity(quantise(unit_cost, 2)),
+        ceiling=stated_quantity(PRICE_MAX),
+    )
+
+
 def _snapshot_financial_result(
     order: ProductionOrder,
     recipe: MakerRecipe | None,
@@ -994,6 +1022,9 @@ async def _receive_output(
     )
     template = await core_api.product_templates.get_async(
         db, organization_id, order.output_template_id
+    )
+    await _refuse_a_unit_cost_a_record_cannot_keep_async(
+        db, organization_id, order, unit_cost
     )
     # The card's "purchase price per unit" and the fallback value for an
     # organization without cost layers — the same field the receipt path
@@ -1351,6 +1382,9 @@ async def complete_production(
     )
     unit_cost = (
         total_cost / actual_qty if actual_qty > 0 and total_cost > 0 else Decimal('0')
+    )
+    await _refuse_a_unit_cost_a_record_cannot_keep_async(
+        db, organization_id, order, unit_cost
     )
     uncosted = any(
         child_template_id not in taken.consumption.unit_costs
@@ -1714,6 +1748,9 @@ async def finish_production(
         estimated_material + fixed_cost + labour_cost, 2
     )
     unit_cost = total_cost / total_actual if total_cost > 0 else Decimal('0')
+    await _refuse_a_unit_cost_a_record_cannot_keep_async(
+        db, organization_id, order, unit_cost
+    )
     _snapshot_financial_result(
         order,
         recipe,

@@ -26,6 +26,7 @@ from ._stock_executor_helpers import (
     _get_item_or_raise,
     _locked_quantity,
     _post_opening_balance_async,
+    _price_per_stock_unit,
     _resolve_lot,
 )
 from .document_profile_service import get_profile
@@ -661,11 +662,7 @@ async def _record_receipt_valuation(
     # too — the line carries it, the document carries it, and the cost history
     # receives both. A receipt of 100 x 40.10 PLN into an organization keeping
     # USD keeps the currency of the line, so the layer knows it is złoty.
-    unit_cost = line.unit_price
-    if unit_cost is not None and stock_quantity > 0:
-        line_quantity = _executed_quantity(line)
-        if line_quantity != stock_quantity:
-            unit_cost = (line_quantity * unit_cost) / stock_quantity
+    unit_cost = _price_per_stock_unit(line, stock_quantity)
     # This line's share of the freight, duty and insurance the delivery
     # arrived with. Without it the shelf is worth what the supplier invoiced
     # and nothing else, and every margin taken off that number is short by

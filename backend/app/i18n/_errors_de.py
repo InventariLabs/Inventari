@@ -363,6 +363,8 @@ ERRORS_DE: ErrorMessages = {
     'stock_record_not_found': 'Der Datensatz {item} wurde nicht gefunden.',
     'stock_product_not_found': 'Das Produkt {product} wurde nicht gefunden.',
     'stock_insufficient_record': 'Nicht genug Bestand für „{item}“: verfügbar {available}, angefordert {requested}.',
+    'stock_layer_unit_cost_above_ceiling': 'Der Kostenwert von {product} beträgt {cost} je Lagereinheit, und eine Kostenebene fasst höchstens {ceiling}.',
+    'stock_layer_value_above_ceiling': 'Der Wert von {product} in dieser Lieferung beträgt {value}, und eine Kostenebene fasst höchstens {ceiling}.',
     'receipt_needs_target_location': 'Der Wareneingangsbeleg hat keinen Zielort.',
     'receipt_needs_quarantine_location': 'Der Wareneingang enthält beschädigte oder qualitätsgesperrte Ware, aber im Belegprofil ist kein Quarantäneort festgelegt. Legen Sie ihn in den Belegeinstellungen fest.',
     'transfer_needs_target_location': 'Der Umlagerungsbeleg hat keinen Zielort.',
@@ -540,6 +542,11 @@ ERRORS_DE: ErrorMessages = {
     'production_overproduction_disabled': (
         'Überproduktion ist in den Einstellungen deaktiviert — dieser Produktionslauf '
         'kann nicht mehr als geplant produzieren.'
+    ),
+    'production_unit_cost_above_ceiling': (
+        'Der Lauf kostet {cost} je Einheit von {product}, und ein Bestandsdatensatz '
+        'fasst höchstens {ceiling}. Erfasse mehr Ausbeute oder korrigiere die Kosten '
+        'des Laufs vor dem Abschluss.'
     ),
     'production_ingredient_unmeasurable': (
         'Die Einheit einer Zutat lässt sich nicht mit ihrem Bestand vergleichen, daher ist '

@@ -438,6 +438,7 @@ class ErrorMessages(TypedDict):
     production_update_not_draft: str
     production_actual_qty_must_be_positive: str
     production_overproduction_disabled: str
+    production_unit_cost_above_ceiling: str
     production_ingredient_unmeasurable: str
     production_short_of_stock: str
     production_best_before_before_made: str
@@ -830,6 +831,8 @@ class ErrorMessages(TypedDict):
     stock_record_not_found: str
     stock_product_not_found: str
     stock_insufficient_record: str
+    stock_layer_unit_cost_above_ceiling: str
+    stock_layer_value_above_ceiling: str
     receipt_needs_target_location: str
     receipt_needs_quarantine_location: str
     transfer_needs_target_location: str
