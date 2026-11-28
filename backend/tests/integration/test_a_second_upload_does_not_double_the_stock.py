@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import UserContextDTO
 from app.models.item import Item
+from app.models.storage_location import StorageLocation
 from app.services.items._import import import_items
 from app.services.items._import_existing import count_rows_in_stock_async
 
@@ -74,6 +75,15 @@ async def _quantities(db: AsyncSession, org_id) -> list[tuple[str, Decimal]]:
         select(Item.name, Item.quantity).where(
             Item.organization_id == org_id, Item.is_deleted.is_(False)
         )
+    )
+    return sorted((name, quantity) for name, quantity in rows.all())
+
+
+async def _shelves(db: AsyncSession, org_id) -> list[tuple[str, Decimal]]:
+    rows = await db.execute(
+        select(StorageLocation.name, Item.quantity)
+        .join(Item, Item.storage_location_id == StorageLocation.id)
+        .where(Item.organization_id == org_id, Item.is_deleted.is_(False))
     )
     return sorted((name, quantity) for name, quantity in rows.all())
 
@@ -150,6 +160,71 @@ class TestASecondUploadDoesNotDoubleTheStock:
             select(Item.quantity, Item.brand).where(Item.brand == 'Mill')
         )
         assert brands.all() == [(Decimal('2'), 'Mill')]
+
+    @pytest.mark.parametrize('code', [{'SKU': 'FL-1'}, {'Barcode': '5901234123457'}])
+    async def test_overwrite_refuses_by_name_a_shelf_the_product_does_not_stand_on(
+        self, real_async_db_session, async_test_user, code
+    ):
+        """Overwrite writes a product's record only where the row says it is."""
+        db = real_async_db_session
+        shelf_a = _row('Flour', '12', 'Shelf A', **code)
+        await _upload(
+            db, async_test_user, [shelf_a, _row('Flour', 'lots', 'Shelf B', **code)]
+        )
+        await db.commit()
+
+        result = await _upload(
+            db,
+            async_test_user,
+            [shelf_a, _row('Flour', '2', 'Shelf B', **code)],
+            mode='overwrite',
+        )
+        await db.commit()
+
+        assert (result['updated'], result['imported'], result['failed']) == (
+            1,
+            0,
+            1,
+        ), result
+        assert result['errors'][0]['row'] == 2
+        reason = result['errors'][0]['error']
+        assert 'Shelf B' in reason and 'Leave alone' in reason, reason
+        assert result['created_locations'] == []
+        assert await _shelves(db, async_test_user.organization_id) == [
+            ('Shelf A', Decimal('12'))
+        ]
+
+    async def test_overwrite_writes_onto_the_empty_record_the_row_names(
+        self, real_async_db_session, async_test_user
+    ):
+        db = real_async_db_session
+        await _upload(
+            db,
+            async_test_user,
+            [
+                _row('Flour', '12', 'Shelf A', SKU='FL-1'),
+                _row('Flour', '0', 'Shelf B', SKU='FL-1'),
+            ],
+        )
+        await db.commit()
+
+        result = await import_items(
+            db,
+            _csv([_row('Flour', '0', 'Shelf B', SKU='FL-1', Brand='Mill')]),
+            'stock.csv',
+            {**_MAPPING, 'brand': 'Brand'},
+            _ctx(async_test_user),
+            on_label_match='overwrite',
+        )
+        await db.commit()
+
+        assert (result['updated'], result['failed']) == (1, 0), result
+        assert await _shelves(db, async_test_user.organization_id) == [
+            ('Shelf A', Decimal('12')),
+            ('Shelf B', Decimal('0')),
+        ]
+        branded = await db.execute(select(Item.quantity).where(Item.brand == 'Mill'))
+        assert branded.scalars().all() == [Decimal('0')]
 
     async def test_overwrite_refuses_a_row_that_fits_several_records(
         self, real_async_db_session, async_test_user

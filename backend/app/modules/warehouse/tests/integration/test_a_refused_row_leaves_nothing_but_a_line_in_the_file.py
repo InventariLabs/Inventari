@@ -139,6 +139,33 @@ class TestARefusedRowLeavesNothingButALineInTheFile:
             select(ProductTemplate).where(ProductTemplate.sku == 'LONG-NAME')
         ).first()
 
+    @pytest.mark.parametrize('column', ['SKU', 'Barcode'])
+    def test_a_code_that_names_a_nameless_row_is_the_column_refused(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_target_location: StorageLocation,
+        column: str,
+    ) -> None:
+        frame = pd.DataFrame([{'Product': '', column: 'C' * 300, 'Qty': 1}])
+
+        resp = client.post(
+            '/api/v1/warehouse/import/opening-stock',
+            files={'file': ('stock.csv', frame.to_csv(index=False), 'text/csv')},
+            data={
+                'mapping_json': json.dumps(
+                    {'name': 'Product', column.lower(): column, 'quantity': 'Qty'}
+                ),
+                'target_location_id': str(doc_target_location.id),
+            },
+            headers=doc_auth_headers,
+        )
+
+        assert resp.status_code == 200, resp.text
+        assert resp.json()['errors'][0]['error'] == (
+            f'Column "{column}": the text is longer than 255 characters'
+        )
+
     def test_document_lines_hand_the_refused_rows_back(
         self,
         client: TestClient,
