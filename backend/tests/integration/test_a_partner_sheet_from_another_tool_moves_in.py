@@ -236,7 +236,11 @@ class TestAContactPersonRow:
 
         assert (result['contacts'], result['failed']) == (0, 1), result
         assert result['errors'][0]['row'] == 1
-        assert 'Unlisted' in result['errors'][0]['error']
+        # Neither the organization nor the file has it, and the reason says both.
+        assert result['errors'][0]['error'] == (
+            'A contact person of "Unlisted": there is no partner of that name here, '
+            'and this file adds none'
+        )
         assert 'Ola' not in _partners(db_session)
 
     def test_a_company_naming_itself_is_a_partner(

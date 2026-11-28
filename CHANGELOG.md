@@ -45,10 +45,9 @@ says what the release does rather than what changed since them.
   one name, by the reader's choice), takes the last step of a category path,
   and knows units such as `Units`, `ea` and `each` and their names in all six
   languages. A row whose file names no location goes to the oldest real
-  location, never to one of the virtual places. A repeated sheet in Leave
-  alone mode still adds a shelf the product has no record on, and a name too
-  long for the product's column is refused with that column and its limit
-  rather than as an internal error. The partner import reads a country by its
+  location, never to one of the virtual places. A name too long for the
+  product's column is refused with that column and its limit rather than as an
+  internal error. The partner import reads a country by its
   name and files a contact person's row with the company it belongs to,
   including a company already in the database. The export's Read me sheet now
   says SKU, stock alert and description are read back.
@@ -124,6 +123,8 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A partner's detail sheet shows notes with their line breaks, so the contact
+  people a partner import writes there are a line each.
 - A code scanned while the one before it is still being looked up is no longer
   dropped without a word: on the put-away sheet, phone receiving and every
   other screen that looks codes up this way, codes are answered one at a time
@@ -167,7 +168,10 @@ says what the release does rather than what changed since them.
   in stock by its SKU or barcode, not only by its Label Code, so a corrected
   sheet can be uploaded whole without doubling stock, and **Add anyway** warns
   before importing a file whose every row finds stock already here
-  (`POST /items/import/check`).
+  (`POST /items/import/check`). Where a product found by its SKU or barcode has
+  no record at the location a row names, **Leave alone** adds the row there and
+  **Overwrite** refuses it, naming the location, instead of moving the record;
+  a Label Code names one record in both modes, wherever it stands.
 
 ### Fixed
 
