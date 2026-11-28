@@ -93,9 +93,9 @@ export function ManualTab({
             <Button
               size="content"
               type="button"
-              variant="ghost"
+              variant="link"
               onClick={onClearCarriedOver}
-              className="text-xs font-medium text-primary-600 hover:text-primary-700 shrink-0 min-h-11 md:min-h-0 min-w-11 md:min-w-0"
+              className="text-xs shrink-0 min-h-11 md:min-h-0 min-w-11 md:min-w-0"
             >
               {t("common:actions.clear")}
             </Button>

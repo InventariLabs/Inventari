@@ -49,7 +49,7 @@ export default function ItemsBulkActionBar({
         size="content"
         variant="ghost"
         onClick={onBulkEdit}
-        className="py-2 rounded-xl font-semibold text-primary-600 hover:bg-primary-50 active:bg-primary-50"
+        className="py-2 rounded-xl font-semibold text-on-primary hover:bg-primary-50 active:bg-primary-50"
       >
         <Edit size={16} />
         {t("common:actions.edit")}
@@ -70,7 +70,7 @@ export default function ItemsBulkActionBar({
             className={`py-2 rounded-xl font-semibold ${
               action.variant === "danger"
                 ? "text-red-600 hover:bg-red-50 active:bg-red-50"
-                : "text-primary-600 hover:bg-primary-50 active:bg-primary-50"
+                : "text-on-primary hover:bg-primary-50 active:bg-primary-50"
             }`}
           >
             <action.icon size={16} />

@@ -46,10 +46,10 @@ export default function RecipeCostSection({
             <p className="text-sm text-on-muted">{t("cost.no_data")}</p>
             {onEditRecipe && (
               <Button
-                variant="ghost"
+                variant="link"
                 size="contentSm"
                 onClick={onEditRecipe}
-                className="text-primary-600 hover:text-primary-700 px-0 text-xs min-h-11 md:min-h-0 min-w-11 md:min-w-0"
+                className="px-0 text-xs min-h-11 md:min-h-0 min-w-11 md:min-w-0"
               >
                 {t("common:form.edit")}
               </Button>

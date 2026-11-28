@@ -51,10 +51,10 @@ export default function ImportIngredientsTab({
         {hasOriginalText && (
           <Button
             type="button"
-            variant="ghost"
+            variant="link"
             size="contentSm"
             onClick={() => setShowOriginal((v) => !v)}
-            className="min-h-11 md:min-h-0 min-w-11 md:min-w-0 px-0 text-xs text-primary-600 hover:text-primary-700 hover:bg-transparent"
+            className="min-h-11 md:min-h-0 min-w-11 md:min-w-0 px-0 text-xs"
           >
             {showOriginal
               ? t("import_export.review_parsed")

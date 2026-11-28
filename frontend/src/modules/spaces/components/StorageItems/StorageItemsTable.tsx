@@ -233,7 +233,7 @@ export function StorageItemsTable({
                         variant="ghost"
                         size="icon"
                         onClick={() => onEditItem(item.id)}
-                        className="text-primary-600 hover:bg-primary-50 active:bg-primary-50"
+                        className="text-on-primary hover:bg-primary-50 active:bg-primary-50"
                         title={t("items:actions.edit")}
                         aria-label={t("items:actions.edit")}
                       >

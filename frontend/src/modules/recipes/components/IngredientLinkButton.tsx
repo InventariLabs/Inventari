@@ -83,7 +83,7 @@ export default function IngredientLinkButton({
           variant="ghost"
           size="contentSm"
           className={`gap-1 rounded px-1 py-1 text-xs hover:bg-primary-50 shrink-0 ${
-            primary ? "text-primary-600" : "text-on-muted"
+            primary ? "text-on-primary" : "text-on-muted"
           }`}
           aria-label={linkName}
           title={linkName}

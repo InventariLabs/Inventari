@@ -51,8 +51,11 @@ function paintsRawRestStep(line: string): boolean {
   return withoutHover.includes("text-primary-600");
 }
 
-/** The markup that marks a line as a link or a link-styled action. */
-const LINK_MARK = /underline|<Link\b|<a\s|variant="link"/;
+/**
+ * The markup that marks a line as a link or a link-styled action. A ghost
+ * button is one: it has no fill of its own, so its colour is read on the card.
+ */
+const LINK_MARK = /underline|<Link\b|<a\s|variant="(?:link|ghost)"/;
 
 /**
  * The wordmark wrapper is a logo, not text: WCAG 1.4.3 exempts logos, and the

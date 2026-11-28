@@ -100,7 +100,7 @@ const ImportIngredientRow = memo(function ImportIngredientRow({
               type="button"
               variant="ghost"
               size="iconSm"
-              className="rounded text-xs text-primary-600 hover:bg-primary-50 hover:text-on shrink-0"
+              className="rounded text-xs text-on-primary hover:bg-primary-50 hover:text-on shrink-0"
               aria-label={t("recipes:import_export.review_change_template")}
               title={t("recipes:import_export.review_change_template")}
             >

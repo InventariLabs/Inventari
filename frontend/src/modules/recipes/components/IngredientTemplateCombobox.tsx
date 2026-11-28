@@ -254,7 +254,7 @@ export default function IngredientTemplateCombobox({
                 size="contentSm"
                 className="w-full px-2.5 py-2 justify-start text-left gap-2"
               >
-                <Link2 size={16} className="shrink-0 text-primary-600" />
+                <Link2 size={16} className="shrink-0 text-on-primary" />
                 <span className="flex-1 min-w-0">
                   <span className="block text-sm text-on truncate">
                     {option.name}

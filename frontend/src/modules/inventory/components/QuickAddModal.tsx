@@ -203,8 +203,9 @@ export default function QuickAddModal({
                   type="button"
                   onClick={() => setActiveTab("vision")}
                   variant="ghost"
+                  aria-pressed={activeTab === "vision"}
                   size="contentSm"
-                  className={`min-h-11 md:min-h-0 min-w-11 md:min-w-0 flex-1 font-semibold text-sm ${activeTab === "vision" ? "bg-surface-card text-primary-600 shadow-sm" : "text-on-secondary hover:text-on"}`}
+                  className={`min-h-11 md:min-h-0 min-w-11 md:min-w-0 flex-1 font-semibold text-sm ${activeTab === "vision" ? "bg-surface-card text-on shadow-sm" : "text-on-secondary hover:text-on"}`}
                 >
                   <Camera size={16} />
                   {t("quickAdd.tabVision")}
@@ -213,8 +214,9 @@ export default function QuickAddModal({
                   type="button"
                   onClick={() => setActiveTab("manual")}
                   variant="ghost"
+                  aria-pressed={activeTab === "manual"}
                   size="contentSm"
-                  className={`min-h-11 md:min-h-0 min-w-11 md:min-w-0 flex-1 font-semibold text-sm ${activeTab === "manual" ? "bg-surface-card text-primary-600 shadow-sm" : "text-on-secondary hover:text-on"}`}
+                  className={`min-h-11 md:min-h-0 min-w-11 md:min-w-0 flex-1 font-semibold text-sm ${activeTab === "manual" ? "bg-surface-card text-on shadow-sm" : "text-on-secondary hover:text-on"}`}
                 >
                   <Edit size={16} />
                   {t("quickAdd.tabManual")}
