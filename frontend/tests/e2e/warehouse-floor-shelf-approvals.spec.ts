@@ -5,6 +5,7 @@ import {
 } from "@playwright/test";
 import { test, expect } from "./fixtures/auth";
 import { ApiHelper } from "./helpers/api";
+import { wedgeScan } from "./helpers/wedge-scan";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
 
 /**
@@ -238,11 +239,22 @@ async function chooseShelf(sheet: Locator, shelf: Shelf) {
   await page.getByRole("button", { name: shelf.name }).first().click();
 }
 
-/** What a hardware scanner does: the keys a few ms apart, then Enter. */
-async function scan(page: Page, code: string) {
-  await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
-  await page.keyboard.type(code, { delay: 10 });
-  await page.keyboard.press("Enter");
+/**
+ * A scan the screen refuses in `words`, waited for until that answer shows. A
+ * message of the same words from an earlier step is closed first, or it would
+ * answer for this scan: the next code would then be read while this one is
+ * still being looked up, and the put-away sheet takes one lookup at a time.
+ */
+async function refusedScan(page: Page, code: string, words: RegExp) {
+  const said = page.locator("[data-sonner-toast]").filter({ hasText: words });
+  // Closed in the page, with no pointer: a message the pointer rests on stops
+  // counting down.
+  await said
+    .locator("[data-close-button]")
+    .evaluateAll((buttons: HTMLElement[]) => buttons.forEach((b) => b.click()));
+  await expect(said).toHaveCount(0);
+  await wedgeScan(page, code);
+  await expect(said.first()).toBeVisible();
 }
 
 async function floorSetup(
@@ -312,7 +324,7 @@ test.describe("Floor shelf card — receiving", () => {
     await expect(card.getByText("The delivery's location")).toBeVisible();
     await expect(card.getByText("Scan the location to confirm")).toHaveCount(0);
 
-    await scan(page, product.barcode);
+    await wedgeScan(page, product.barcode);
     await expect(card.getByText("Scanned", { exact: true })).toBeVisible();
     await page
       .getByRole("button", { name: "Correct, finish receiving" })
@@ -340,7 +352,7 @@ test.describe("Floor shelf card — receiving", () => {
     // The product first. The scan only names the line; booking its count is
     // what the shelf has to precede, so finishing is refused in words that
     // name the shelf, and nothing reaches the ledger.
-    await scan(page, product.barcode);
+    await wedgeScan(page, product.barcode);
     await expect(card.getByText("Scanned", { exact: true })).toBeVisible();
     await page
       .getByRole("button", { name: "Correct, finish receiving" })
@@ -350,14 +362,14 @@ test.describe("Floor shelf card — receiving", () => {
     expect(await floor.onHand(product, shelf)).toBe(0);
 
     // Another shelf's label is not the one the card names.
-    await scan(page, other.code);
+    await wedgeScan(page, other.code);
     await expect(
       page.getByText(/That is not the location — go to /),
     ).toBeVisible();
     await expect(card.getByText("Scan the location to confirm")).toBeVisible();
 
     // The right label confirms the card, and now the same press books it.
-    await scan(page, shelf.code);
+    await wedgeScan(page, shelf.code);
     await expect(card.getByText("Location confirmed")).toBeVisible();
     expect(await floor.onHand(product, shelf)).toBe(0);
     await page
@@ -438,7 +450,7 @@ test.describe("Floor shelf card — picking", () => {
     await expect(sheet.getByText(shelf.name, { exact: true })).toBeVisible();
     await expect(sheet.getByText("Scan the location label")).toHaveCount(0);
 
-    await scan(page, product.barcode);
+    await wedgeScan(page, product.barcode);
     await expect(page.locator("body")).toContainText("Picking complete");
     await expect(sheet.getByText("1 of 1 lines picked")).toBeVisible();
     await expect(sheet.getByText("1 picked", { exact: true })).toBeVisible();
@@ -496,17 +508,18 @@ test.describe("Floor shelf card — picking", () => {
       await expect(card).toContainText(step.shelf.name);
 
       // The product before its shelf: refused, and nothing is picked.
-      await scan(page, step.product.barcode);
-      await expect(
-        page.getByText(/Scan the location first: /).first(),
-      ).toBeVisible();
+      await refusedScan(
+        page,
+        step.product.barcode,
+        /Scan the location first: /,
+      );
       await expect(progress).toBeVisible();
       await expect(card.getByText("Scan the location label")).toBeVisible();
 
       // The shelf, then the product on it.
-      await scan(page, step.shelf.code);
+      await wedgeScan(page, step.shelf.code);
       await expect(card.getByText("Location confirmed")).toBeVisible();
-      await scan(page, step.product.barcode);
+      await wedgeScan(page, step.product.barcode);
       // The last pick ends the session, which is the summary's to say.
       if (picked === 0) {
         await expect(sheet.getByText("1/2 picked")).toBeVisible();
@@ -748,14 +761,11 @@ test.describe("Floor shelf card — put-away tasks", () => {
       await expect(post).toBeDisabled();
 
       // Another shelf's label is not the one the card names.
-      await scan(page, shelfB.code);
-      await expect(
-        page.getByText(/That is not the location — go to /),
-      ).toBeVisible();
+      await refusedScan(page, shelfB.code, /That is not the location — go to /);
       await expect(post).toBeDisabled();
 
       // The right label confirms the card and releases the button.
-      await scan(page, shelfA.code);
+      await wedgeScan(page, shelfA.code);
       await expect(sheet.getByText("Location confirmed")).toBeVisible();
       await expect(post).toBeEnabled();
       expect(await floor.onHand(product, shelfA)).toBe(1);

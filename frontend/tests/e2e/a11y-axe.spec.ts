@@ -282,9 +282,11 @@ test.describe("Accessibility — axe scan of the first screens", () => {
       await page.goto("/warehouse/register");
       await settle(page);
       // The register opens as groups; the rows the scan measures are inside
-      // the one holding the receipt. It is found by the type code: the name on
-      // the button is the document profile's to choose ("Receipt", "PZ").
-      await page.getByTestId("register-group-IN").click();
+      // the one holding the receipt. Grouped by partner, that group is the
+      // supplier made here, so the receipt is on its first page however many
+      // receipts the stack already holds (a group shows 50 rows, oldest first).
+      await page.getByRole("button", { name: "Partner", exact: true }).click();
+      await page.getByTestId(`register-group-${supplier.name}`).click();
       await expect(
         page.getByRole("link", { name: new RegExp(number) }),
       ).toBeVisible({ timeout: 15000 });
