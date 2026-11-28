@@ -67,7 +67,7 @@ class TestNumbers:
     def test_a_price_or_quantity_as_it_is_written(
         self, cell: str, expected: str
     ) -> None:
-        assert parse_sheet_number(cell) == Decimal(expected)
+        assert parse_sheet_number(cell, money=True) == Decimal(expected)
 
     def test_a_lone_comma_before_three_digits_follows_the_language(self) -> None:
         assert parse_sheet_number('1,250') == Decimal('1.25')
@@ -199,18 +199,76 @@ class TestNumbers:
         with pytest.raises(ValueError):
             parse_sheet_number(cell)
 
-    @pytest.mark.parametrize('cell', ['2 cup', '3 top', '5 all', '1 bob'])
-    def test_a_unit_word_after_the_number_is_not_a_currency_code(
-        self, cell: str
-    ) -> None:
-        """``CUP`` is the Cuban peso as a code, ``cup`` is a cup.
+    @pytest.mark.parametrize(
+        'cell',
+        [
+            '3 ft',
+            '10 ft',
+            '2 kr',
+            '5 fr',
+            '3 lei',
+            '2 cup',
+            '2 CUP',
+            '3 top',
+            '2 TOP',
+            '5 all',
+            '5 ALL',
+            '1 bob',
+            'PLN 12',
+        ],
+    )
+    def test_a_word_beside_a_quantity_is_not_dropped(self, cell: str) -> None:
+        """``ft`` is the forint and feet, ``CUP`` the Cuban peso and a cup.
 
-        An ISO 4217 code is written in capitals; a lowercase word after a
-        quantity is that language's word for the thing measured, and the cell
-        is refused rather than read as a bare number with its unit dropped.
+        Only a price cell names a currency. Anywhere else the word is the
+        sheet's own unit, and the cell is refused rather than read as a bare
+        number with its unit dropped.
         """
         with pytest.raises(ValueError):
             parse_sheet_number(cell)
+        sheet = SheetColumns(pd.DataFrame({'qty': [cell]}))
+        with pytest.raises(ValueError):
+            sheet.number(cell, 'qty')
+
+    @pytest.mark.parametrize(
+        ('cell', 'expected'),
+        [
+            ('12,5 eur', '12.5'),
+            ('12,5 Eur', '12.5'),
+            ('12 usd', '12'),
+            ('pln 12,5', '12.5'),
+            ('PLN 12,5', '12.5'),
+            ('1 290 Ft', '1290'),
+            ('12,50 ZŁ', '12.50'),
+        ],
+    )
+    def test_a_price_reads_its_currency_whatever_its_case(
+        self, cell: str, expected: str
+    ) -> None:
+        sheet = SheetColumns(pd.DataFrame({'price': [cell]}))
+        assert sheet.number(cell, 'price', money=True) == Decimal(expected)
+
+    def test_a_price_with_its_code_still_settles_its_columns_dot(self) -> None:
+        set_current_lang('en')
+        sheet = SheetColumns(pd.DataFrame({'price': ['12,5 eur', '1.250 eur']}))
+        assert sheet.number('1.250 eur', 'price', money=True) == Decimal('1250')
+
+    @pytest.mark.parametrize(
+        ('cell', 'restated'), [('1.250 eur', '1250'), ('3 ft', None)]
+    )
+    def test_a_cell_taken_out_of_its_column_is_restated_as_it_was_read(
+        self, cell: str, restated: str | None
+    ) -> None:
+        """The refused-rows file keeps a price's reading and a quantity's unit."""
+        set_current_lang('en')
+        money = restated is not None
+        sheet = SheetColumns(pd.DataFrame({'a': ['12,5', cell]}))
+        if money:
+            sheet.number(cell, 'a', money=True)
+        else:
+            with pytest.raises(ValueError):
+                sheet.number(cell, 'a')
+        assert sheet.restate(cell, 'a') == restated
 
 
 class TestDates:
@@ -244,6 +302,47 @@ class TestDates:
         assert parse_sheet_date('05/11/2026 10:30 AM', False) == date(2026, 5, 11)
         assert parse_sheet_date('05/11/2026 10:30:15 pm', True) == date(2026, 11, 5)
         assert parse_sheet_date('05.11.2026 10:30 a.m.', True) == date(2026, 11, 5)
+
+    @pytest.mark.parametrize(
+        'cell',
+        [
+            '05/11/2026 10 AM',
+            '05/11/2026 10pm',
+            '05/11/2026, 10:30',
+            '05/11/2026, 10:30 AM',
+            '05/11/2026,10:30:15',
+            '05/11/2026 10h30',
+            '05/11/2026 10h',
+            '05/11/2026 10:30 UTC',
+            '05/11/2026 10:30:00 +01:00',
+            '5. 11. 2026',
+            '05 / 11 / 2026, 10:30',
+            '2026-11-05, 10:30',
+            '2026-11-05 10:30:00 UTC',
+        ],
+    )
+    def test_a_time_however_written_keeps_the_day_where_the_column_put_it(
+        self, cell: str
+    ) -> None:
+        assert parse_sheet_date(cell, True) == date(2026, 11, 5)
+
+    @pytest.mark.parametrize(
+        'cell',
+        [
+            '05/11/2026 morning',
+            '05/11/2026 - 10:30',
+            '05/11/2026 at 10:30',
+            'Thu 05/11/2026',
+            '10:30 05/11/2026',
+            '05.11.26 half past ten',
+        ],
+    )
+    def test_a_year_last_date_in_an_unknown_shape_is_refused_not_guessed(
+        self, cell: str
+    ) -> None:
+        """No other reader gets to choose which part of it is the month."""
+        with pytest.raises(ValueError):
+            parse_sheet_date(cell, True)
 
     @pytest.mark.parametrize(
         'cell', ['end of March', 'tomorrow-ish', '31.02.2026', '99']

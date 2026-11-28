@@ -646,6 +646,9 @@ export default function WmsReceivingPhone({
                 {t("receiving.phone.heldPart")}
               </Button>
               <PutawayBlock
+                // A shelf code still being looked up belongs to the line it
+                // was read for, never to the one that follows it.
+                key={line.id}
                 line={line}
                 shelf={shelf}
                 session={session}

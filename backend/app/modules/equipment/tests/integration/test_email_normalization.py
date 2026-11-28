@@ -6,6 +6,7 @@ whatever the casing it was typed in. Emails are case-insensitive by RFC 5321:
 store them lowercase and compare case-insensitively.
 """
 
+from collections.abc import Callable
 from uuid import uuid4
 
 import pytest
@@ -240,6 +241,7 @@ class TestEmailNormalization:
         )
         assert active == []
 
+    @pytest.mark.parametrize('typed', [str.lower, str.upper])
     async def test_the_asset_history_names_the_holder_as_my_assets_does(
         self,
         real_async_client: AsyncClient,
@@ -247,17 +249,19 @@ class TestEmailNormalization:
         eq_org: Organization,
         eq_user: User,
         eq_item: Item,
+        typed: Callable[[str], str],
     ) -> None:
         """A partner carrying the reader's address holds the asset for them.
 
         The row names no address: "My assets" counts it, and the asset's own
-        history says the same, for this reader and for nobody else.
+        history says the same, for this reader and for nobody else, however
+        the partner's address is capitalised.
         """
         partner = Partner(
             organization_id=eq_org.id,
             name='Anna Kowalska',
             type='EMPLOYEE',
-            email=eq_user.email,
+            email=typed(eq_user.email),
         )
         real_async_db_session.add(partner)
         await real_async_db_session.flush()

@@ -66,7 +66,9 @@ def _parse_quantity(raw: Any, column: str, sheet: SheetColumns) -> Decimal:
     return quantity
 
 
-def _optional_decimal(raw: Any, column: str, sheet: SheetColumns) -> Decimal | None:
+def _optional_decimal(
+    raw: Any, column: str, sheet: SheetColumns, *, money: bool = False
+) -> Decimal | None:
     """Money and tax are optional: a blank cell is no price.
 
     A cell that holds something else than a number refuses the row and names
@@ -75,7 +77,7 @@ def _optional_decimal(raw: Any, column: str, sheet: SheetColumns) -> Decimal | N
     if cell_text(raw) is None:
         return None
     try:
-        return sheet.number(raw, column)
+        return sheet.number(raw, column, money=money)
     except ValueError as exc:
         raise _RowSkippedError(
             'import_column_not_a_number', column=column, value=raw
@@ -84,7 +86,7 @@ def _optional_decimal(raw: Any, column: str, sheet: SheetColumns) -> Decimal | N
 
 def _line_price(raw: Any, column: str, sheet: SheetColumns) -> Decimal | None:
     """A price an order line can keep; any other cell refuses the row."""
-    price = _optional_decimal(raw, column, sheet)
+    price = _optional_decimal(raw, column, sheet, money=True)
     if price is not None and not 0 <= price <= PRICE_MAX:
         raise _RowSkippedError('import_price_invalid', column=column, value=raw)
     return price

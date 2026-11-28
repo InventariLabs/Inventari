@@ -36,21 +36,20 @@ async def read_reference(
 ) -> tuple[str, str | None]:
     """The name and the SKU a name cell holds when it reads "[REF] Name".
 
-    The brackets are a reference when a product carries it as its SKU, or
-    when it holds a digit; "[New] Chair" stays a name.
+    The brackets are a reference only when a product already carries it as its
+    SKU: a reading the reader can see in the catalogue. "[2 pcs] Batteries"
+    and "[A4] Paper" are the names their sheet gives them, unless the
+    organization has a product with that very code.
     """
     match = _REFERENCE.match(name)
     if match is None:
         return name, None
     reference, rest = match.group(1).strip(), match.group(2).strip()
-    numbered = any(character.isdigit() for character in reference)
     try:
         sku = sku_from_cell(reference, column)
     except ServiceRejectionError:
-        if numbered:
-            raise
         return name, None
-    if numbered or await SkuService.lookup_by_sku_async(db, org_id, sku):
+    if await SkuService.lookup_by_sku_async(db, org_id, sku):
         return rest, sku
     return name, None
 

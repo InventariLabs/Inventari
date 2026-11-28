@@ -157,7 +157,7 @@ and the static assets the frontend serves.
 | `yarl` | 1.25.1 | Apache-2.0 |  |
 | `zopfli` | 0.4.3 | Apache-2.0 |  |
 
-## Frontend production bundle (303 packages)
+## Frontend production bundle (304 packages)
 
 | Package | Version | Licence | Note |
 |---|---|---|---|
@@ -338,6 +338,7 @@ and the static assets the frontend serves.
 | `jiti` | 1.21.7 | MIT |  |
 | `jiti` | 2.7.0 | MIT |  |
 | `js-tokens` | 4.0.0 | MIT |  |
+| `jsqr` | 1.4.0 | Apache-2.0 |  |
 | `lilconfig` | 3.1.3 | MIT |  |
 | `lines-and-columns` | 1.2.4 | MIT |  |
 | `longest-streak` | 3.1.0 | MIT |  |
