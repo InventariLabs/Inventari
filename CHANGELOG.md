@@ -122,6 +122,8 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A partner's detail sheet shows notes with their line breaks, so the contact
+  people a partner import writes there are a line each.
 - A receipt written in another unit than the product is kept in records the
   price per the product's unit: 500 g at 0.02 opens a record at 20.00 a
   kilogram, not 0.02. A price, or a share of the delivery's costs, that comes

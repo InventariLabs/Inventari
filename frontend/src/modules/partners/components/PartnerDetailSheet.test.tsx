@@ -68,6 +68,16 @@ describe("PartnerDetailSheet", () => {
     expect(screen.getByText("PL1234567890")).toBeInTheDocument();
   });
 
+  it("shows each line of the notes on a line of its own", () => {
+    const notes = "Kim\nZoe Ui, zoe@beta.example";
+    render(<PartnerDetailSheet {...makeProps({ notes })} />);
+    const shown = screen.getByText(/Zoe Ui/, {
+      normalizer: (text) => text,
+    });
+    expect(shown.textContent).toBe(notes);
+    expect(shown).toHaveClass("whitespace-pre-line");
+  });
+
   it("says when the partner is a private person, and only then", () => {
     const { unmount } = render(
       <PartnerDetailSheet {...makeProps({ is_consumer: true })} />,
