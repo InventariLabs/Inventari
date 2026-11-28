@@ -29,6 +29,9 @@ from .models import DocumentLine
 
 logger = get_logger(__name__)
 
+#: ``DocumentLine.name`` and ``ProductTemplate.name`` are both ``String(255)``.
+_NAME_LIMIT = 255
+
 
 def _extract_string(row: pd.Series, col_name: str | None) -> str | None:
     """Read a string column value as the reader typed it, or None when blank.
@@ -217,6 +220,17 @@ async def _build_document_line(
     name = given_name or sku or barcode
     if not name:
         raise ServiceRejectionError('import_line_name_missing')
+    if len(name) > _NAME_LIMIT:
+        # The line and the product stub it may found share one name column.
+        # Left to the driver, the row is a truncation error the reader sees
+        # as "an internal error" and cannot correct.
+        raise ServiceRejectionError(
+            'import_column_too_long',
+            column=column_mapping.get('name')
+            or column_mapping.get('sku')
+            or column_mapping.get('barcode'),
+            limit=_NAME_LIMIT,
+        )
 
     brand = _extract_string(row, column_mapping.get('brand'))
     quantity = _extract_decimal(
