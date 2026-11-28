@@ -778,7 +778,8 @@
         "work_item": "Tarea",
         "partner": "Socio",
         "label": "Etiqueta",
-        "ai_connection": "Conexión de IA"
+        "ai_connection": "Conexión de IA",
+        "rental_kit": "Kit"
       },
       "columns": {
         "timestamp": "Cuándo",

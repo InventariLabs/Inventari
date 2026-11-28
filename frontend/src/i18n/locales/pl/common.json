@@ -780,7 +780,8 @@
         "work_item": "Zadanie",
         "partner": "Partner",
         "label": "Etykieta",
-        "ai_connection": "Połączenie AI"
+        "ai_connection": "Połączenie AI",
+        "rental_kit": "Zestaw"
       },
       "columns": {
         "timestamp": "Kiedy",

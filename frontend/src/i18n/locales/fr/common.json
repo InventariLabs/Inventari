@@ -778,7 +778,8 @@
         "work_item": "Tâche",
         "partner": "Partenaire",
         "label": "Étiquette",
-        "ai_connection": "Connexion IA"
+        "ai_connection": "Connexion IA",
+        "rental_kit": "Kit"
       },
       "columns": {
         "timestamp": "Quand",

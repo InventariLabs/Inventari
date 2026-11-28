@@ -778,7 +778,8 @@
         "work_item": "Task",
         "partner": "Partner",
         "label": "Label",
-        "ai_connection": "AI connection"
+        "ai_connection": "AI connection",
+        "rental_kit": "Kit"
       },
       "columns": {
         "timestamp": "When",

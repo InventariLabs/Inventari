@@ -276,11 +276,13 @@ export default function PickupPage() {
     const value = raw.trim();
     if (!value) return;
     setCode("");
-    const kit = (kits.data ?? []).find(
-      (entry) =>
-        entry.code.toLowerCase() === value.toLowerCase() ||
-        entry.name.toLowerCase() === value.toLowerCase(),
-    );
+    const kit = kits.isLoading
+      ? undefined
+      : (kits.data ?? []).find(
+          (entry) =>
+            entry.code.toLowerCase() === value.toLowerCase() ||
+            entry.name.toLowerCase() === value.toLowerCase(),
+        );
     if (kit) {
       handOutKit(kit.id, kit.name);
       return;
@@ -364,7 +366,7 @@ export default function PickupPage() {
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-4">
       <ReadOnlyNotice module="rentals" />
-      {assets.isError || calendarFailed ? (
+      {assets.isError || kits.isError || calendarFailed ? (
         <p
           role="alert"
           className="m-0 rounded-lg bg-red-50 p-3 text-sm text-red-800"

@@ -778,7 +778,8 @@
         "work_item": "Aufgabe",
         "partner": "Partner",
         "label": "Etikett",
-        "ai_connection": "KI-Verbindung"
+        "ai_connection": "KI-Verbindung",
+        "rental_kit": "Set"
       },
       "columns": {
         "timestamp": "Wann",

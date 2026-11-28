@@ -778,7 +778,8 @@
         "work_item": "Tarefa",
         "partner": "Parceiro",
         "label": "Etiqueta",
-        "ai_connection": "Conexão de IA"
+        "ai_connection": "Conexão de IA",
+        "rental_kit": "Conjunto"
       },
       "columns": {
         "timestamp": "Quando",
