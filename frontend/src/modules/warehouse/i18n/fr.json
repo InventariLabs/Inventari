@@ -1762,6 +1762,7 @@
       "chooseLocation": "Choisir un emplacement",
       "done": "Rangé — {{number}} comptabilisé",
       "awaitingApproval": "{{number}} attend une approbation ; la marchandise bougera une fois approuvée",
+      "checking": "Vérification de l'étiquette…",
       "putOn": "Poser sur",
       "elsewhere": "Je le range ailleurs",
       "step": "Rangement {{current}} sur {{total}}",

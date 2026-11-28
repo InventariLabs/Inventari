@@ -82,6 +82,7 @@ export function usePoLineScanner({
   );
 
   const { resolve } = useScanResolver({
+    everyReadCounts: true,
     handle: async (result, code) => {
       const kind = scanSubjectKind(result);
       if (kind === "storage" || kind === "document") return false;

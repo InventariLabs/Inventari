@@ -248,3 +248,37 @@ describe("useDocumentScanner — a product scanned into a dispatch", () => {
     );
   });
 });
+
+describe("useDocumentScanner — a second piece read during the lookup", () => {
+  it("adds a line piece for each read of the same code", async () => {
+    const answers: (() => void)[] = [];
+    scan.mockReset();
+    scan.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          answers.push(() =>
+            resolve({
+              status: "assigned",
+              label_code: "STM-EHBH",
+              action: "show_quick_actions",
+              item: { id: "item-1", name: "Lean Quark", uom_id: "uom-1" },
+            }),
+          );
+        }),
+    );
+    const onAddOrIncrementLine = vi.fn();
+    const { result } = renderHook(() =>
+      useDocumentScanner({ onAddOrIncrementLine, onOpenQuickAdd: vi.fn() }),
+    );
+
+    await act(async () => {
+      result.current.handleCodeScanned("5901234123457");
+      result.current.handleCodeScanned("5901234123457");
+    });
+    await act(async () => answers[0]());
+    await waitFor(() => expect(answers).toHaveLength(2));
+    await act(async () => answers[1]());
+
+    expect(onAddOrIncrementLine).toHaveBeenCalledTimes(2);
+  });
+});

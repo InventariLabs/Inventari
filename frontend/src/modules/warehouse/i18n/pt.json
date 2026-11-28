@@ -1738,6 +1738,7 @@
       "chooseLocation": "Escolha um local",
       "done": "Guardado — {{number}} lançado",
       "awaitingApproval": "{{number}} está aguardando aprovação; as mercadorias são movidas quando for aprovado",
+      "checking": "Verificando a etiqueta…",
       "putOn": "Guardar em",
       "elsewhere": "Vou guardar em outro lugar",
       "step": "Guardar {{current}} de {{total}}",

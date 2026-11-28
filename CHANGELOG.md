@@ -129,7 +129,10 @@ says what the release does rather than what changed since them.
   dropped without a word: on the put-away sheet, phone receiving and every
   other screen that looks codes up this way, codes are answered one at a time
   in the order they were read. A symbol the camera keeps reading is still one
-  lookup, and the put-away button waits until the scan is answered.
+  lookup, and the put-away button waits until the scan is answered, with the
+  sheet saying that the label is being checked. Where a scan adds a piece (the
+  document and order line editors and the panel that executes a document), a
+  second piece read while the first is still being looked up counts as well.
 - A printed label's QR code is read by the phone camera in every browser. The
   bundled scanner's zxing port fails to locate some valid matrices however
   clean the picture — about one label in a hundred — so a second reader now

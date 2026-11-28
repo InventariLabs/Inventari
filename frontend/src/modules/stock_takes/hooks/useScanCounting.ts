@@ -118,12 +118,12 @@ export function useScanCounting({
     onCount(itemId);
   };
 
-  // Distinct codes that arrive while a lookup is in flight are separate count
-  // instructions — somebody scanning the next item, not the camera seeing the
-  // same symbol again. The shared resolver drops a code while it is busy (its
-  // guard is what keeps a held barcode from counting every frame), so the
-  // count keeps its own queue and feeds the resolver one code at a time. Each
-  // code is answered, and its save started, before the next one is looked up.
+  // Every read is a count instruction, and what was read is counted even when
+  // the reader leaves the screen before the lookups come back. The shared
+  // resolver asks nothing more of its waiting codes once the screen is gone,
+  // so the count keeps its own queue and feeds the resolver one code at a
+  // time: each code is answered, and its save started, before the next one is
+  // looked up.
   const queueRef = useRef<string[]>([]);
   const drainingRef = useRef(false);
   const resolveRef = useRef(resolve);

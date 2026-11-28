@@ -1762,6 +1762,7 @@
       "chooseLocation": "Ort wählen",
       "done": "Eingelagert — {{number}} gebucht",
       "awaitingApproval": "{{number}} wartet auf Genehmigung; die Ware wird nach der Genehmigung umgelagert",
+      "checking": "Etikett wird geprüft…",
       "putOn": "Legen auf",
       "elsewhere": "Ich lege es woanders hin",
       "step": "Einlagern {{current}} von {{total}}",
