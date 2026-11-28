@@ -548,9 +548,9 @@ apart.
 | `PO_RECEIVE_QUANTITY_EXCEEDS` | Quantity {quantity} exceeds the remaining {remaining} for line {line} |
 | `PO_SUPPLIER_REQUIRED` | A purchase order cannot be confirmed without a supplier |
 | `PO_UPDATE_NOT_DRAFT` | Only DRAFT purchase orders can be updated |
-| `PRICELIST_MIN_QUANTITY_NOT_POSITIVE` | min_quantity must be > 0, got {min_quantity} |
-| `PRICELIST_UNIT_PRICE_NOT_POSITIVE` | unit_price must be > 0, got {unit_price} |
-| `PRICELIST_VALID_TO_BEFORE_VALID_FROM` | valid_to ({valid_to}) must be >= valid_from ({valid_from}) |
+| `PRICELIST_MIN_QUANTITY_NOT_POSITIVE` | The minimum quantity must be above 0, got {min_quantity} |
+| `PRICELIST_UNIT_PRICE_NOT_POSITIVE` | The unit price must be above 0, got {unit_price} |
+| `PRICELIST_VALID_TO_BEFORE_VALID_FROM` | The price cannot stop being valid ({valid_to}) before it starts ({valid_from}) |
 | `PRINT_JOB_NOTHING_TO_PRINT` | Nothing to print: none of the chosen labels was found |
 | `PRINT_JOB_ONE_TARGET` | Send exactly one kind of label: pool labels by id, pool labels by code, or storage locations. |
 | `PRINT_JOB_TOO_MANY_COPIES` | Up to {limit} copies of a label at once. |
@@ -646,10 +646,10 @@ apart.
 | `RENTAL_SERVICE_UNTIL_IN_PAST` | The service ends after it starts |
 | `RENTAL_UNIT_ON_TWO_LINES` | The same unit is on two lines of the booking |
 | `RENTAL_WINDOW_ORDER` | The return comes after the pickup |
-| `REORDER_MAX_BELOW_MIN` | max_quantity ({max_quantity}) must be >= min_quantity ({min_quantity}) |
-| `REORDER_MIN_QUANTITY_NEGATIVE` | min_quantity must be >= 0, got {min_quantity} |
+| `REORDER_MAX_BELOW_MIN` | The maximum ({max_quantity}) cannot be below the minimum ({min_quantity}) |
+| `REORDER_MIN_QUANTITY_NEGATIVE` | The minimum quantity cannot be negative, got {min_quantity} |
 | `REORDER_RULE_NOT_FOUND` | Reorder rule not found |
-| `REORDER_SAFETY_STOCK_NEGATIVE` | safety_stock must be >= 0, got {safety_stock} |
+| `REORDER_SAFETY_STOCK_NEGATIVE` | The safety stock cannot be negative, got {safety_stock} |
 | `REPLENISHMENT_NOTHING_TO_MOVE` | There is nothing to carry from reserve: the shelf no longer has the stock, or the pick face no longer needs it. |
 | `REPLENISHMENT_SHELF_SCAN_MISMATCH` | That code names another shelf: scan the reserve location the goods are taken from. |
 | `REPLENISHMENT_SHELF_SCAN_REQUIRED` | Scan the reserve location you are taking the goods from. |
@@ -683,8 +683,8 @@ apart.
 | `SHOPPING_LIST_ITEM_UOM_UNKNOWN` | Unknown unit of measure (uom_id: {uom_id}) — the unit does not exist |
 | `SHOPPING_LIST_NOTHING_TO_CONVERT` | No convertible items (all lack a product template) |
 | `SHOPPING_LIST_NOT_WRITABLE` | This shopping list is no longer open and cannot be modified. Reactivate it first. |
-| `SHORT_CODES_TAKEN` | short_code(s) already in use in this org: {codes} |
-| `SHORT_CODE_DUPLICATE_IN_REQUEST` | Duplicate short_code in request: {short_code} |
+| `SHORT_CODES_TAKEN` | These short codes are already in use in this organization: {codes} |
+| `SHORT_CODE_DUPLICATE_IN_REQUEST` | Duplicate short code in request: {short_code} |
 | `SHORT_CODE_INVALID_FORMAT` | Invalid code format |
 | `SKU_FORMAT_INVALID` | SKU may contain only letters, digits, dashes, underscores and slashes |
 | `SKU_IN_USE` | SKU {sku} already belongs to another product |

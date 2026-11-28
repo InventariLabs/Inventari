@@ -54,7 +54,8 @@ class TestSettingsValidatorRefusals:
         assert resp.status_code == 400, resp.text
         detail = resp.json()['detail']
         assert detail['message'] == (
-            'Ustawienie „allow_admin_self_approve” musi mieć wartość prawda albo fałsz'
+            'Ustawienie „Admins may approve their own requests” '
+            'musi mieć wartość prawda albo fałsz'
         )
         assert detail['lang'] == 'pl'
 
