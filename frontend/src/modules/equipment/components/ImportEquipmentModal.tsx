@@ -303,7 +303,8 @@ export default function ImportEquipmentModal({
   return (
     <Dialog open onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="w-full max-w-md sm:max-w-xl lg:max-w-2xl xl:max-w-3xl gap-0 p-0 rounded-t-3xl sm:rounded-2xl max-h-[90vh] flex flex-col overflow-hidden">
-        <DialogHeader className="px-5 py-4 border-b border-border">
+        {/* The right padding keeps a wrapped title clear of the close button. */}
+        <DialogHeader className="py-4 pl-5 pr-14 border-b border-border">
           <DialogTitle className="flex items-center gap-3">
             <Upload size={18} className="text-primary-500" />
             {t("import.title", "Import Equipment from CSV / XLSX")}

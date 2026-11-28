@@ -1366,7 +1366,11 @@
     "firstErrors": "First few errors",
     "rowsCountedNote": "Rows are counted from the first line of data; the header row is not counted, so a row number is the spreadsheet row minus one.",
     "previewTitle": "Preview",
-    "previewHint": "The first rows of the source, read with the mapping above."
+    "previewHint": "The first rows of the source, read with the mapping above.",
+    "refusedShown_one": "Showing {{shown}} of {{count}} refused row.",
+    "refusedShown_other": "Showing {{shown}} of {{count}} refused rows.",
+    "refusedDownload": "Download refused rows",
+    "refusedHint": "Correct them and upload that file on its own: it adds only the rows that were refused."
   },
   "optional": "Optional",
   "remove": "Remove",

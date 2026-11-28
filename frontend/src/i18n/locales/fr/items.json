@@ -179,20 +179,23 @@
     "foundedCategories_one": "{{count}} catégorie créée",
     "foundedCategories_other": "{{count}} catégories créées",
     "labelMatch": {
-      "label": "Lignes avec un code d'étiquette",
-      "hint": "La colonne « Label Code » d'une feuille exportée indique de quel produit la ligne parle.",
+      "label": "Lignes portant sur un stock déjà présent",
+      "hint": "Une ligne désigne un stock déjà présent par son code d’étiquette, son SKU ou son code-barres.",
       "modes": {
         "add": "Ajouter quand même",
         "skip": "Laisser tel quel",
         "overwrite": "Écraser"
       },
       "notes": {
-        "add": "Chaque ligne devient un nouveau produit ; le code d'étiquette est ignoré.",
-        "skip": "Une ligne dont le code d'étiquette désigne un produit existant reste inchangée. Une ligne sans code, ou avec un code inconnu, est ajoutée.",
-        "overwrite": "Une ligne dont le code d'étiquette désigne un produit existant écrase ses données. La quantité n'est jamais écrasée — le stock bouge par une réception ou un inventaire."
+        "add": "Toutes les lignes sont ajoutées : le stock présent augmente.",
+        "skip": "Une ligne désignant un stock déjà présent est laissée de côté. Les autres sont ajoutées.",
+        "overwrite": "Une ligne désignant un stock déjà présent écrit ses colonnes sur cet enregistrement. La quantité n’est jamais écrasée : le stock change par une réception ou un inventaire."
       },
-      "needsColumn": "Mappez d'abord la colonne « Label Code », sinon il n'y a rien à faire correspondre et chaque ligne est ajoutée.",
-      "noCodesInFile": "La colonne « Label Code » est assignée, mais aucune ligne ne porte de code — les codes n’apparaissent qu’après l’impression d’une étiquette. Dans ce mode, chaque ligne sera ajoutée comme un nouvel enregistrement, comme en mode ajout."
+      "needsColumn": "Associez d’abord la colonne code d’étiquette, SKU ou code-barres, sinon rien ne permet la correspondance et toutes les lignes sont ajoutées.",
+      "noCodesInFile": "Aucune ligne ne porte de code d’étiquette, de SKU ni de code-barres : toutes seront ajoutées, comme dans le mode ajout.",
+      "allInStock_one": "La {{count}} ligne de ce fichier désigne un produit déjà en stock. L’importer dans ce mode ajoute à nouveau la quantité.",
+      "allInStock_many": "Les {{count}} lignes de ce fichier désignent des produits déjà en stock. Les importer dans ce mode ajoute à nouveau les quantités.",
+      "allInStock_other": "Les {{count}} lignes de ce fichier désignent des produits déjà en stock. Les importer dans ce mode ajoute à nouveau les quantités."
     },
     "matchedUpdated_one": "{{count}} produit mis à jour",
     "matchedUpdated_other": "{{count}} produits mis à jour",

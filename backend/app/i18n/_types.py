@@ -476,6 +476,8 @@ class ErrorMessages(TypedDict):
     partner_delete_open_purchase_orders: str
     partner_delete_open_purchase_orders_one: NotRequired[str]
     partner_delete_open_purchase_orders_few: NotRequired[str]
+    import_reason_column: str
+    import_overwrite_several_records: str
     partner_import_name_missing: str
     partner_import_duplicate: str
     partner_import_company_missing: str

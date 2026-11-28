@@ -4,7 +4,8 @@ import type { components } from "@/types/api-generated";
  *
  * The server reports how many rows it read, how many it kept and, for the
  * first few refused, the row number and the reason — products and partners
- * alike. An entity may add what its import founded on the way. */
+ * alike — with every refused row as a file. An entity may add what its import
+ * founded on the way. */
 export interface ImportRowError {
   row: number;
   error: string;
@@ -15,6 +16,7 @@ export interface ImportOutcome {
   imported: number;
   failed: number;
   errors: ImportRowError[];
+  refused_file?: components["schemas"]["RefusedRowsFile"] | null;
 }
 
 /** How far a background import has got: rows read of rows in the sheet. */

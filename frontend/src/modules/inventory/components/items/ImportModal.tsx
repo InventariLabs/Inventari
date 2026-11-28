@@ -21,6 +21,7 @@ import type {
   StorageLocationSummary,
 } from "@/types";
 import { locationFieldKey, suggestMapping } from "./importMapping";
+import { ImportRepeatWarning } from "./ImportRepeatWarning";
 import { ImportResultDetails } from "./ImportResultDetails";
 import {
   ImportReadingChoices,
@@ -113,8 +114,11 @@ function categoriesNeedingUncarriableFields(
   return { categories: [...names], fields: [...fields] };
 }
 
-/** What a row does when its Label Code names a product already here. */
+/** What a row does when it names stock already here. */
 const LABEL_MATCH_MODES: LabelMatchMode[] = ["add", "skip", "overwrite"];
+
+/** The columns a row can name stock already here by. */
+const MATCH_COLUMNS = ["label_code", "sku", "barcode"] as const;
 
 export default function ImportModal({ onClose }: Props) {
   const { t } = useTranslation(["common", "items", "inventory"]);
@@ -254,7 +258,7 @@ export default function ImportModal({ onClose }: Props) {
         closeAndView: t("items:import.closeAndView"),
       }}
       fileSource={grocy.source}
-      mappingExtras={({ headers, mapping, setMapping, filledCounts }) => (
+      mappingExtras={({ file, headers, mapping, setMapping, filledCounts }) => (
         <>
           {/* Without the answer the columns the locations add are missing
               from the mapping, and a column of the file that belongs to one
@@ -307,24 +311,32 @@ export default function ImportModal({ onClose }: Props) {
             <p className="mt-2 text-sm text-on-secondary">
               {t(`items:import.labelMatch.notes.${onLabelMatch}`)}
             </p>
-            {onLabelMatch !== "add" && !mapping.label_code && (
-              /* Without the column there is nothing to match on, so every
-                 row would quietly become a new product again. */
-              <p className="mt-2 text-sm text-amber-700 dark:text-amber-400">
-                {t("items:import.labelMatch.needsColumn")}
-              </p>
+            {onLabelMatch === "add" && file && (
+              <ImportRepeatWarning
+                file={file}
+                mapping={mapping}
+                countAsOne={reading.countAsOne}
+              />
             )}
             {onLabelMatch !== "add" &&
-              mapping.label_code &&
-              !(filledCounts[mapping.label_code as string] > 0) && (
-                /* The column is mapped but not one row of the whole
-                   file carries a code — the count the analysis made over
-                   every row, not the five the preview shows, because
-                   codes can start below them. Codes exist only once a
-                   label has been printed, so an export-reimport round
-                   trip walks in without any; the mode would then add
-                   duplicates exactly as "add" does, which the person
-                   deserves to know before the summary says so. */
+              !MATCH_COLUMNS.some((key) => mapping[key]) && (
+                /* Without such a column there is nothing to match on, so
+                   every row would quietly be added again. */
+                <p className="mt-2 text-sm text-amber-700 dark:text-amber-400">
+                  {t("items:import.labelMatch.needsColumn")}
+                </p>
+              )}
+            {onLabelMatch !== "add" &&
+              MATCH_COLUMNS.some((key) => mapping[key]) &&
+              !MATCH_COLUMNS.some((key) => filledCounts[mapping[key]] > 0) && (
+                /* A column is mapped but not one row of the whole file
+                   carries a code — the count the analysis made over every
+                   row, not the five the preview shows, because codes can
+                   start below them. Label codes exist only once a label has
+                   been printed, so an export-reimport round trip can walk in
+                   without any; the mode would then add duplicates exactly as
+                   "add" does, which the person deserves to know before the
+                   summary says so. */
                 <p className="mt-2 text-sm text-amber-700 dark:text-amber-400">
                   {t("items:import.labelMatch.noCodesInFile")}
                 </p>

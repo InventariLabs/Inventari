@@ -23,6 +23,13 @@ def keyed_by_column(data: dict[str, Any]) -> dict[str, Any]:
 SheetPreviewValue = str | int | float | None
 
 
+class RefusedRowsFile(BaseModel):
+    """The rows an import refused, as a file to correct and upload alone."""
+
+    filename: str
+    content_base64: str
+
+
 class SheetAnalysisResponse(BaseModel):
     """What the mapping step is told about an uploaded sheet.
 

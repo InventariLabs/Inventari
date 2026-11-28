@@ -1366,7 +1366,11 @@
     "firstErrors": "Erste Fehler",
     "rowsCountedNote": "Die Zeilen werden ab der ersten Datenzeile gezählt; die Kopfzeile zählt nicht, die Zeilennummer ist also die Tabellenzeile minus eins.",
     "previewTitle": "Vorschau",
-    "previewHint": "Die ersten Zeilen der Quelle, gelesen mit der Zuordnung oben."
+    "previewHint": "Die ersten Zeilen der Quelle, gelesen mit der Zuordnung oben.",
+    "refusedShown_one": "{{shown}} von {{count}} abgelehnten Zeile angezeigt.",
+    "refusedShown_other": "{{shown}} von {{count}} abgelehnten Zeilen angezeigt.",
+    "refusedDownload": "Abgelehnte Zeilen herunterladen",
+    "refusedHint": "Korrigieren Sie sie und laden Sie nur diese Datei hoch: Sie fügt nur die abgelehnten Zeilen hinzu."
   },
   "optional": "Optional",
   "remove": "Entfernen",

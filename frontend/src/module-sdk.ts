@@ -192,6 +192,7 @@ export { useKeysetPaging } from "@/hooks/useKeysetPaging";
 
 // What an import created beside its records, listed by name on the result.
 export { ImportFoundedList } from "@/components/import/ImportFoundedList";
+export { RefusedRows } from "@/components/import/RefusedRows";
 
 // Generated wire types and the helper a create payload uses when a field may be
 // left to the server's default.

@@ -1368,7 +1368,12 @@
     "firstErrors": "Premières erreurs",
     "rowsCountedNote": "Les lignes sont comptées à partir de la première ligne de données ; l'en-tête n'est pas compté, le numéro est donc celui de la feuille moins un.",
     "previewTitle": "Aperçu",
-    "previewHint": "Les premières lignes de la source, lues avec le mappage ci-dessus."
+    "previewHint": "Les premières lignes de la source, lues avec le mappage ci-dessus.",
+    "refusedShown_one": "{{shown}} sur {{count}} ligne refusée affichée.",
+    "refusedShown_many": "{{shown}} sur {{count}} lignes refusées affichées.",
+    "refusedShown_other": "{{shown}} sur {{count}} lignes refusées affichées.",
+    "refusedDownload": "Télécharger les lignes refusées",
+    "refusedHint": "Corrigez-les et importez ce seul fichier : il n’ajoute que les lignes refusées."
   },
   "optional": "Facultatif",
   "remove": "Supprimer",

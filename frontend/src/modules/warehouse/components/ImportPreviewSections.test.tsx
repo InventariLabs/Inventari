@@ -166,4 +166,30 @@ describe("the import screen's counters", () => {
       expect(screen.queryByRole("checkbox")).toBeNull();
     });
   });
+
+  it("counts every refusal, not the few listed", () => {
+    render(
+      <ImportResultView
+        result={{
+          imported: 0,
+          matched: 0,
+          unmatched: 0,
+          stubs_created: 0,
+          failed: 12,
+          errors: Array.from({ length: 10 }, (_, i) => ({
+            row: i + 1,
+            error: "no name",
+          })),
+          no_stock: [],
+          lines: [],
+        }}
+        t={tFor("warehouse")}
+      />,
+    );
+
+    expect(screen.getByText(/^12 /)).toBeInTheDocument();
+    expect(
+      screen.getByText("Showing 5 of 12 refused rows."),
+    ).toBeInTheDocument();
+  });
 });

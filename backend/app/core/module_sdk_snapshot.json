@@ -2174,6 +2174,25 @@
         }
       }
     },
+    "RefusedRowsFile": {
+      "bases": [
+        "BaseModel"
+      ],
+      "init": [
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "filename",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "content_base64",
+          "required": true
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
     "RoleInUseError": {
       "bases": [
         "ValueError"
@@ -3897,6 +3916,31 @@
           "kind": "POSITIONAL_OR_KEYWORD",
           "name": "record",
           "required": true
+        }
+      ]
+    },
+    "refused_rows_file": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "df",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "errors",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "filename",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "sheet",
+          "required": false
         }
       ]
     },

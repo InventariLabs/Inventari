@@ -9,8 +9,8 @@ needs, the migration helpers a revision uses, the field type a scanned code
 arrives in, the lot-trace source a module names its movements through, the
 pagination envelopes with the helper that pages a query into one, the helper
 that writes a location's path, the resolver that reads a free-text unit
-against the catalogue, and the effective-expiry rule an opened
-package is judged by. Anything under ``app.`` that is not
+against the catalogue, the file an import hands its refused rows back in,
+and the effective-expiry rule an opened package is judged by. Anything under ``app.`` that is not
 re-exported here is Core's own business: it may be renamed, split or deleted
 between releases.
 
@@ -128,6 +128,7 @@ from app.core.move_contributors import (
     register_move_contributor,
 )
 from app.core.open_package import effective_expiry
+from app.core.refused_rows import RefusedRowsFile, refused_rows_file
 from app.core.scan_registry import ScanProvider, scan_registry
 from app.core.settings_diff import journal_config_change, record_settings
 from app.core.uom_resolver import UomResolverAsync
@@ -209,6 +210,7 @@ __all__ = [
     'PeriodClosedError',
     'QuotaExceededError',
     'QuotaProvider',
+    'RefusedRowsFile',
     'RoleInUseError',
     'ScanProvider',
     'ScannedCode',
@@ -258,6 +260,7 @@ __all__ = [
     'register_held_back_locations',
     'register_lot_trace_source',
     'read_sheet',
+    'refused_rows_file',
     'register_move_contributor',
     'register_work_in_progress_provider',
     'relation_exists',
