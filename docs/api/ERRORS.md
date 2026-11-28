@@ -411,6 +411,7 @@ apart.
 | `IMPORT_LOCATION_NOT_FOUND` | No location is named “{value}” |
 | `IMPORT_LOCATION_UNRESOLVED` | Could not resolve storage location |
 | `IMPORT_ONLY_DRAFT` | Can only import lines to DRAFT documents |
+| `IMPORT_OVERWRITE_OTHER_LOCATION` | Product "{name}" has no stock record at "{location}", and Overwrite neither moves nor adds stock: to add it there, upload this row in the "Leave alone" mode |
 | `IMPORT_OVERWRITE_SEVERAL_RECORDS` | Product "{name}" has several stock records ({count}): name the location or the label code to say which one to overwrite |
 | `IMPORT_PRICE_INVALID` | Column "{column}": "{value}" is not a price |
 | `IMPORT_QUANTITY_NOT_POSITIVE` | Column "{column}": the quantity has to be greater than zero, "{value}" is not |
