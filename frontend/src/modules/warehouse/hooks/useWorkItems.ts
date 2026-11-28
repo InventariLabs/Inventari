@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { usersApi } from "@/lib/api/admin";
 import { queryKeys } from "@/hooks/queries/keys";
@@ -8,6 +7,7 @@ import { useAppMutation } from "@/lib/api/mutationFactory";
 import { invalidation } from "@/lib/api/invalidation";
 import { documentsApi } from "@/modules/warehouse/api/documents";
 import type { WorkItem } from "@/modules/warehouse/types";
+import { useQueuedSearchParams } from "@/module-sdk";
 
 /** Give a task to a person, or to nobody. With `onlyIfUnassigned` the task
  * is claimed only while nobody holds it, and a task somebody took first is
@@ -114,7 +114,7 @@ export function useOpenReplenishmentLink(
   onOpen: (item: WorkItem) => void,
   loadAll: () => void,
 ) {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, writeParams] = useQueuedSearchParams();
   const replenishId = searchParams.get("replenish");
   useEffect(() => {
     if (!replenishId) return;
@@ -127,18 +127,8 @@ export function useOpenReplenishmentLink(
       return;
     }
     onOpen(task);
-    const next = new URLSearchParams(searchParams);
-    next.delete("replenish");
-    setSearchParams(next, { replace: true });
-  }, [
-    replenishId,
-    tasks,
-    total,
-    searchParams,
-    setSearchParams,
-    onOpen,
-    loadAll,
-  ]);
+    writeParams((next) => next.delete("replenish"));
+  }, [replenishId, tasks, total, writeParams, onOpen, loadAll]);
 }
 
 /**

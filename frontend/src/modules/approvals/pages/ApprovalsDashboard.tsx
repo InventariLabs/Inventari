@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   User as UserIcon,
@@ -36,6 +36,7 @@ import { OPEN_APPROVAL_STATES } from "@/modules/approvals/approvalStates";
 import { targetPath } from "@/modules/approvals/targetTypes";
 import { formatMoney, formatDate } from "@/utils/formatters";
 import { cn } from "@/lib/utils";
+import { useQueuedSearchParams } from "@/module-sdk";
 
 // This is a decision queue, so it opens on the states that still need
 // a decision. Deleting a document cancels its request, and a cancelled
@@ -101,17 +102,16 @@ export default function ApprovalsDashboard() {
   // search string without unmounting this route, so the tab is read on every
   // render instead of once at mount. The value has to name a tab: an arbitrary
   // string would render a control bar with nothing selected.
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, writeParams] = useQueuedSearchParams();
   const requestedStatus = searchParams.get("status");
   const statusFilter = STATUS_TABS.some((tab) => tab.value === requestedStatus)
     ? (requestedStatus as string)
     : OPEN_STATES;
-  const selectStatus = (value: string) => {
-    const next = new URLSearchParams(searchParams);
-    if (value === OPEN_STATES) next.delete("status");
-    else next.set("status", value);
-    setSearchParams(next, { replace: true });
-  };
+  const selectStatus = (value: string) =>
+    writeParams((next) => {
+      if (value === OPEN_STATES) next.delete("status");
+      else next.set("status", value);
+    });
   const [search, setSearch] = useState("");
   const [offset, setOffset] = useState(0);
 

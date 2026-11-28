@@ -47,6 +47,7 @@ export { readJson, writeJson } from "@/lib/localStorage";
 // The same remembered value as state a screen renders: `useState` kept in step
 // with the stored copy.
 export { useLocalStorage } from "@/hooks/useLocalStorage";
+export { useQueuedSearchParams } from "@/hooks/useQueuedSearchParams";
 // The sentence to show for a failed request: the server's own message, in the
 // reader's language, or the fallback the caller passes when there is none.
 export { extractApiError } from "@/lib/errors";

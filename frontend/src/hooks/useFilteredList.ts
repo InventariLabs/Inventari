@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useQueuedSearchParams } from "@/hooks/useQueuedSearchParams";
 
 /**
  * Whether a list screen should render its narrowing tools.
@@ -120,7 +120,7 @@ export function useFilteredList<T extends FilterDefinitions>(
     syncToUrl = false,
     urlSearchKey,
   } = options ?? {};
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, writeParams] = useQueuedSearchParams();
 
   // ── Search ──
   const [searchInput, setSearchState] = useState(
@@ -187,37 +187,6 @@ export function useFilteredList<T extends FilterDefinitions>(
     // itself is a fresh object on every render and would loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlSignature]);
-
-  // Each write edits "the address as rendered", and the router commits an
-  // address in a transition: several controls cleared in one go, or a second
-  // chip tapped while a busy phone is still rendering the first, would each
-  // start from the same old address and the last write would undo the others.
-  // So a write builds on the writes the screen has not caught up with yet.
-  // They are forgotten once it shows the last of them, or an address that is
-  // none of them: somebody else navigated, and that address wins.
-  const unrendered = useRef<string[]>([]);
-  const rendered = searchParams.toString();
-  useEffect(() => {
-    const writes = unrendered.current;
-    const stillToCome = writes.includes(rendered) && writes.at(-1) !== rendered;
-    if (!stillToCome) unrendered.current = [];
-  }, [rendered]);
-  const writeParams = useCallback(
-    (edit: (next: URLSearchParams) => void, write?: { push?: boolean }) => {
-      setSearchParams(
-        (current) => {
-          const next = new URLSearchParams(
-            unrendered.current.at(-1) ?? current,
-          );
-          edit(next);
-          unrendered.current.push(next.toString());
-          return next;
-        },
-        { replace: !write?.push },
-      );
-    },
-    [setSearchParams],
-  );
 
   const setSearchInput = useCallback(
     (value: string) => {

@@ -1,6 +1,6 @@
 import { extractApiError } from "@/lib/errors";
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { addDays, format, parseISO } from "date-fns";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { QueryFailure } from "@/components/ui/QueryResult";
@@ -35,6 +35,7 @@ import { useCanWrite } from "@/hooks/useCanWrite";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { todayIso } from "@/utils/formatters";
 import { onOtherListsMessage } from "@/modules/shared/lib/shoppingOverlap";
+import { useQueuedSearchParams } from "@/module-sdk";
 
 const DEFAULT_SLOTS: MealSlot[] = ["BREAKFAST", "LUNCH", "DINNER"];
 const SLOT_ORDER: MealSlot[] = [...DEFAULT_SLOTS, "SNACK"];
@@ -77,7 +78,7 @@ export default function MealPlannerPage() {
   const createPlan = useCreateMealPlan();
   const addEntry = useAddMealPlanEntry();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, writeParams] = useQueuedSearchParams();
   // A recipe that sent the reader here to make its first plan ("?recipe=")
   // goes onto that plan once it exists.
   const [recipeForNewPlan, setRecipeForNewPlan] = useState<string | null>(null);
@@ -119,11 +120,11 @@ export default function MealPlannerPage() {
       setPlacement(null);
       setShowCreateModal(true);
     }
-    const next = new URLSearchParams(searchParams);
-    next.delete("new");
-    next.delete("recipe");
-    setSearchParams(next, { replace: true });
-  }, [searchParams, setSearchParams, canWrite]);
+    writeParams((next) => {
+      next.delete("new");
+      next.delete("recipe");
+    });
+  }, [searchParams, writeParams, canWrite]);
 
   useEffect(() => {
     setHeader({

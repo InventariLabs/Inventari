@@ -1,7 +1,7 @@
 import { extractApiError, followUpError } from "@/lib/errors";
 import { useDndA11y, useDndSensors } from "@/lib/dndA11y";
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   DndContext,
@@ -56,6 +56,7 @@ import { useCanWrite } from "@/hooks/useCanWrite";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { showListControls } from "@/hooks/useFilteredList";
 import { ListControlBar } from "@/components/ui/ListControlBar";
+import { useQueuedSearchParams } from "@/module-sdk";
 
 type FilterTab = "all" | "available" | "favorites";
 
@@ -312,7 +313,7 @@ export default function RecipesPage() {
   const [addingToCollection, setAddingToCollection] =
     useState<RecipeCollection | null>(null);
   const [draggingRecipeId, setDraggingRecipeId] = useState<string | null>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, writeParams] = useQueuedSearchParams();
 
   // A screen whose empty state cannot create a recipe sends the reader here
   // with "?new=1" — the form opens on arrival instead of asking them to find
@@ -320,10 +321,8 @@ export default function RecipesPage() {
   useEffect(() => {
     if (searchParams.get("new") !== "1") return;
     setShowForm(true);
-    const next = new URLSearchParams(searchParams);
-    next.delete("new");
-    setSearchParams(next, { replace: true });
-  }, [searchParams, setSearchParams]);
+    writeParams((next) => next.delete("new"));
+  }, [searchParams, writeParams]);
 
   const collectionsQuery = useRecipeCollections();
   const collections = collectionsQuery.data ?? [];

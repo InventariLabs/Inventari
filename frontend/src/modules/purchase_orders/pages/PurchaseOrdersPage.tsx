@@ -1,5 +1,5 @@
 import { useCallback, useDeferredValue, useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { FileText, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -30,6 +30,7 @@ import type {
   PurchaseOrder,
   PurchaseOrderRow,
 } from "@/modules/purchase_orders/types/purchase-orders";
+import { useQueuedSearchParams } from "@/module-sdk";
 
 const PAGE_SIZE = 50;
 const STATUS_FILTERS: Array<"ALL" | POStatus> = [
@@ -115,13 +116,10 @@ export default function PurchaseOrdersPage() {
 
   // reached from a partner card as ?partner_id=…, so the filter lives
   // in the URL and survives a reload.
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, writeParams] = useQueuedSearchParams();
   const partnerId = searchParams.get("partner_id");
-  const clearPartnerFilter = () => {
-    const next = new URLSearchParams(searchParams);
-    next.delete("partner_id");
-    setSearchParams(next, { replace: true });
-  };
+  const clearPartnerFilter = () =>
+    writeParams((next) => next.delete("partner_id"));
 
   const { data, isLoading, isError, error, refetch } = usePurchaseOrders({
     search: deferredSearch || undefined,

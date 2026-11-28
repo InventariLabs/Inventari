@@ -6,7 +6,7 @@ import {
   type FormEvent,
 } from "react";
 import { toast } from "sonner";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { Info, Pencil, Plus, Power, Trash2 } from "lucide-react";
@@ -64,6 +64,7 @@ import {
   targetTypeLabel,
   useOfferedTargetTypes,
 } from "@/modules/approvals/targetTypes";
+import { useQueuedSearchParams } from "@/module-sdk";
 
 /**
  * The stage a new workflow starts with. Its label is a suggestion the user
@@ -379,7 +380,7 @@ function useOpenCreateFromLink(
   setTargetType: (target: string) => void,
   setShowCreate: (open: boolean) => void,
 ) {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, writeParams] = useQueuedSearchParams();
   const offeredTargets = useOfferedTargetTypes();
   useEffect(() => {
     if (searchParams.get("new") !== "1") return;
@@ -391,13 +392,13 @@ function useOpenCreateFromLink(
       }
       setShowCreate(true);
     }
-    const next = new URLSearchParams(searchParams);
-    next.delete("new");
-    next.delete("target");
-    setSearchParams(next, { replace: true });
+    writeParams((next) => {
+      next.delete("new");
+      next.delete("target");
+    });
   }, [
     searchParams,
-    setSearchParams,
+    writeParams,
     offeredTargets,
     canConfigure,
     resetForm,
