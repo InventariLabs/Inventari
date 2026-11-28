@@ -150,4 +150,8 @@ class TestAReservationWhoseWindowPassed:
             item for item in today['expired'] if item['booking_id'] == detail['id']
         )
         assert row['can_pickup'] is False
-        assert all(item['booking_id'] != detail['id'] for item in today['pickups'])
+        # A reservation that started earlier today may also sit in the day's
+        # pickups; there it must still offer Extend, never Hand out.
+        for item in today['pickups']:
+            if item['booking_id'] == detail['id']:
+                assert item['can_pickup'] is False

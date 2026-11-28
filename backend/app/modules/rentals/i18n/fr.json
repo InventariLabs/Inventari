@@ -37,8 +37,5 @@
   "rental_service_needs_reason_and_date": "Besoin de réparation demande ce qui s'est passé et jusqu'à quand.",
   "rental_service_until_in_past": "La réparation doit se terminer dans le futur.",
   "rental_unit_on_two_lines": "Un équipement figure sur deux lignes ; supprimez l'une des deux.",
-  "rental_window_order": "Le retour suit la remise.",
-  "rental_booking": "Réservation introuvable.",
-  "rental_block": "Blocage introuvable.",
-  "rental_buffer_rule": "Règle de marge introuvable."
+  "rental_window_order": "Le retour suit la remise."
 }

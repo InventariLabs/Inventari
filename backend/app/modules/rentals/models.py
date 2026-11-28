@@ -221,7 +221,7 @@ class RentalBookingLine(CoreModelBase):
     # The kit this line came from, kept after the kit is deleted so the
     # booking still reads as one set.
     kit_id: Mapped[uuid.UUID | None] = mapped_column(
-        ForeignKey('rental_kits.id', ondelete='SET NULL'), nullable=True
+        ForeignKey('rental_kits.id', ondelete='SET NULL'), nullable=True, index=True
     )
     kit_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
 

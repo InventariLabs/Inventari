@@ -59,6 +59,16 @@ class ErrorMessages(TypedDict):
     rental_block_not_found: str
     rental_buffer_rule_not_found: str
     rental_availability_needs_target: str
+    rental_kit_not_found: str
+    rental_kit_empty: str
+    rental_kit_line_quantity: str
+    rental_kit_member_names_one_kind: str
+    rental_kit_member_on_two_lines: str
+    rental_kit_name_taken: str
+    rental_kit_needs_name: str
+    rental_kit_not_in_booking: str
+    rental_model_not_in_fleet: str
+    rental_return_unknown_unit: str
     equipment_module_unavailable: str
     rental_booking_conflict: str
     rental_pickup_incomplete: str

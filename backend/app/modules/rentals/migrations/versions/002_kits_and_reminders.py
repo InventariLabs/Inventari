@@ -109,6 +109,11 @@ def upgrade() -> None:
     create_index_if_absent(
         'ix_rental_kit_members_kit_id', 'rental_kit_members', ['kit_id']
     )
+    create_index_if_absent(
+        'ix_rental_kit_members_org_kit',
+        'rental_kit_members',
+        ['organization_id', 'kit_id'],
+    )
 
     op.add_column(
         'rental_booking_lines',

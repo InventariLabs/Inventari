@@ -37,8 +37,5 @@
   "rental_service_needs_reason_and_date": "Serwis wymaga opisu i daty końca.",
   "rental_service_until_in_past": "Serwis musi kończyć się w przyszłości.",
   "rental_unit_on_two_lines": "Jeden zasób jest na dwóch pozycjach; usuń jedną z nich.",
-  "rental_window_order": "Zwrot następuje po wydaniu.",
-  "rental_booking": "Nie znaleziono rezerwacji.",
-  "rental_block": "Nie znaleziono blokady.",
-  "rental_buffer_rule": "Nie znaleziono reguły bufora."
+  "rental_window_order": "Zwrot następuje po wydaniu."
 }

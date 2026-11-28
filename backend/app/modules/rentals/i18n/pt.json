@@ -37,8 +37,5 @@
   "rental_service_needs_reason_and_date": "Precisa de reparação pergunta o que aconteceu e até quando.",
   "rental_service_until_in_past": "A reparação tem de terminar no futuro.",
   "rental_unit_on_two_lines": "Um equipamento está em duas linhas; remova uma delas.",
-  "rental_window_order": "A devolução vem depois da entrega.",
-  "rental_booking": "Reserva não encontrada.",
-  "rental_block": "Bloqueio não encontrado.",
-  "rental_buffer_rule": "Regra de margem não encontrada."
+  "rental_window_order": "A devolução vem depois da entrega."
 }

@@ -37,8 +37,5 @@
   "rental_service_needs_reason_and_date": "Needs service asks what happened and until when.",
   "rental_service_until_in_past": "The service must end in the future.",
   "rental_unit_on_two_lines": "One unit is on two lines; remove one of them.",
-  "rental_window_order": "The return comes after the pickup.",
-  "rental_booking": "Booking not found.",
-  "rental_block": "Block not found.",
-  "rental_buffer_rule": "Buffer rule not found."
+  "rental_window_order": "The return comes after the pickup."
 }

@@ -500,8 +500,10 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `generate_code128_base64` | `(value: str) -> str` | READ | Code128 barcode as a data-URI image at the standard print geometry. |
 | `generate_qr_base64` | `(value: str) -> str` | READ | QR code as a data-URI PNG at the standard print geometry. |
 | `get_doc_status_map` | `(lang: str) -> dict[str, str]` | READ | Document status code -> localized label map. |
+| `issuer_async` | `(db: AsyncSession, organization_id: UUID, lang: str='en') -> IssuerContext` | READ | The organization's identity block for a printed document. |
 | `printed_codes` | `(number: str) -> dict[str, Any]` | READ | The code images a printout carries, and the size to print them at. |
 | `register_pdf_filters` | `(env: Any) -> None` | READ | Register standard Jinja2 filters (format_date, format_qty, etc.). |
+| `render_document_pdf_async` | `(db: AsyncSession, organization_id: UUID, html: str) -> bytes` | READ | Render a document on the organization's paper, off the event loop. |
 | `render_html` | `(template_html: str \| None, context: dict[str, Any], *, templates_dir: Path \| None=None) -> str` | READ | Render a template string with the sandboxed Jinja2 engine. |
 | `render_pdf` | `(html: str) -> bytes` | READ | Convert rendered HTML to PDF bytes (WeasyPrint). |
 | `sanitize_html` | `(body_html: str) -> str` | READ | Strip dangerous tags/attributes from user-authored HTML (nh3). |
@@ -600,9 +602,9 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 ## Statistics
 
-- **Total methods:** 317
+- **Total methods:** 319
 - **Namespaces:** 33
-- **Documented methods:** 317 (100%)
-- **READ methods:** 222 (70%)
+- **Documented methods:** 319 (100%)
+- **READ methods:** 224 (70%)
 - **WRITE methods:** 95 (30%)
 

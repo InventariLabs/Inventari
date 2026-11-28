@@ -632,15 +632,24 @@ apart.
 | `RENTAL_CANCEL_NOT_RESERVED` | Only a booking that has not been handed out can be cancelled |
 | `RENTAL_EXTEND_NOT_ACTIVE` | Only a reserved or handed-out booking can be extended |
 | `RENTAL_EXTEND_NOT_LATER` | The new return must be later than the current one |
+| `RENTAL_KIT_EMPTY` | A kit needs at least one member. |
+| `RENTAL_KIT_LINE_QUANTITY` | A kit line takes one kit. |
+| `RENTAL_KIT_MEMBER_NAMES_ONE_KIND` | A kit member is a unit or a model, not both. |
+| `RENTAL_KIT_MEMBER_ON_TWO_LINES` | One unit is on two lines of the kit. |
+| `RENTAL_KIT_NAME_TAKEN` | A kit with this name already exists. |
+| `RENTAL_KIT_NEEDS_NAME` | Give the kit a name. |
+| `RENTAL_KIT_NOT_FOUND` | Kit not found |
+| `RENTAL_KIT_NOT_IN_BOOKING` | This kit is not part of the booking. |
 | `RENTAL_LINE_NAMES_ONE_KIND` | A line names one asset or one model, not both |
 | `RENTAL_MODEL_LINE_NEEDS_MODEL` | A model line names a model |
+| `RENTAL_MODEL_NOT_IN_FLEET` | No unit of this model is in the register. |
 | `RENTAL_MOVE_NEEDS_SAME_MODEL` | A booking moves only to a unit of the same model |
 | `RENTAL_MOVE_TARGET_TAKEN` | The chosen unit is not free for that booking |
 | `RENTAL_PICKUP_DUPLICATE_SCAN` | The same unit was scanned twice |
 | `RENTAL_PICKUP_NOT_RESERVED` | Only a reserved booking can be handed out |
 | `RENTAL_PICKUP_WINDOW_PASSED` | This booking's window is over: extend the booking, then hand it out |
-| `RENTAL_RETURN_NEEDS_EVERY_UNIT` | The return lists every unit of the booking |
 | `RENTAL_RETURN_NOT_PICKED_UP` | Only a handed-out booking can be returned |
+| `RENTAL_RETURN_UNKNOWN_UNIT` | Choose the units that are coming back. |
 | `RENTAL_SERVICE_NEEDS_REASON_AND_DATE` | A unit going to service says what happened and until when |
 | `RENTAL_SERVICE_UNTIL_IN_PAST` | The service ends after it starts |
 | `RENTAL_UNIT_ON_TWO_LINES` | The same unit is on two lines of the booking |

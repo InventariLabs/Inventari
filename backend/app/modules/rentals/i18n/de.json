@@ -37,8 +37,5 @@
   "rental_service_needs_reason_and_date": "Servicebedarf fragt, was passiert ist und bis wann.",
   "rental_service_until_in_past": "Der Service muss in der Zukunft enden.",
   "rental_unit_on_two_lines": "Ein Gegenstand steht auf zwei Positionen; entfernen Sie eine davon.",
-  "rental_window_order": "Die Rückgabe liegt nach der Ausgabe.",
-  "rental_booking": "Buchung nicht gefunden.",
-  "rental_block": "Sperre nicht gefunden.",
-  "rental_buffer_rule": "Pufferregel nicht gefunden."
+  "rental_window_order": "Die Rückgabe liegt nach der Ausgabe."
 }
