@@ -114,6 +114,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A printed label's QR code is read by the phone camera in every browser. The
+  bundled scanner's zxing port fails to locate some valid matrices however
+  clean the picture — about one label in a hundred — so a second reader now
+  reads the frames it reports it cannot, a few times a second. Labels printed
+  before this change scan too.
 - When saving a product's edit form is refused — for example a unit changed
   while the product holds stock — the form scrolls to the sentence that says
   why and screen readers announce it. It stood above the fields, out of sight

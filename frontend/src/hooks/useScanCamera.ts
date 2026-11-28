@@ -6,6 +6,7 @@ export { useTorchAvailable } from "@/hooks/useTorchAvailable";
 import { logger } from "@/utils/logger";
 import { cameraErrorMessage } from "@/lib/cameraErrors";
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
+import jsQR from "jsqr";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
@@ -34,6 +35,12 @@ export function decodeRegion(
 // camera is. The canvas is sized to the camera pixels the box covers instead
 // (longest edge capped, to keep the decode time in check).
 const MAX_DECODE_EDGE = 1280;
+
+// How often the second reader is offered a frame while the bundled one is
+// failing: twice a second. Enough for a label held in front of the camera to
+// be read twice (the hook needs two readings of one code) within a second,
+// little enough that the phone spends most of its time in the cheaper reader.
+const QR_FALLBACK_INTERVAL_MS = 500;
 
 // The 1-D reader picks one black point per row from a histogram, and a label
 // printed on a mid-tone surround gives that histogram three humps, so the
@@ -92,10 +99,46 @@ export function binarizeLocally(image: ImageData, dropWide = false) {
   }
 }
 
-export function decodeAtCameraResolution(canvas: HTMLCanvasElement) {
+/**
+ * A second reader for the frames the bundled decoder reports it cannot read.
+ *
+ * html5-qrcode's zxing port fails to *locate* some valid QR matrices however
+ * clean the picture is: a whole frame, a sharper camera or the library's
+ * try-harder mode changes nothing, because the locator rejects the code
+ * itself. Those are the labels that never scan in a browser whose
+ * BarcodeDetector html5-qrcode cannot fall back on (Safari, Firefox). jsQR
+ * locates and decodes the same frame, so it reads what the locator missed;
+ * the hook gives it the frames only after the bundled decoder has missed one,
+ * and not every one of them, because the everyday reader stays the cheaper
+ * and more robust one.
+ */
+interface QrFallback {
+  /** Whether this frame is one to spend the second decoder on. */
+  shouldRead: () => boolean;
+  /** The text it read, for the same place the library's own reading goes. */
+  onRead: (text: string) => void;
+}
+
+/** The text of a QR in the frame, decoded by the second reader. */
+export function decodeQrFallback(image: ImageData): string | null {
+  return (
+    jsQR(image.data, image.width, image.height, {
+      inversionAttempts: "dontInvert",
+    })?.data ?? null
+  );
+}
+
+export function decodeAtCameraResolution(
+  canvas: HTMLCanvasElement,
+  fallback?: QrFallback,
+) {
   const context = canvas.getContext("2d");
   if (!context) return;
   let frame = 0;
+  const readFallback = (reader: QrFallback, picture: ImageData) => {
+    const text = decodeQrFallback(picture);
+    if (text !== null) reader.onRead(text);
+  };
   const draw = context.drawImage.bind(context) as (...a: unknown[]) => void;
   (context as { drawImage: unknown }).drawImage = (...args: unknown[]) => {
     const [source, , , sw, sh] = args as [
@@ -125,8 +168,17 @@ export function decodeAtCameraResolution(canvas: HTMLCanvasElement) {
     // the other two are thresholded, one of them also dropping the wide
     // ink of a dark package edge, which a QR code cannot survive.
     const pass = frame++ % 3;
-    if (pass === 0) return;
+    if (pass === 0) {
+      if (fallback && fallback.shouldRead()) {
+        readFallback(fallback, context.getImageData(0, 0, width, height));
+      }
+      return;
+    }
     const picture = context.getImageData(0, 0, width, height);
+    // The second reader works from the frame as the camera saw it, not from
+    // the thresholded one below: its own threshold is part of what makes it
+    // find the codes the library's locator missed.
+    if (fallback && fallback.shouldRead()) readFallback(fallback, picture);
     binarizeLocally(picture, pass === 2);
     context.putImageData(picture, 0, 0);
   };
@@ -243,6 +295,82 @@ function useRestartWhenReaderBoxChanges(
   }, [isCameraRunning, aimedFor]);
 }
 
+// About a second of frames with nothing to read (the reader runs at 20 fps
+// and tries twice per frame). Long enough that a code merely hard to read
+// — a frame or three of blur — is still the same reading, short enough that
+// taking the code away and bringing it back reads as the second piece it is.
+const MISSES_TO_LEAVE_VIEW = 40;
+
+// Two frames must read a code before it is reported: one frame's misread is
+// not a piece on the shelf.
+const CONSENSUS_REQUIRED = 2;
+
+interface ReadState {
+  lastReadCode: { current: string | null };
+  readCount: { current: number };
+  reportedCode: { current: string | null };
+  missedAttempts: { current: number };
+  zxingMissed: { current: boolean };
+  onCodeScanned: { current: (code: string) => void };
+}
+
+/**
+ * The two callbacks every frame of a camera run goes through: one for a read
+ * — made by the library or, when it reports the frame unreadable, by the
+ * second reader — and one for a frame neither could read. Between them they
+ * decide when a code has been shown once, and when it has gone away and come
+ * back as a second piece.
+ */
+function createReadHandlers(state: ReadState, isMounted: () => boolean) {
+  const onDecoded = (decodedText: string) => {
+    if (!isMounted()) return;
+    const { reportedCode, missedAttempts, lastReadCode, readCount } = state;
+
+    if (decodedText === reportedCode.current) {
+      // The reading already happened; the code is simply still there.
+      // Nothing to count and nothing to report.
+      missedAttempts.current = 0;
+      return;
+    }
+    // Some other code is in the frame, so the reported one has left it and
+    // may be read as a new piece whenever it returns.
+    reportedCode.current = null;
+    missedAttempts.current = 0;
+
+    if (decodedText === lastReadCode.current) {
+      readCount.current++;
+    } else {
+      lastReadCode.current = decodedText;
+      readCount.current = 1;
+      return;
+    }
+
+    if (readCount.current >= CONSENSUS_REQUIRED) {
+      lastReadCode.current = null;
+      readCount.current = 0;
+      reportedCode.current = decodedText;
+      state.onCodeScanned.current(decodedText);
+    }
+  };
+
+  const onMiss = () => {
+    if (!isMounted()) return;
+    const { reportedCode, missedAttempts } = state;
+    state.zxingMissed.current = true;
+    // A frame the decoder could not read. The only one it matters for is a
+    // code already reported: once it has gone unread for long enough it
+    // counts as out of view, and showing it again is a second reading.
+    // Counted in frames rather than clock time, so a page the browser
+    // throttles cannot decide it.
+    if (reportedCode.current === null) return;
+    if (++missedAttempts.current < MISSES_TO_LEAVE_VIEW) return;
+    reportedCode.current = null;
+    missedAttempts.current = 0;
+  };
+
+  return { onDecoded, onMiss };
+}
+
 export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
   const { t: tScan } = useTranslation("scan");
 
@@ -260,6 +388,11 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
   // first one has left the frame.
   const reportedCode = useRef<string | null>(null);
   const missedAttempts = useRef<number>(0);
+  // Whether the library's own decoder is currently failing on this camera
+  // run, which is the only time the second reader is offered a frame, and
+  // when it was last offered one (see QR_FALLBACK_INTERVAL_MS).
+  const zxingMissed = useRef(false);
+  const lastQrFallbackAt = useRef(0);
   // A turn of the phone restarts the camera only to size its frame for the
   // new screen; the code in front of it never left. The run before the turn
   // hands the code it reported to the run after it, which keeps it reported
@@ -268,17 +401,11 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
   const reportedBeforeTurn = useRef<string | null>(null);
   // The size of the reader's box the running camera's frame was computed for.
   const aimedFor = useRef<{ width: number; height: number } | null>(null);
-  // About a second of frames with nothing to read (the reader runs at 20 fps
-  // and tries twice per frame). Long enough that a code merely hard to read
-  // — a frame or three of blur — is still the same reading, short enough that
-  // taking the code away and bringing it back reads as the second piece it is.
-  const MISSES_TO_LEAVE_VIEW = 40;
   // Read through a ref: at every call site this is an inline arrow, so as an
   // effect dependency it tore the running camera down and started it again on
   // each render — and publishing the device state below is itself a render.
   const onCodeScannedRef = useRef(onCodeScanned);
   onCodeScannedRef.current = onCodeScanned;
-  const CONSENSUS_REQUIRED = 2;
 
   const [scannerError, setScannerError] = useState<string | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(() => {
@@ -425,6 +552,8 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
     if (!shouldRun) return;
     reportedCode.current = reportedBeforeTurn.current;
     reportedBeforeTurn.current = null;
+    zxingMissed.current = false;
+    lastQrFallbackAt.current = 0;
 
     // A reader torn down and started again — the panel closed and reopened,
     // the page hidden and shown — knows nothing about the code in front of
@@ -436,6 +565,8 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
       readCount.current = 0;
       reportedCode.current = null;
       missedAttempts.current = 0;
+      zxingMissed.current = false;
+      lastQrFallbackAt.current = 0;
     };
 
     let isMounted = true;
@@ -514,53 +645,49 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
             ],
           };
 
+          // One reading, whichever decoder made it: the library's own, or the
+          // second reader below when the library reported it could not read
+          // the frame. Both count towards the same consensus and the same
+          // "still in view" state, so a code read by either is one code.
+          const { onDecoded, onMiss } = createReadHandlers(
+            {
+              lastReadCode,
+              readCount,
+              reportedCode,
+              missedAttempts,
+              zxingMissed,
+              onCodeScanned: onCodeScannedRef,
+            },
+            () => isMounted,
+          );
+
           // The library creates #qr-canvas in its "playing" handler, after
           // start() has resolved, so the canvas is waited for, not looked up.
-          stopWatchingCanvas = whenDecodeCanvas(decodeAtCameraResolution);
+          stopWatchingCanvas = whenDecodeCanvas((decodeCanvas) =>
+            decodeAtCameraResolution(decodeCanvas, {
+              shouldRead: () => {
+                if (!zxingMissed.current) return false;
+                const at = performance.now();
+                if (at - lastQrFallbackAt.current < QR_FALLBACK_INTERVAL_MS) {
+                  return false;
+                }
+                lastQrFallbackAt.current = at;
+                return true;
+              },
+              onRead: onDecoded,
+            }),
+          );
           absorbReaderPlayAbort();
           await html5QrCode.start(
             { facingMode: "environment" },
             config,
             (decodedText) => {
-              if (!isMounted) return;
-
-              if (decodedText === reportedCode.current) {
-                // The reading already happened; the code is simply still
-                // there. Nothing to count and nothing to report.
-                missedAttempts.current = 0;
-                return;
-              }
-              // Some other code is in the frame, so the reported one has
-              // left it and may be read as a new piece whenever it returns.
-              reportedCode.current = null;
-              missedAttempts.current = 0;
-
-              if (decodedText === lastReadCode.current) {
-                readCount.current++;
-              } else {
-                lastReadCode.current = decodedText;
-                readCount.current = 1;
-                return;
-              }
-
-              if (readCount.current >= CONSENSUS_REQUIRED) {
-                lastReadCode.current = null;
-                readCount.current = 0;
-                reportedCode.current = decodedText;
-                onCodeScannedRef.current(decodedText);
-              }
+              // The library read the frame, so its locator is working again;
+              // the second reader need not be asked until it next misses.
+              zxingMissed.current = false;
+              onDecoded(decodedText);
             },
-            () => {
-              // A frame the decoder could not read. The only one it matters
-              // for is a code already reported: once it has gone unread for
-              // long enough it counts as out of view, and showing it again
-              // is a second reading. Counted in frames rather than clock
-              // time, so a page the browser throttles cannot decide it.
-              if (reportedCode.current === null) return;
-              if (++missedAttempts.current < MISSES_TO_LEAVE_VIEW) return;
-              reportedCode.current = null;
-              missedAttempts.current = 0;
-            },
+            onMiss,
           );
 
           if (!isMounted) {
