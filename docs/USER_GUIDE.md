@@ -381,11 +381,15 @@ alert** and a **Sublocation**.
   stock you had before the upload, by its Label Code, else its SKU, else its
   barcode: **Add anyway** adds it again, **Leave alone** skips it, and
   **Overwrite** writes its columns onto that record. Quantity is never
-  overwritten. Where the product stands in several records, the row's location
-  says which one; a row that cannot say is refused. **Leave alone** tells the
-  shelves apart as **Overwrite** does: a shelf the product has no record on is
-  added, so a corrected sheet can be uploaded whole. In **Add anyway** mode, a
-  file whose every row finds stock already here says so before it is imported.
+  overwritten. A Label Code names one record wherever it stands: **Leave
+  alone** leaves it where it is, and **Overwrite** moves it to the location the
+  row names. A SKU or a barcode names a product, and the row's location says
+  which of its records is meant. Where the product has no record at that
+  location, **Leave alone** adds the row there, so a corrected sheet can be
+  uploaded whole, and **Overwrite** refuses the row and names the location. A
+  row that cannot say which of several records it means is refused by
+  **Overwrite**. In **Add anyway** mode, a file whose every row finds stock
+  already here says so before it is imported.
 - The result counts every refused row and lists the first few.
   **Download refused rows** gives all of them back in the format you uploaded,
   with your columns and the reason beside each: correct them and upload that

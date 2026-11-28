@@ -149,12 +149,16 @@ class ExistingStock:
             stock.by_name[product_name or name].append(record)
         return stock
 
+    def named_by_label(self, row: RowIdentity) -> list[StockRecord]:
+        """The record the row's Label Code names: one object, wherever it stands."""
+        if not row.label_code:
+            return []
+        return self.by_label.get(row.label_code.strip().lower(), [])
+
     def named_by_code(self, row: RowIdentity) -> list[StockRecord]:
         """The records the row's Label Code names, else its SKU, else its barcode."""
-        if row.label_code:
-            found = self.by_label.get(row.label_code.strip().lower())
-            if found:
-                return found
+        if found := self.named_by_label(row):
+            return found
         if row.sku and row.sku in self.by_sku:
             return self.by_sku[row.sku]
         if row.barcode:

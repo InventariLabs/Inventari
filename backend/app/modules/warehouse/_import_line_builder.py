@@ -223,11 +223,10 @@ async def _build_document_line(
         # The line and the product stub it may found share one name column.
         # Left to the driver, the row is a truncation error the reader sees
         # as "an internal error" and cannot correct.
+        source = 'name' if given_name else 'sku' if sku else 'barcode'
         raise ServiceRejectionError(
             'import_column_too_long',
-            column=column_mapping.get('name')
-            or column_mapping.get('sku')
-            or column_mapping.get('barcode'),
+            column=column_mapping.get(source),
             limit=_NAME_LIMIT,
         )
 
