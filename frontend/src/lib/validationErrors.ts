@@ -16,7 +16,8 @@
  * `errors` state:
  *   - top-level: `partner_id`, `source_location_id`, `target_location_id`,
  *     `notes`, `external_reference`, `scheduled_date`
- *   - per-line: `line.<stableKey>.name`, `line.<stableKey>.quantity`
+ *   - per-line: `line.<stableKey>.name`, `line.<stableKey>.quantity`,
+ *     `line.<stableKey>.unit_price`
  *   - fallback: `_form` (rendered by the caller as a form-level message)
  *
  * Line indices from the backend are translated to the frontend's stable
@@ -100,6 +101,9 @@ function mapLocToKey(
     }
     if (LINE_NAME_FIELDS.has(field)) {
       return `line.${stableKey}.name`;
+    }
+    if (field === "unit_price") {
+      return `line.${stableKey}.unit_price`;
     }
     return "_form";
   }

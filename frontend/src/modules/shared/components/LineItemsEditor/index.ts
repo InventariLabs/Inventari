@@ -7,6 +7,7 @@ export { LineItemSearchDropdown } from "./LineItemSearchDropdown";
 export { LineItemOptionalPanel } from "./LineItemOptionalPanel";
 export type {
   LineItem,
+  LineItemErrors,
   LineItemProduct,
   LineItemsEditorLabels,
   RenderUomSelect,

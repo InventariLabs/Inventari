@@ -483,6 +483,7 @@ class TestAnalyzeExecuteRoundtrip:
             'imported': 2,
             'failed': 0,
             'errors': [],
+            'refused_file': None,
             'skipped': 0,
             'updated': 0,
             'skipped_serials': [],

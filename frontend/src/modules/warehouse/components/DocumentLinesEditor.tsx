@@ -11,6 +11,7 @@ import {
 import { UomSelect } from "@/modules/shared/components/UomSelect";
 import { DocumentQuickAddPanel } from "@/modules/warehouse/components/DocumentQuickAddPanel";
 import {
+  type LineFieldErrors,
   type QuickAddLineDraft,
   type ReceiptDraftLine,
 } from "@/modules/warehouse/components/documentFormShared";
@@ -70,7 +71,7 @@ interface DocumentLinesEditorProps {
    * transfer moves a single record and keeps the rows one by one.
    */
   mergeStockRows?: boolean;
-  lineErrors?: Record<string, { name?: string; quantity?: string }>;
+  lineErrors?: LineFieldErrors;
   onAddEmptyLine: () => void;
   onConsolidate?: () => void;
   onQuickAddChange: (updates: Partial<QuickAddLineDraft>) => void;

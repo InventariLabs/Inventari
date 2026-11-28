@@ -16,6 +16,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_utils import acquire_advisory_lock
+from app.core.money import quantise
 from app.core.public_api import core_api
 
 from .models import MakerIngredientPrice
@@ -40,6 +41,18 @@ async def typed_rates_async(
     for template_id, price in rows.all():
         rates[template_id] = price
     return rates
+
+
+def order_line_price(price: Decimal | None) -> Decimal | None:
+    """A price as a purchase order line keeps it: to two decimals.
+
+    A price per a small unit can round away to nothing; the line then carries
+    no price for the buyer to fill in, since zero would order it as free.
+    """
+    if price is None:
+        return None
+    kept = quantise(price)
+    return None if price and not kept else kept
 
 
 async def get_typed_price_async(

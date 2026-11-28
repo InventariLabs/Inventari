@@ -298,9 +298,9 @@ Good to know:
   Import works the same way: a row whose barcode, or name and brand, matches
   an existing product becomes another record of it. A row is refused when its
   serial number is already on a record you have, or when its barcode is worn
-  by a live record of a different product. To update products instead of
-  adding records, import with the Label Code column mapped and a match mode
-  on; a row without a code always adds.
+  by a live record of a different product. To leave records you already have
+  alone, or to write the rows onto them, import with a match mode on (see
+  *Importing a sheet* below).
 
 **From a photograph.** With photo recognition on, the page has a **From photo**
 tab: **Take Product Photo**, then **Analyze label**. It reads the name, brand, expiry
@@ -374,6 +374,18 @@ alert** and a **Sublocation**.
   step.
 - A unit is read by its symbol, by common spellings such as `Units`, `ea` or
   `each`, and by the name the app gives it in any of its languages.
+- **Rows about stock already here** decides what happens to a row that names
+  stock you had before the upload, by its Label Code, else its SKU, else its
+  barcode: **Add anyway** adds it again, **Leave alone** skips it, and
+  **Overwrite** writes its columns onto that record. Quantity is never
+  overwritten. Where the product stands in several records, the row's location
+  says which one; a row that cannot say is refused. In **Add anyway** mode, a
+  file whose every row finds stock already here says so before it is imported.
+- The result counts every refused row and lists the first few.
+  **Download refused rows** gives all of them back in the format you uploaded,
+  with your columns and the reason beside each: correct them and upload that
+  file on its own. The partner, equipment, document-line and opening-stock
+  imports offer the same file.
 - Each row has **Remove 1 unit**, **Add 1 unit**, **Edit**, **Delete** and a bell,
   **Set stock alert**, for the minimum below which the product counts as
   running low. Clicking a row opens its quick actions.

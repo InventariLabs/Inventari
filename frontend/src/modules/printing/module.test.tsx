@@ -10,6 +10,12 @@ import { signInWith } from "@/test/auth";
 import type { Item } from "@/types";
 import "./module";
 import { useProductLabelRequest } from "./hooks/useProductLabelRequest";
+// What the manifest loads on demand, resolved with this file: on a busy machine
+// a first import can outlast the wait for the screen.
+import "./pages/LabelScanPage";
+import "./components/ItemLabelAttachSlot";
+import "./components/ProductLabelPrintSlot";
+import "./components/ProductLabelSheetHost";
 
 /**
  * What the module hands the shell. The shell loads each contribution on

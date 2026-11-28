@@ -489,6 +489,7 @@ export const LineItemRow = memo(function LineItemRow({
             unitPriceFieldId={ids.unitPriceFieldId}
             taxRateFieldId={ids.taxRateFieldId}
             lineValue={lineValue}
+            error={error}
             onUpdate={onUpdate}
           />
         )}
@@ -526,6 +527,7 @@ export const LineItemRow = memo(function LineItemRow({
           unitPriceFieldId={ids.unitPriceFieldId}
           taxRateFieldId={ids.taxRateFieldId}
           lineValue={lineValue}
+          error={error}
           onUpdate={onUpdate}
         />
       )}

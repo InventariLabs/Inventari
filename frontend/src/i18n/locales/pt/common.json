@@ -1366,7 +1366,12 @@
     "firstErrors": "Primeiros erros",
     "rowsCountedNote": "As linhas são contadas a partir da primeira linha de dados; o cabeçalho não conta, então o número é o da planilha menos um.",
     "previewTitle": "Prévia",
-    "previewHint": "As primeiras linhas da origem, lidas com o mapeamento acima."
+    "previewHint": "As primeiras linhas da origem, lidas com o mapeamento acima.",
+    "refusedShown_one": "Mostrando {{shown}} de {{count}} linha recusada.",
+    "refusedShown_many": "Mostrando {{shown}} de {{count}} linhas recusadas.",
+    "refusedShown_other": "Mostrando {{shown}} de {{count}} linhas recusadas.",
+    "refusedDownload": "Baixar linhas recusadas",
+    "refusedHint": "Corrija-as e envie somente esse arquivo: ele adiciona apenas as linhas recusadas."
   },
   "optional": "Opcional",
   "remove": "Remover",

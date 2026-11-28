@@ -2549,6 +2549,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/items/import/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check Import
+         * @description What an import in 'add' mode would add to stock that is already here.
+         *
+         *     Nothing is written. The mapping step asks before the import runs, so a
+         *     sheet uploaded a second time says so while its quantities are still
+         *     single.
+         */
+        post: operations["check_import_api_v1_items_import_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/items/import/grocy": {
         parameters: {
             query?: never;
@@ -13660,6 +13684,15 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
+        /** Body_check_import_api_v1_items_import_check_post */
+        Body_check_import_api_v1_items_import_check_post: {
+            /** File */
+            file: string;
+            /** Mapping Json */
+            mapping_json: string;
+            /** Count As One */
+            count_as_one?: boolean;
+        };
         /** Body_execute_equipment_import_endpoint_api_v1_equipment_import_execute_post */
         Body_execute_equipment_import_endpoint_api_v1_equipment_import_execute_post: {
             /** File */
@@ -15776,6 +15809,8 @@ export interface components {
             headers: string[];
             /** Preview Rows */
             preview_rows: components["schemas"]["ImportPreviewRow"][];
+            /** Preview Rows As Written */
+            preview_rows_as_written: components["schemas"]["ImportPreviewRow"][];
             /** Total Rows */
             total_rows: number;
         };
@@ -15835,6 +15870,7 @@ export interface components {
             failed: number;
             /** Errors */
             errors: components["schemas"]["DocumentImportErrorResponse"][];
+            refused_file?: components["schemas"]["RefusedRowsFile"] | null;
             /**
              * No Stock
              * @default []
@@ -17491,6 +17527,10 @@ export interface components {
             preview_rows: {
                 [key: string]: unknown;
             }[];
+            /** Preview Rows As Written */
+            preview_rows_as_written: {
+                [key: string]: unknown;
+            }[];
             /** Total Rows */
             total_rows: number;
             /** Suggested Mapping */
@@ -17538,6 +17578,7 @@ export interface components {
             errors: {
                 [key: string]: unknown;
             }[];
+            refused_file?: components["schemas"]["RefusedRowsFile"] | null;
             /**
              * Skipped
              * @default 0
@@ -18550,6 +18591,18 @@ export interface components {
             source_document_id?: string | null;
         };
         /**
+         * ItemImportCheckResponse
+         * @description How many of a sheet's rows would add to stock that is already here.
+         *
+         *     Both counts are zero for a sheet that carries no stock.
+         */
+        ItemImportCheckResponse: {
+            /** Rows */
+            rows: number;
+            /** Rows In Stock */
+            rows_in_stock: number;
+        };
+        /**
          * ItemImportJobResponse
          * @description An import that runs on in the background, and how far it has got.
          *
@@ -18633,6 +18686,7 @@ export interface components {
             errors: {
                 [key: string]: unknown;
             }[];
+            refused_file?: components["schemas"]["RefusedRowsFile"] | null;
             /**
              * Created Locations
              * @default []
@@ -20500,6 +20554,7 @@ export interface components {
             failed: number;
             /** Errors */
             errors: components["schemas"]["DocumentImportErrorResponse"][];
+            refused_file?: components["schemas"]["RefusedRowsFile"] | null;
             /** Matched */
             matched: number;
             /** Unmatched */
@@ -22650,6 +22705,7 @@ export interface components {
             errors: {
                 [key: string]: unknown;
             }[];
+            refused_file?: components["schemas"]["RefusedRowsFile"] | null;
         };
         /**
          * PartnerListItem
@@ -26458,6 +26514,16 @@ export interface components {
             price_volatility: string;
         };
         /**
+         * RefusedRowsFile
+         * @description The rows an import refused, as a file to correct and upload alone.
+         */
+        RefusedRowsFile: {
+            /** Filename */
+            filename: string;
+            /** Content Base64 */
+            content_base64: string;
+        };
+        /**
          * RegisterCurrencyTotal
          * @description Aggregated totals for one currency — sums are never mixed across currencies.
          */
@@ -27384,6 +27450,10 @@ export interface components {
             headers: string[];
             /** Preview Rows */
             preview_rows: {
+                [key: string]: string | number | null;
+            }[];
+            /** Preview Rows As Written */
+            preview_rows_as_written: {
                 [key: string]: string | number | null;
             }[];
             /** Total Rows */
@@ -36616,6 +36686,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SheetAnalysisResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    check_import_api_v1_items_import_check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_check_import_api_v1_items_import_check_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemImportCheckResponse"];
                 };
             };
             /** @description Validation Error */

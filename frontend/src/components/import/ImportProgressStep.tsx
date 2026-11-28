@@ -7,6 +7,7 @@ import {
   FileSpreadsheet,
   AlertCircle,
 } from "lucide-react";
+import { RefusedRows } from "./RefusedRows";
 import type { ImportOutcome, ImportProgress } from "./types";
 
 interface ImportProgressStepProps {
@@ -165,6 +166,13 @@ export function ImportProgressStep({
               </li>
             ))}
           </ul>
+          <div className="mt-4">
+            <RefusedRows
+              failed={errorCount}
+              shown={importResult.errors.length}
+              file={importResult.refused_file}
+            />
+          </div>
         </div>
       )}
     </div>

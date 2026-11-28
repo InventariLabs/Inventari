@@ -14,6 +14,7 @@ from app.core.contracts import (
 )
 from app.core.contracts._core_dtos import ISO_3166_ALPHA2_CODES
 from app.core.exceptions import ServiceRejectionError
+from app.schemas._common import RefusedRowsFile
 
 ALLOWED_PARTNER_TYPES = frozenset(
     {'SUPPLIER', 'CUSTOMER', 'BOTH', 'SERVICE_PROVIDER', 'MANUFACTURER', 'EMPLOYEE'}
@@ -181,3 +182,5 @@ class PartnerImportResponse(BaseModel):
     contacts: int = 0
     failed: int
     errors: list[dict[str, Any]] = []
+    #: Every refused row, to correct and upload alone.
+    refused_file: RefusedRowsFile | None = None

@@ -7,6 +7,7 @@ category the sheet names is founded, or the row is refused by that name.
 
 from __future__ import annotations
 
+import base64
 import csv
 import io
 import json
@@ -21,6 +22,7 @@ from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
 from app.core.contracts import SystemPermission
+from app.core.import_sheet import read_rows
 from app.core.testing import ModuleTestHelper
 from app.models.category import Category
 from app.models.item import Item
@@ -293,6 +295,82 @@ def test_the_shelf_export(
     } == {'Camera': 'AVAILABLE', 'Tripod': 'DEPLOYED', 'Lamp': 'DEPLOYED'}
     assert assets['Camera'].purchase_price == Decimal('1289')
     assert _meta(assets['Camera'])['warranty_until'] == '2025-01-05'
+    assert _meta(assets['Camera'])['asset_tag'] == 'c1'
+    assert _meta(assets['Camera'])['notes'] == 'Body only'
+
+
+def test_asset_tag_and_notes_columns_come_before_asset_id_and_description(
+    client: TestClient,
+    eq_auth_headers: dict[str, str],
+) -> None:
+    sheet = _sheet(
+        ['Asset ID', 'Description', 'Asset Tag', 'Notes', 'Name'],
+        ['id', 'text', 'tag', 'note', 'Saw'],
+    )
+
+    analyzed = client.post(
+        '/api/v1/equipment/import/analyze',
+        headers=eq_auth_headers,
+        files={'file': ('export.csv', sheet, 'text/csv')},
+    )
+
+    suggested = analyzed.json()['suggested_mapping']
+    assert (suggested['asset_tag'], suggested['notes']) == ('Asset Tag', 'Notes')
+
+
+def test_the_refused_rows_come_back_as_a_file_that_imports_once_corrected(
+    client: TestClient,
+    eq_auth_headers: dict[str, str],
+    eq_org: Organization,
+    db_session: Session,
+) -> None:
+    sheet = _sheet(
+        ['Name', 'Location', 'Cost'],
+        ['Saw', 'Workshop', '10'],
+        ['Press', 'Workshop', 'a lot'],
+        ['', 'Workshop', ''],
+    )
+
+    body = _import(client, eq_auth_headers, sheet).json()
+
+    assert (body['imported'], body['failed']) == (1, 2), body
+    answer = body['refused_file']
+    assert answer['filename'] == 'export-refused.csv'
+    content = base64.b64decode(answer['content_base64'])
+    frame = read_rows(content, answer['filename'])
+    assert list(frame.columns) == ['Name', 'Location', 'Cost', 'Reason refused']
+    assert list(frame['Cost'].fillna('')) == ['a lot', '']
+
+    corrected = _sheet(['Name', 'Location', 'Cost'], ['Press', 'Workshop', '20'])
+    fixed = _import(client, eq_auth_headers, corrected).json()
+    assert (fixed['imported'], fixed['failed']) == (1, 0), fixed
+    assert fixed['refused_file'] is None
+    assert set(_assets(db_session, eq_org)) == {'Saw', 'Press'}
+
+
+def test_a_place_the_sheet_founds_is_an_equipment_place(
+    client: TestClient,
+    eq_auth_headers: dict[str, str],
+    eq_storage_location: StorageLocation,
+    db_session: Session,
+) -> None:
+    sheet = _sheet(
+        ['Name', 'Location'],
+        ['One', 'Workshop > Bench'],
+        ['Two', 'Server Room A > Rack 1'],
+    )
+
+    body = _import(client, eq_auth_headers, sheet).json()
+
+    assert (body['imported'], body['failed']) == (2, 0), body['errors']
+    listed = client.get(
+        '/api/v1/locations',
+        headers=eq_auth_headers,
+        params={'context_tag': 'equipment', 'limit': 100},
+    )
+    assert listed.status_code == status.HTTP_200_OK, listed.text
+    names = {place['name'] for place in listed.json()['items']}
+    assert {'Workshop', 'Bench', 'Rack 1'} <= names
 
 
 def test_months_of_warranty_end_that_long_after_the_purchase(

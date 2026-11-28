@@ -179,20 +179,23 @@
     "foundedCategories_one": "{{count}} categoria criada",
     "foundedCategories_other": "{{count}} categorias criadas",
     "labelMatch": {
-      "label": "Linhas com código de etiqueta",
-      "hint": "A coluna Código da etiqueta de uma planilha exportada indica de qual produto a linha trata.",
+      "label": "Linhas sobre estoque que já está aqui",
+      "hint": "Uma linha identifica estoque já registrado pelo código da etiqueta, pelo SKU ou pelo código de barras.",
       "modes": {
         "add": "Adicionar mesmo assim",
         "skip": "Deixar como está",
         "overwrite": "Sobrescrever"
       },
       "notes": {
-        "add": "Cada linha vira um novo produto; o código da etiqueta é ignorado.",
-        "skip": "Uma linha cujo código de etiqueta indica um produto daqui é deixada como está. Uma linha sem código, ou com um código desconhecido, é adicionada.",
-        "overwrite": "Uma linha cujo código de etiqueta indica um produto daqui grava suas colunas nele. A quantidade nunca é sobrescrita — o estoque se movimenta por um recebimento ou uma contagem."
+        "add": "Todas as linhas são adicionadas, então o estoque atual aumenta.",
+        "skip": "Uma linha que identifica estoque já registrado é deixada como está. As demais são adicionadas.",
+        "overwrite": "Uma linha que identifica estoque já registrado grava suas colunas nesse registro. A quantidade nunca é sobrescrita: o estoque muda por um recebimento ou uma contagem."
       },
-      "needsColumn": "Mapeie primeiro a coluna Código da etiqueta; sem ela não há como fazer a correspondência e todas as linhas são adicionadas.",
-      "noCodesInFile": "A coluna Código da etiqueta está mapeada, mas nenhuma linha traz um código — os códigos aparecem depois que uma etiqueta é impressa. Neste modo, todas as linhas serão adicionadas como novos registros, exatamente como no modo de adicionar."
+      "needsColumn": "Mapeie primeiro a coluna de código da etiqueta, SKU ou código de barras; caso contrário não há com o que comparar e todas as linhas são adicionadas.",
+      "noCodesInFile": "Nenhuma linha tem código de etiqueta, SKU ou código de barras, então todas serão adicionadas, como no modo de adicionar.",
+      "allInStock_one": "A {{count}} linha deste arquivo identifica um produto que já está em estoque. Importá-la neste modo soma a quantidade de novo.",
+      "allInStock_many": "As {{count}} linhas deste arquivo identificam produtos que já estão em estoque. Importá-las neste modo soma as quantidades de novo.",
+      "allInStock_other": "As {{count}} linhas deste arquivo identificam produtos que já estão em estoque. Importá-las neste modo soma as quantidades de novo."
     },
     "matchedUpdated_one": "{{count}} produto atualizado",
     "matchedUpdated_other": "{{count}} produtos atualizados",

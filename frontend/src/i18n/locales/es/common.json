@@ -1368,7 +1368,12 @@
     "firstErrors": "Primeros errores",
     "rowsCountedNote": "Las filas se cuentan desde la primera fila de datos; el encabezado no cuenta, así que el número es el de la hoja menos uno.",
     "previewTitle": "Vista previa",
-    "previewHint": "Las primeras filas del origen, leídas con la asignación de arriba."
+    "previewHint": "Las primeras filas del origen, leídas con la asignación de arriba.",
+    "refusedShown_one": "Se muestran {{shown}} de {{count}} fila rechazada.",
+    "refusedShown_many": "Se muestran {{shown}} de {{count}} filas rechazadas.",
+    "refusedShown_other": "Se muestran {{shown}} de {{count}} filas rechazadas.",
+    "refusedDownload": "Descargar filas rechazadas",
+    "refusedHint": "Corrígelas y sube solo ese archivo: añade únicamente las filas rechazadas."
   },
   "optional": "Opcional",
   "remove": "Eliminar",

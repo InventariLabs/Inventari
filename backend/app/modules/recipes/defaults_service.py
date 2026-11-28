@@ -22,7 +22,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db_utils import acquire_advisory_lock, escape_ilike, paginate_async
 from app.core.exceptions import AppException
 from app.core.logging import get_logger
-from app.core.module_sdk import cell_text, read_sheet, rows_to_csv
+from app.core.module_sdk import (
+    SheetColumns,
+    cell_text,
+    read_sheet,
+    rows_to_csv,
+)
 from app.i18n.service import get_current_lang, get_error_message
 
 from ._name_matching import normalize_name
@@ -240,20 +245,29 @@ def read_defaults_csv(content: bytes, filename: str) -> list[dict[str, Any]]:
     decoded cp1250 with ``errors='replace'``: the Polish letters reached the
     column as '�' under a 200.
 
-    A decimal comma is the same sheet's arithmetic. With the semicolon
-    separating columns, a comma inside a cell is never a boundary, and
-    Excel writes 368,5 where a comma-separated sheet writes 368.5 — read as
-    text it fails the numeric validation and every fractional row counts as
-    an error. A nutrient cell named that way reads as the number it names;
-    the rest of the row stays the text it was.
+    A nutrient cell is read as the number it names by the same reader every
+    other import door uses (:class:`SheetColumns`): "1 289,5" is 1289.5 and
+    "1.234,5" is 1234.5, and a lone dot is read by what the rest of its
+    column says. A cell the reader cannot read stays as it came, and the
+    row's validation counts it as an error.
     """
+    frame = read_sheet(content, filename)
+    sheet = SheetColumns(frame)
     items: list[dict[str, Any]] = []
-    for record in read_sheet(content, filename).to_dict(orient='records'):
-        row = {str(column): cell_text(value) for column, value in record.items()}
+    for record in frame.to_dict(orient='records'):
+        row: dict[str, Any] = {
+            str(column): cell_text(value) for column, value in record.items()
+        }
         for field in _NUTRIENT_FIELDS:
             value = row.get(field)
-            if isinstance(value, str):
-                row[field] = value.replace(',', '.')
+            if not value:
+                continue
+            try:
+                row[field] = sheet.number(value, field)
+            except ValueError:
+                # Left as it came: the row's validation refuses it and the
+                # import counts the row as an error.
+                pass
         items.append(row)
     return items
 

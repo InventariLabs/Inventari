@@ -17,14 +17,14 @@ import pandas as pd
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.barcode import normalize_barcode
 from app.core.contracts import UserContextDTO
 from app.core.exceptions import ServiceRejectionError
-from app.core.import_sheet import SheetColumns, read_rows, sku_from_cell
+from app.core.import_sheet import SheetColumns, read_rows
 from app.core.import_sheet import cell_text as _cell_text
 from app.core.import_sheet import explain as _explain
 from app.core.import_sheet import row_get as _row_get
 from app.core.logging import get_logger
+from app.core.refused_rows import refused_rows_file
 from app.i18n.service import get_unit_label
 from app.models.category import Category
 from app.models.item import Item
@@ -33,12 +33,15 @@ from app.schemas.item import ItemCreate, ItemUpdate
 from app.services.fields.validation import FieldValueError, validate_field_value
 
 from ._create import create_item_async
-from ._import_locations import LocationSlash, SheetLocations
-from ._import_products import (
-    add_product_without_stock,
-    product_of_a_record,
-    read_reference,
+from ._import_existing import (
+    STOCK_AT_PREFIX,
+    ExistingStock,
+    RowIdentity,
+    StockRecord,
+    row_identity,
 )
+from ._import_locations import LocationSlash, SheetLocations
+from ._import_products import add_product_without_stock, product_of_a_record
 from ._update import update_item
 
 if TYPE_CHECKING:
@@ -46,10 +49,10 @@ if TYPE_CHECKING:
 
 logger = get_logger(__name__)
 
-#: What a row does when its Label Code names a product the organization
-#: already has. 'add' is what the import always did — the code is ignored and
-#: the row becomes a new product; 'skip' leaves the product alone; 'overwrite'
-#: writes the row's other columns onto it.
+#: What a row does when its Label Code, SKU or barcode names stock the
+#: organization already has. 'add' adds the row whatever it names; 'skip'
+#: leaves what is there alone; 'overwrite' writes the row's other columns
+#: onto the record it names.
 LabelMatch = Literal['add', 'skip', 'overwrite']
 
 #: Plain-text fields an overwrite writes back. Quantity is deliberately
@@ -61,10 +64,6 @@ _OVERWRITABLE_TEXT = ('brand', 'barcode', 'serial_number')
 #: A mapping key naming a product field a location sets ("field:supplier"),
 #: as opposed to one of the fixed system columns above.
 _FIELD_PREFIX = 'field:'
-
-#: A mapping key naming a column that holds the quantity at one location
-#: ("stock_at:Shop"), for a sheet with a quantity column per location.
-_STOCK_AT_PREFIX = 'stock_at:'
 
 #: What the description column of a product and of a record holds.
 _DESCRIPTION_LIMIT = 500
@@ -102,12 +101,11 @@ async def import_items(
     commits: a caller that holds a session of its own (the background job)
     commits the batch there, a request commits the import with its response.
 
-    ``on_label_match`` decides what happens to a row whose Label Code — the
-    code the export sheet carries — names a product already in the
-    organization: nothing ('add', the historical behaviour), leave it alone
-    ('skip') or write the row's other columns onto it ('overwrite'). A row
-    without a code, or with one the organization does not know, always
-    becomes a new product.
+    ``on_label_match`` decides what happens to a row naming stock the
+    organization had before the upload — by Label Code (the code the export
+    sheet carries), else by SKU, else by barcode: it is added anyway ('add'),
+    left alone ('skip') or written onto the record ('overwrite'). A row that
+    names none of it is always added.
 
     A sheet with no quantity column adds products without stock, unless
     ``count_as_one`` asks for a record of one per row. ``location_slash``
@@ -128,9 +126,9 @@ async def import_items(
         count_as_one=count_as_one,
         create_missing_categories=create_missing_categories,
         on_label_match=on_label_match,
-        labels=await _preload_label_codes(db, user.organization_id)
+        existing=await ExistingStock.load(db, user.organization_id)
         if on_label_match != 'add'
-        else {},
+        else ExistingStock(),
     )
 
     imported = 0
@@ -170,6 +168,7 @@ async def import_items(
         'skipped': skipped,
         'failed': failed,
         'errors': errors[:10],
+        'refused_file': refused_rows_file(df, errors, filename, ctx.sheet),
         'created_locations': ctx.locations.created,
         'created_categories': ctx.created_categories,
     }
@@ -222,26 +221,6 @@ async def _preload_category_fields(
         if own:
             fields[category_id] = own
     return fields
-
-
-async def _preload_label_codes(
-    db: AsyncSession, org_id: UUID | None
-) -> dict[str, UUID]:
-    """Every label code in the org, lowercased, to the product carrying it.
-
-    Read once so a thousand-row sheet asks the database once, the way the
-    barcode and category caches do.
-    """
-    if org_id is None:
-        return {}
-    result = await db.execute(
-        select(Item.label_code, Item.id).where(
-            Item.organization_id == org_id,
-            Item.label_code.is_not(None),
-            Item.is_deleted.is_(False),
-        )
-    )
-    return {code.strip().lower(): item_id for code, item_id in result.all() if code}
 
 
 async def _resolve_or_create_category(
@@ -367,12 +346,6 @@ async def _known_units(ctx: '_ImportContext') -> str:
         return ''
     uoms = await list_uoms_for_org_async(ctx.db, org_id)
     return ', '.join(sorted({get_unit_label(u.symbol) for u in uoms}))
-
-
-def _barcode_from_cell(row: pd.Series, mapping: dict[str, Any]) -> str | None:
-    """The row's code in the shape the forms keep it, which products match by."""
-    text = _cell_text(_row_get(row, mapping, 'barcode'))
-    return normalize_barcode(text) if text else None
 
 
 def _description_from_cell(row: pd.Series, mapping: dict[str, Any]) -> str | None:
@@ -605,9 +578,9 @@ def _shelves(ctx: '_ImportContext', row: pd.Series) -> list[_Shelf]:
     has no quantity column and the reader did not ask for one of each.
     """
     per_location = [
-        (key.removeprefix(_STOCK_AT_PREFIX), column)
+        (key.removeprefix(STOCK_AT_PREFIX), column)
         for key, column in ctx.mapping.items()
-        if key.startswith(_STOCK_AT_PREFIX) and column
+        if key.startswith(STOCK_AT_PREFIX) and column
     ]
     if not per_location:
         if ctx.mapping.get('quantity') or ctx.count_as_one:
@@ -618,7 +591,7 @@ def _shelves(ctx: '_ImportContext', row: pd.Series) -> list[_Shelf]:
         quantity = _number_from_cell(
             row,
             ctx.mapping,
-            f'{_STOCK_AT_PREFIX}{location}',
+            f'{STOCK_AT_PREFIX}{location}',
             None,
             ctx.sheet,
         )
@@ -630,11 +603,10 @@ def _shelves(ctx: '_ImportContext', row: pd.Series) -> list[_Shelf]:
 async def _build_item(
     ctx: '_ImportContext',
     row: pd.Series,
-    name: str,
+    identity: RowIdentity,
     storage_id: UUID,
     category_id: UUID | None,
     quantity: Decimal | None,
-    sku: str | None,
 ) -> tuple[ItemCreate, bool]:
     """One record of a row as the create endpoint would have received it.
 
@@ -644,18 +616,18 @@ async def _build_item(
     org_id = ctx.user.organization_id
     if org_id is None:
         raise ServiceRejectionError('user_has_no_organization')
-    barcode = _barcode_from_cell(row, mapping)
-    brand = _cell_text(_row_get(row, mapping, 'brand'))
+    assert identity.name is not None
+    barcode, brand = identity.barcode, identity.brand
     description = _description_from_cell(row, mapping)
     uom_id = await _resolve_unit(ctx, row)
     product = await product_of_a_record(
         ctx.db,
         ctx.user,
         org_id,
-        name=name,
+        name=identity.name,
         brand=brand,
         barcode=barcode,
-        sku=sku,
+        sku=identity.sku,
         description=description,
         uom_id=uom_id,
     )
@@ -701,7 +673,7 @@ class _ImportContext:
     create_missing_categories: bool
     count_as_one: bool = False
     on_label_match: LabelMatch = 'add'
-    labels: dict[str, UUID] = field(default_factory=dict)
+    existing: ExistingStock = field(default_factory=ExistingStock)
     uom_cache: dict[str, UUID | None] = field(default_factory=dict)
     uom_resolver: 'UomResolverAsync | None' = None
     created_categories: list[str] = field(default_factory=list)
@@ -744,24 +716,30 @@ class _RowResult:
         self.joined_existing = joined_existing
 
 
-def _match_by_label(ctx: _ImportContext, row: pd.Series) -> UUID | None:
-    """The product this row's Label Code names, when the mode asks for one.
+async def _record_to_overwrite(
+    ctx: _ImportContext, row: pd.Series, found: list[StockRecord], name: str
+) -> UUID:
+    """The one record of those the row names that it is written onto.
 
-    A row without a code, or with a code the organization does not know, has
-    no match — it goes on to become a new product, exactly as before.
+    Several records of one product are told apart by the location the row
+    names, an empty one set aside; a row that cannot tell them apart is
+    refused.
     """
-    if ctx.on_label_match == 'add':
-        return None
-    code = _cell_text(_row_get(row, ctx.mapping, 'label_code'))
-    if not code:
-        return None
-    return ctx.labels.get(code.strip().lower())
+    records = [record for record in found if record.quantity > 0] or found
+    if len(records) > 1 and (cells := _location_cells(ctx, row)):
+        location_id = await ctx.locations.resolve(cells)
+        records = [record for record in records if record.location_id == location_id]
+    if len(records) != 1:
+        raise ServiceRejectionError(
+            'import_overwrite_several_records', name=name, count=len(found)
+        )
+    return records[0].item_id
 
 
 async def _overwrite_existing(
     ctx: _ImportContext, row: pd.Series, item_id: UUID, name: str, sku: str | None
 ) -> _RowResult:
-    """Write the row's columns onto the product its Label Code named.
+    """Write the row's columns onto the record the row names.
 
     Only mapped columns carrying a value are written — an unmapped or empty
     cell leaves the field as it was, so a sheet holding half the columns is
@@ -845,8 +823,7 @@ async def _process_import_row(
 async def _import_one_row(
     ctx: _ImportContext, row: pd.Series, row_num: int
 ) -> _RowResult:
-    name = _cell_text(_row_get(row, ctx.mapping, 'name'))
-    if not name:
+    if not _cell_text(_row_get(row, ctx.mapping, 'name')):
         return _RowResult(
             outcome='failed',
             error={
@@ -855,30 +832,25 @@ async def _import_one_row(
             },
         )
 
-    sku_column = ctx.mapping.get('sku')
-    sku_text = _cell_text(_row_get(row, ctx.mapping, 'sku'))
-    sku = sku_from_cell(sku_text, sku_column) if sku_column and sku_text else None
-    if sku is None and ctx.user.organization_id is not None:
-        name, sku = await read_reference(
-            ctx.db, ctx.user.organization_id, name, ctx.mapping['name']
-        )
-
-    matched = _match_by_label(ctx, row)
-    if matched is not None:
+    identity = await row_identity(ctx.db, ctx.user.organization_id, ctx.mapping, row)
+    name = identity.name
+    assert name is not None
+    if ctx.on_label_match != 'add' and (found := ctx.existing.named_by_code(identity)):
         if ctx.on_label_match == 'skip':
             return _RowResult(outcome='skipped')
-        return await _overwrite_existing(ctx, row, matched, name, sku)
+        record_id = await _record_to_overwrite(ctx, row, found, name)
+        return await _overwrite_existing(ctx, row, record_id, name, identity.sku)
 
     shelves = _shelves(ctx, row)
     if not shelves:
-        return await _import_product_alone(ctx, row, name, sku)
+        return await _import_product_alone(ctx, row, identity)
 
     category_id = await _resolve_or_create_category(ctx, row)
     joined = 0
     for shelf in shelves:
         storage_id = await ctx.locations.resolve(shelf.cells)
         item_in, exists = await _build_item(
-            ctx, row, name, storage_id, category_id, shelf.quantity, sku
+            ctx, row, identity, storage_id, category_id, shelf.quantity
         )
         await _file_the_record(ctx, item_in)
         joined += exists
@@ -886,7 +858,7 @@ async def _import_one_row(
 
 
 async def _import_product_alone(
-    ctx: _ImportContext, row: pd.Series, name: str, sku: str | None
+    ctx: _ImportContext, row: pd.Series, identity: RowIdentity
 ) -> _RowResult:
     """A row without stock: the product only, nothing on a shelf.
 
@@ -895,14 +867,15 @@ async def _import_product_alone(
     """
     if ctx.user.organization_id is None:
         raise ServiceRejectionError('user_has_no_organization')
+    assert identity.name is not None
     added = await add_product_without_stock(
         ctx.db,
         ctx.user,
         ctx.user.organization_id,
-        name=name,
-        brand=_cell_text(_row_get(row, ctx.mapping, 'brand')),
-        barcode=_barcode_from_cell(row, ctx.mapping),
-        sku=sku,
+        name=identity.name,
+        brand=identity.brand,
+        barcode=identity.barcode,
+        sku=identity.sku,
         description=_description_from_cell(row, ctx.mapping),
         uom_id=await _resolve_unit(ctx, row),
         min_quantity=_min_quantity_from_cell(row, ctx.mapping, ctx.sheet),

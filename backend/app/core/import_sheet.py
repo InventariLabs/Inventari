@@ -154,6 +154,9 @@ def _header_is_text(header_line: str) -> bool:
 #: instead, which reading a number has to tell apart from typed text.
 _TEXT_SHEET = 'typed_text'
 
+#: The ``attrs`` key naming the delimiter a delimited upload was read with.
+CSV_DELIMITER_ATTR = 'csv_delimiter'
+
 
 def read_csv_sheet(
     content: bytes, delimiters: tuple[str, ...] = _CSV_DELIMITERS, **kwargs: Any
@@ -223,14 +226,16 @@ def read_csv_sheet(
                 )
             continue
         try:
+            delimiter = _pick_delimiter(probe, delimiters)
             frame = pd.read_csv(
                 BytesIO(content),
-                sep=_pick_delimiter(probe, delimiters),
+                sep=delimiter,
                 encoding=encoding,
                 dtype=str,
                 **kwargs,
             )
             frame.attrs[_TEXT_SHEET] = True
+            frame.attrs[CSV_DELIMITER_ATTR] = delimiter
             return frame
         except UnicodeDecodeError as e:
             # The header decoded but a later row did not: the next rung
@@ -405,17 +410,32 @@ class UnreadableCellError(ValueError):
 
 
 #: What may stand beside a price without being part of the number: ISO codes
-#: ("PLN", "eur") and the short words a till writes ("zł", "Kč", "kr").
-_CURRENCY_WORDS = frozenset(code.lower() for code in list_currencies()) | {
-    'zł',
-    'zl',
-    'kč',
-    'kc',
-    'kr',
-    'ft',
-    'lei',
-    'fr',
-}
+#: ("PLN", "EUR") and the short words a till writes ("zł", "Kč", "kr").
+#:
+#: A code is written the way ISO 4217 writes it, in capitals. A lowercase
+#: word after a quantity is the language's word for the thing measured —
+#: "2 cup", "3 top" — and CUP, TOP, ALL and BOB are also currency codes:
+#: matched case-insensitively, each would make the cell a bare number and
+#: drop the unit without a word.
+_CURRENCY_CODES = frozenset(list_currencies())
+_CURRENCY_WORDS = frozenset(
+    {
+        'zł',
+        'zl',
+        'kč',
+        'kc',
+        'kr',
+        'ft',
+        'lei',
+        'fr',
+    }
+)
+
+
+def _is_currency_word(word: str) -> bool:
+    """Whether *word* is an ISO code as written in capitals or a till's word."""
+    return word in _CURRENCY_CODES or word.lower() in _CURRENCY_WORDS
+
 
 _LEADING_WORD = re.compile(r'^([^\W\d_]+)\.?\s*(.*)$', re.DOTALL)
 _TRAILING_WORD = re.compile(r'^(.*?)\s*([^\W\d_]+)\.?$', re.DOTALL)
@@ -438,10 +458,10 @@ def _strip_currency(text: str) -> str:
     text = _REAL_SYMBOL.sub('', text)
     text = ''.join(ch for ch in text if category(ch) != 'Sc').strip()
     lead = _LEADING_WORD.match(text)
-    if lead and lead.group(1).lower() in _CURRENCY_WORDS:
+    if lead and _is_currency_word(lead.group(1)):
         text = lead.group(2).strip()
     tail = _TRAILING_WORD.match(text)
-    if tail and tail.group(2).lower() in _CURRENCY_WORDS:
+    if tail and _is_currency_word(tail.group(2)):
         text = tail.group(1).strip()
     return text
 
@@ -589,7 +609,10 @@ def _dot_evidence(raw: Any) -> bool | None:
     return None if _lone_group(text, '.') else False
 
 
-_TIME_TAIL = r'(?:[T ]\d{1,2}:\d{2}(?::\d{2}(?:[.,]\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?'
+_TIME_TAIL = (
+    r'(?:[T ]\d{1,2}:\d{2}(?::\d{2}(?:[.,]\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?'
+    r'(?:\s*[AaPp]\.?[Mm]\.?)?)?'
+)
 _YEAR_FIRST = re.compile(rf'^(\d{{4}})[-./ ](\d{{1,2}})[-./ ](\d{{1,2}}){_TIME_TAIL}$')
 _YEAR_LAST = re.compile(
     rf'^(\d{{1,2}})[-./ ](\d{{1,2}})[-./ ](\d{{4}}|\d{{2}}){_TIME_TAIL}$'
@@ -680,21 +703,53 @@ class SheetColumns:
             return None
         assert column is not None
         if column not in self._dot_thousands:
-            votes = Counter(_dot_evidence(raw) for raw in self._df[column])
-            if votes[True] != votes[False]:
-                decided: bool | None = votes[True] > votes[False]
-            elif self._df.attrs.get(_TEXT_SHEET) and writes_decimal_comma(
-                get_current_lang()
-            ):
-                decided = True
-            else:
-                decided = None
-            self._dot_thousands[column] = decided
+            self._dot_thousands[column] = self._decide_dot(self._df[column])
         return self._dot_thousands[column]
+
+    def _decide_dot(self, values: Iterable[Any]) -> bool | None:
+        votes = Counter(_dot_evidence(raw) for raw in values)
+        if votes[True] != votes[False]:
+            return votes[True] > votes[False]
+        if self._df.attrs.get(_TEXT_SHEET) and writes_decimal_comma(get_current_lang()):
+            return True
+        return None
 
     def number(self, raw: Any, column: str | None) -> Decimal:
         """The cell as a number, or ``UnreadableCellError`` (a ``ValueError``) when it is not one."""
         return parse_sheet_number(raw, self.dot_thousands(column))
+
+    def restate(self, raw: Any, column: str) -> str | None:
+        """A cell of *column* rewritten to read, in any other sheet, as the
+        column read it here; ``None`` when it may stay as typed.
+
+        Only a column that was read as dates or numbers has anything to keep:
+        a few rows taken out of the file no longer say whether the day comes
+        first, or whether a dot groups thousands. A cell that reads the same
+        on its own, or that does not read at all, stays.
+        """
+        if column not in self._day_first and column not in self._dot_thousands:
+            return None
+        text = cell_text(raw)
+        if text is None:
+            return None
+        try:
+            if column in self._day_first and looks_like_numeric_date(text):
+                day = self.date(raw, column)
+                alone = parse_sheet_date(raw, column_day_first((raw,)))
+                return None if alone == day else day.isoformat()
+            if column in self._dot_thousands:
+                number = self.number(raw, column)
+                if parse_sheet_number(raw, self._decide_dot((raw,))) != number:
+                    return _unambiguous(number)
+        except ValueError:
+            return None
+        return None
+
+
+def _unambiguous(number: Decimal) -> str:
+    """*number* written so that no column reads its dot as a thousands mark."""
+    text = format(number, 'f')
+    return f'{text}0' if _lone_group(text.lstrip('-'), '.') else text
 
 
 def parse_sheet_date(raw: Any, day_first: bool) -> date:
@@ -704,8 +759,10 @@ def parse_sheet_date(raw: Any, day_first: bool) -> date:
     is taken as it is. A year-first text ("2026-11-05") is read as written.
     A text of three numeric parts with the year last is read day-first or
     month-first by *day_first* unless one of its own parts settles it (a
-    day above 12). Anything else ("5 Nov 2026") goes to pandas, which reads
-    English month names; "end of March" is refused.
+    day above 12); the time after it, twelve-hour ("10:30 AM") or not,
+    belongs to the day and does not hand the value to another reader.
+    Anything else ("5 Nov 2026") goes to pandas, which reads English month
+    names; "end of March" is refused.
     """
     if isinstance(raw, pd.Timestamp):
         if pd.isna(raw):

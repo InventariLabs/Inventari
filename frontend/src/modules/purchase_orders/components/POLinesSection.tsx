@@ -4,6 +4,7 @@ import { useTorchAvailable } from "@/hooks/useScanCamera";
 import {
   LineItemsEditor,
   type LineItem,
+  type LineItemErrors,
   type LineItemProduct,
   type LineItemsEditorLabels,
   type RenderUomSelect,
@@ -49,6 +50,8 @@ interface POLinesSectionProps {
   t: (key: string) => string;
   /** Inline "name required" errors keyed by line id. */
   nameErrors?: Record<string, string>;
+  /** A line's refused price, keyed by line id. */
+  priceErrors?: Record<string, string>;
   currency?: string | null;
   subtotalAmount?: string;
   totalTaxAmount?: string;
@@ -87,6 +90,7 @@ export function POLinesSection({
   onRemove,
   t,
   nameErrors,
+  priceErrors,
   currency,
   subtotalAmount,
   totalTaxAmount,
@@ -128,17 +132,19 @@ export function POLinesSection({
   // the field rather than after a round trip — an order is often edited to
   // "0 for now", and the reader has no way to know that will not save.
   const lineErrors = useMemo(() => {
-    const errors: Record<string, { quantity?: string; name?: string }> =
-      Object.fromEntries(
-        lines
-          .filter((line) => !(Number(line.quantity_ordered) > 0))
-          .map((line) => [line.id, { quantity: t("form.quantityPositive") }]),
-      );
+    const errors: Record<string, LineItemErrors> = Object.fromEntries(
+      lines
+        .filter((line) => !(Number(line.quantity_ordered) > 0))
+        .map((line) => [line.id, { quantity: t("form.quantityPositive") }]),
+    );
     for (const [id, message] of Object.entries(nameErrors ?? {})) {
       errors[id] = { ...errors[id], name: message };
     }
+    for (const [id, message] of Object.entries(priceErrors ?? {})) {
+      errors[id] = { ...errors[id], unit_price: message };
+    }
     return errors;
-  }, [lines, t, nameErrors]);
+  }, [lines, t, nameErrors, priceErrors]);
 
   const labels: LineItemsEditorLabels = {
     lines: t("form.linesSectionEyebrow"),

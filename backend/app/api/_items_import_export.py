@@ -43,6 +43,7 @@ from app.schemas._common import SheetAnalysisResponse
 from app.schemas.item import (
     GrocyFileAnalysis,
     ItemExportJobResponse,
+    ItemImportCheckResponse,
     ItemImportJobResponse,
     ItemImportResponse,
 )
@@ -57,6 +58,7 @@ from app.services.items._grocy_import import (
     plan_grocy_import_async,
 )
 from app.services.items._import import LabelMatch
+from app.services.items._import_existing import count_rows_in_stock_async
 from app.services.items._import_locations import LocationSlash
 
 router = APIRouter()
@@ -87,6 +89,40 @@ async def analyze_import_file(
         raise
     except OSError as e:
         raise catalogue_refusal('failed_to_read_file', error=str(e)) from e
+
+
+def _sheet_mapping(text: str) -> Any:
+    """The column mapping a form field carries; a refusal when it is not JSON."""
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as e:
+        raise catalogue_refusal('invalid_mapping_json') from e
+
+
+@router.post('/import/check', response_model=ItemImportCheckResponse)
+async def check_import(
+    file: UploadFile = File(...),
+    mapping_json: str = Form(...),
+    count_as_one: bool = Form(False),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    _: object = require_permission(SystemPermission.ITEMS_WRITE),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
+    """What an import in 'add' mode would add to stock that is already here.
+
+    Nothing is written. The mapping step asks before the import runs, so a
+    sheet uploaded a second time says so while its quantities are still
+    single.
+    """
+    require_org(current_user)
+    mapping = _sheet_mapping(mapping_json)
+    content = await read_import_file(file)
+    try:
+        return await count_rows_in_stock_async(
+            db, content, file.filename or '', mapping, current_user, count_as_one
+        )
+    except ValueError as exc:
+        raise refusal_exception(exc) from exc
 
 
 @router.post(
@@ -123,11 +159,7 @@ async def import_items(
     ``GET /items/import/jobs/{id}``. A shorter one is imported inside the
     request and answered with its result.
     """
-    try:
-        mapping = json.loads(mapping_json)
-    except json.JSONDecodeError as e:
-        raise catalogue_refusal('invalid_mapping_json') from e
-
+    mapping = _sheet_mapping(mapping_json)
     refuse_founding_without_permission(
         current_user,
         mapping,

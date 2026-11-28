@@ -111,6 +111,10 @@ says what the release does rather than what changed since them.
   `useReturnTarget`, which reads where a screen entered from another module
   sends its back arrow (`state={{ backTo }}` on the link), and `listedFields`,
   which tells a category's fields apart from the flags stored beside them.
+- Module authors: the backend module SDK exports `SheetColumns`, which reads
+  a cell's number or date by what its whole column says — the decimal mark,
+  the thousands grouping, a day-first order, a currency code — so a module's
+  own import door reads a sheet the way every other door does.
 
 ### Fixed
 
@@ -119,6 +123,35 @@ says what the release does rather than what changed since them.
   clean the picture — about one label in a hundred — so a second reader now
   reads the frames it reports it cannot, a few times a second. Labels printed
   before this change scan too.
+- A receipt written in another unit than the product is kept in records the
+  price per the product's unit: 500 g at 0.02 opens a record at 20.00 a
+  kilogram, not 0.02. A price, or a share of the delivery's costs, that comes
+  to more than a record can keep once restated is refused with the figure and
+  the limit named, not with a server error.
+- Ordering what a recipe or a production plan is missing works with a price of
+  more than two decimals: the order line takes it rounded to two, and a price
+  that rounds to nothing leaves the line unpriced for the buyer to fill in.
+- A line price a new document or purchase order refuses is marked on that
+  line's price field, and the message names the field.
+- A second attempt at an import: every import of a sheet (products, partners,
+  equipment, document lines, opening stock, and purchase order lines through
+  the API) hands the refused rows back as a file in the uploaded format, the
+  original columns plus the reason, to correct and upload on its own; the
+  result says how many rows were refused when it lists only some. The product
+  import's **Leave alone** and **Overwrite** modes also find a product already
+  in stock by its SKU or barcode, not only by its Label Code, so a corrected
+  sheet can be uploaded whole without doubling stock, and **Add anyway** warns
+  before importing a file whose every row finds stock already here
+  (`POST /items/import/check`).
+
+### Fixed
+
+- A document or opening-stock row refused while its product was being founded
+  leaves no line on the draft and is not counted as imported.
+- The equipment import reads Shelf's `Asset ID` as the asset tag and
+  `Description` as the notes, gives the places it founds to the equipment
+  module, so its location pickers offer them, and its title no longer runs
+  under the close button on a phone.
 - When saving a product's edit form is refused — for example a unit changed
   while the product holds stock — the form scrolls to the sentence that says
   why and screen readers announce it. It stood above the fields, out of sight
@@ -300,16 +333,23 @@ says what the release does rather than what changed since them.
   add the host.
 - Spreadsheet imports read numbers and dates the way the sheet's country
   writes them — products, opening stock, document lines, order lines and
-  equipment alike. A decimal comma ("12,5"), thousands separated by a space or
-  a dot, a currency symbol or code ("1 289,00 zł", "$1,289.00", "€ 4,50") are
-  numbers; a day-first date such as "05.11.2026" is 5 November, not 11 May. A
-  column of dates is read from the whole file (a day above 12 settles the
-  order), and a column that is ambiguous throughout follows the language of
-  the person importing: month-first for English, day-first for the others.
-  The mapping preview shows each date column as it will be stored. Document
-  lines and opening stock now refuse a date they cannot read, as the product
-  import does, instead of importing the row without it, and order lines
-  refuse an unreadable price or tax rate instead of dropping it.
+  equipment alike. A decimal comma ("12,5"), thousands separated by a space
+  or a dot, a currency symbol or code ("1 289,00 zł", "$1,289.00",
+  "€ 4,50") are numbers, and a currency code is the one ISO 4217 spells in
+  capitals, so "2 cup" is refused with its cell named rather than read as 2.
+  A day-first date such as "05.11.2026" is 5 November, not 11 May, and a
+  time after it, AM or PM included, belongs to that day. A column of dates
+  is read from the whole file (a day above 12 settles the order), and a
+  column that is ambiguous throughout follows the language of the person
+  importing: month-first for English, day-first for the others. The mapping
+  preview shows a date column as the day it will be stored where it feeds a
+  date field, and the text as written where it feeds a text field such as a
+  batch or serial number; the document lines' preview shows the expiry it
+  will store. The ingredient dictionary reads its nutrient numbers the same
+  way every other sheet does. Document lines and opening stock now refuse a
+  date they cannot read, as the product import does, instead of importing
+  the row without it, and order lines refuse an unreadable price or tax
+  rate instead of dropping it.
 - *Rebuilding on a new server* (DEPLOYMENT.md) brings the backup back from the
   off-host copy. It pulls `<BACKUP_RCLONE_REMOTE>/backups/last`, where the copy
   puts the backups since that variable names the parent, and then gives the

@@ -33,7 +33,7 @@ from app.core.import_sheet import (
 )
 from app.core.interceptors import InterceptorError
 from app.core.logging import get_logger
-from app.core.module_sdk import PRICE_MAX
+from app.core.module_sdk import PRICE_MAX, refused_rows_file
 
 from ._import_dedup_service import find_item_by_serial_async
 from ._serial import serial_of, without_serial
@@ -71,6 +71,8 @@ _FIELD_ALIASES: dict[str, list[str]] = {
     'asset_tag': [
         'asset tag',
         'tag',
+        # Shelf heads the column with this.
+        'asset id',
         'inventory number',
         'numer inwentarzowy',
         'inventarnummer',
@@ -145,7 +147,8 @@ _FIELD_ALIASES: dict[str, list[str]] = {
         'garantía hasta',
         'garantia até',
     ],
-    'notes': ['notes', 'notatki', 'notizen', 'remarques', 'notas'],
+    # Shelf calls an asset's notes its description.
+    'notes': ['notes', 'notatki', 'notizen', 'remarques', 'notas', 'description'],
     'equipment_status': [
         'status',
         'equipment status',
@@ -170,11 +173,13 @@ _FIELD_ALIAS_INDEX: dict[str, str] = {
     for alias in aliases
 }
 
-#: Headers that may count months instead of naming a day. The suggestion takes
-#: one only when no other header names the same field: Snipe-IT writes
-#: "Warranty" (24) beside "Warranty Expires" (the date).
+#: Headers the suggestion takes only when no other header names the same
+#: field. Snipe-IT writes "Warranty" (months) beside "Warranty Expires" (the
+#: date); "Asset ID" and "Description" stand in where a sheet has no asset tag
+#: or notes column of its own.
 _SECOND_CHOICE_HEADERS = frozenset(
-    _normalize_header(header) for header in ('warranty', 'warranty months')
+    _normalize_header(header)
+    for header in ('warranty', 'warranty months', 'asset id', 'description')
 )
 
 #: A warranty cell that counts months: "24", "24 months". Three digits at most,
@@ -456,6 +461,7 @@ async def execute_equipment_import(
         'skipped': skipped,
         'updated': updated,
         'errors': errors[:20],
+        'refused_file': refused_rows_file(df, errors, filename, sheet),
         'skipped_serials': skipped_serials[:20],
         'created_locations': founding.locations,
         'created_categories': founding.categories,
@@ -579,6 +585,7 @@ async def _process_row(
         founding.location_cache,
         founder=founding.location_founder,
         founded=founding.locations,
+        context_tag='equipment',
     )
     if not storage_location_id:
         location_text = row_text(row, mapping.get('location'))

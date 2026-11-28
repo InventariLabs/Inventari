@@ -150,6 +150,50 @@ describe("PurchaseOrderFormModal — what a save sends", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
+  it("shows a refused price on the line it belongs to until it is edited", async () => {
+    mutations.create.mockRejectedValue(
+      Object.assign(new Error("422"), {
+        isAxiosError: true,
+        response: {
+          status: 422,
+          data: {
+            detail: [
+              {
+                loc: ["body", "lines", 1, "unit_price"],
+                msg: "Must be less than or equal to 99999999.99",
+                type: "less_than_equal",
+              },
+            ],
+          },
+        },
+      }),
+    );
+    const user = userEvent.setup();
+    render(<PurchaseOrderFormModal onClose={vi.fn()} onSuccess={vi.fn()} />);
+    await user.type(screen.getByPlaceholderText("Product"), "Widget");
+    await user.click(screen.getByRole("button", { name: /add line/i }));
+    await user.type(screen.getAllByPlaceholderText("Product")[1], "Gadget");
+    await user.click(screen.getByRole("button", { name: "Create order" }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Unit price: Must be less than or equal to 99999999.99",
+      ),
+    );
+    // Each line draws a desktop and a phone price field, in line order.
+    const prices = screen.getAllByLabelText(/^Unit price/);
+    const invalid = prices.filter(
+      (price) => price.getAttribute("aria-invalid") === "true",
+    );
+    expect(invalid).toEqual(prices.slice(2));
+
+    await user.type(invalid[0], "5");
+
+    for (const price of screen.getAllByLabelText(/^Unit price/)) {
+      expect(price).toBeValid();
+    }
+  });
+
   it("refuses an order with no lines at all", async () => {
     const user = userEvent.setup();
     render(<PurchaseOrderFormModal onClose={vi.fn()} onSuccess={vi.fn()} />);
