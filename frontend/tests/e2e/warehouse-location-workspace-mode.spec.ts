@@ -4,6 +4,7 @@ import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
 import { ApiHelper } from "./helpers/api";
 import { decodeLabel, download, sendToPrinter } from "./helpers/label-decode";
 import { pickLocationSettingsPlace } from "./helpers/location-settings";
+import { wedgeScan } from "./helpers/wedge-scan";
 
 /**
  * From home to business, with the stickers already on the shelves.
@@ -88,26 +89,6 @@ async function switchProfile(page: Page, targetName: string) {
       .locator("li", { has: badge })
       .locator(`input[aria-label="${targetName}"]`),
   ).toBeVisible({ timeout: 20000 });
-}
-
-/**
- * A scanner typing: every key of the code, then Enter, with the focus nowhere
- * in particular. The keys are raised in the page in one go, the way a scanner
- * sends them (the app takes a burst whose keys come under 50 ms apart as a
- * scan): sent one by one from outside, a busy machine stretches a gap past
- * that and the code arrives cut in two, which is the app doing what it should.
- */
-async function scan(page: Page, reading: string) {
-  await page.evaluate((code) => {
-    (document.activeElement as HTMLElement | null)?.blur();
-    const send = (key: string) => {
-      document.body.dispatchEvent(
-        new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true }),
-      );
-    };
-    for (const key of code) send(key);
-    send("Enter");
-  }, reading);
 }
 
 test.describe.serial("Warehouse — from home to business", () => {
@@ -319,21 +300,21 @@ test.describe.serial("Warehouse — from home to business", () => {
       const tag = `${how}-${Date.now().toString(36)}`;
 
       const receiving = await receivingFor(page, sticker.shelf, tag);
-      await scan(page, wrong[how]);
+      await wedgeScan(page, wrong[how]);
       await expect(
         page.getByText(/That is not the location — go to/),
       ).toBeVisible();
       await expect(receiving.getByText("Location confirmed")).toHaveCount(0);
-      await scan(page, reading);
+      await wedgeScan(page, reading);
       await expect(receiving.getByText("Location confirmed")).toBeVisible();
 
       const picking = await pickingFrom(page, sticker.shelf, tag);
-      await scan(page, wrong[how]);
+      await wedgeScan(page, wrong[how]);
       await expect(
         page.getByText(/That is not the location — go to/),
       ).toBeVisible();
       await expect(picking.getByText("Location confirmed")).toHaveCount(0);
-      await scan(page, reading);
+      await wedgeScan(page, reading);
       await expect(picking.getByText("Location confirmed")).toBeVisible();
 
       await page.goto(`/inventory/stock-takes/${take.id}/counting`);
