@@ -44550,6 +44550,11 @@
             "type": "boolean",
             "title": "Usable",
             "default": false
+          },
+          "server_default": {
+            "type": "boolean",
+            "title": "Server Default",
+            "default": false
           }
         },
         "type": "object",
@@ -44561,7 +44566,7 @@
           "owner_module"
         ],
         "title": "AiPurposeDTO",
-        "description": "Read shape for AI purposes \u2014 mirrors AiPurposeSchema.\n\nTwo questions, two fields: ``bound_connection_id`` is the raw choice\nthe organization made (what the binding select renders and the\ndeletion guard protects), ``usable`` is the verdict on whether the\npurpose will actually run \u2014 the only field the promise sentences\nbranch on."
+        "description": "Read shape for AI purposes \u2014 mirrors AiPurposeSchema.\n\nTwo questions, two fields: ``bound_connection_id`` is the raw choice\nthe organization made (what the binding select renders and the\ndeletion guard protects), ``usable`` is the verdict on whether the\npurpose will actually run \u2014 the only field the promise sentences\nbranch on. ``server_default`` says whether the server's own default\nmodel would serve the purpose with nothing chosen, which is what the\nselect's empty option stands for."
       },
       "AlertItem": {
         "properties": {

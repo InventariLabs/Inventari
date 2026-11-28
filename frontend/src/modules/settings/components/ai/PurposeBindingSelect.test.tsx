@@ -434,6 +434,7 @@ describe("a purpose the server's default model serves", () => {
     capability: "text",
     bound_connection_id: null,
     usable: false,
+    server_default: false,
     ...over,
   });
 
@@ -448,14 +449,58 @@ describe("a purpose the server's default model serves", () => {
     // No binding, usable: the env default runs this purpose. The select used
     // to read "Not configured" and offer to set up a connection while recipe
     // text parsing worked.
-    renderPurpose(textPurpose({ usable: true }));
+    renderPurpose(textPurpose({ usable: true, server_default: true }), [
+      connections[1],
+    ]);
 
     expect(
       screen.getByRole("option", { name: "Server default model" }),
     ).toBeInTheDocument();
     expect(screen.queryByText("Not configured")).toBeNull();
-    expect(screen.getByText(/default model/i, { selector: "p" })).toBeVisible();
+    expect(screen.getByText(/Pick a connection to use your own/)).toBeVisible();
     expect(screen.queryByRole("link")).toBeNull();
+  });
+
+  it("asks for no pick when there is nothing to pick, and offers to set one up", () => {
+    renderPurpose(textPurpose({ usable: true, server_default: true }));
+
+    expect(
+      screen.getByText("Served by the server's default model."),
+    ).toBeVisible();
+    expect(screen.queryByText(/Pick a connection/)).toBeNull();
+    expect(screen.getByRole("link", { name: "Set one up" })).toHaveAttribute(
+      "href",
+      "/settings/ai",
+    );
+  });
+
+  it("asks an account that may not bind for no pick", () => {
+    signInWith([]);
+    renderPurpose(textPurpose({ usable: true, server_default: true }), [
+      connections[1],
+    ]);
+
+    expect(
+      screen.getByText("Served by the server's default model."),
+    ).toBeVisible();
+    expect(screen.queryByText(/Pick a connection/)).toBeNull();
+    expect(screen.queryByRole("link")).toBeNull();
+  });
+
+  it("names the server default in the empty option while a connection is bound", () => {
+    renderPurpose(
+      textPurpose({
+        usable: true,
+        server_default: true,
+        bound_connection_id: "conn-2",
+      }),
+      [connections[1]],
+    );
+
+    expect(
+      screen.getByRole("option", { name: "Server default model" }),
+    ).toHaveValue("");
+    expect(screen.queryByText("Not configured")).toBeNull();
   });
 
   it("keeps today's sentences when nothing serves the purpose", () => {
@@ -472,6 +517,10 @@ describe("a purpose the server's default model serves", () => {
     renderPurpose(
       textPurpose({ usable: true, bound_connection_id: "conn-2" }),
       [connections[1]],
+    );
+    // No server default: choosing the empty option configures nothing.
+    expect(screen.getByRole("option", { name: "Not configured" })).toHaveValue(
+      "",
     );
 
     expect(

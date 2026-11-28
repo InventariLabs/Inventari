@@ -12245,7 +12245,9 @@ export interface components {
          *     the organization made (what the binding select renders and the
          *     deletion guard protects), ``usable`` is the verdict on whether the
          *     purpose will actually run — the only field the promise sentences
-         *     branch on.
+         *     branch on. ``server_default`` says whether the server's own default
+         *     model would serve the purpose with nothing chosen, which is what the
+         *     select's empty option stands for.
          */
         AiPurposeDTO: {
             /** Key */
@@ -12265,6 +12267,11 @@ export interface components {
              * @default false
              */
             usable: boolean;
+            /**
+             * Server Default
+             * @default false
+             */
+            server_default: boolean;
         };
         /** AlertItem */
         AlertItem: {

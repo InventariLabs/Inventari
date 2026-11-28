@@ -134,6 +134,7 @@
     "noEligibleConnectionsCta": "Załóż połączenie",
     "serverDefaultOption": "Model domyślny serwera",
     "serverDefaultHint": "Obsługuje go model domyślny serwera. Wybierz połączenie, aby użyć własnego.",
+    "serverDefaultOnly": "Obsługuje go model domyślny serwera.",
     "noConnectionsServerDefaultHint": "Niektóre funkcje AI już działają na modelu domyślnym serwera. Dodaj połączenie, aby użyć własnego.",
     "createFailed": "Nie udało się utworzyć połączenia",
     "updateFailed": "Nie udało się zaktualizować połączenia",

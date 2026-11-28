@@ -134,6 +134,7 @@
     "noEligibleConnectionsCta": "En configurer une",
     "serverDefaultOption": "Modèle par défaut du serveur",
     "serverDefaultHint": "Pris en charge par le modèle par défaut du serveur. Choisissez une connexion pour utiliser la vôtre.",
+    "serverDefaultOnly": "Pris en charge par le modèle par défaut du serveur.",
     "noConnectionsServerDefaultHint": "Certaines fonctionnalités IA fonctionnent déjà avec le modèle par défaut du serveur. Ajoutez une connexion pour utiliser la vôtre.",
     "createFailed": "Impossible de créer la connexion",
     "updateFailed": "Impossible de mettre à jour la connexion",

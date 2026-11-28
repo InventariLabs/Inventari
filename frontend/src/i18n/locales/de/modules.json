@@ -134,6 +134,7 @@
     "noEligibleConnectionsCta": "Verbindung einrichten",
     "serverDefaultOption": "Standardmodell des Servers",
     "serverDefaultHint": "Wird vom Standardmodell des Servers bedient. Wählen Sie eine Verbindung, um stattdessen Ihre eigene zu nutzen.",
+    "serverDefaultOnly": "Wird vom Standardmodell des Servers bedient.",
     "noConnectionsServerDefaultHint": "Einige KI-Funktionen laufen bereits über das Standardmodell des Servers. Fügen Sie eine Verbindung hinzu, um stattdessen Ihre eigene zu nutzen.",
     "createFailed": "Verbindung konnte nicht erstellt werden",
     "updateFailed": "Verbindung konnte nicht aktualisiert werden",

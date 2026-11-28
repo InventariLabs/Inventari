@@ -567,7 +567,9 @@ class AiPurposeDTO(BaseModel):
     the organization made (what the binding select renders and the
     deletion guard protects), ``usable`` is the verdict on whether the
     purpose will actually run — the only field the promise sentences
-    branch on.
+    branch on. ``server_default`` says whether the server's own default
+    model would serve the purpose with nothing chosen, which is what the
+    select's empty option stands for.
     """
 
     key: str
@@ -577,6 +579,7 @@ class AiPurposeDTO(BaseModel):
     owner_module: str
     bound_connection_id: UUID | None = None
     usable: bool = False
+    server_default: bool = False
 
 
 class AiConnectionCreateDTO(BaseModel):

@@ -134,6 +134,7 @@
     "noEligibleConnectionsCta": "Set one up",
     "serverDefaultOption": "Server default model",
     "serverDefaultHint": "Served by the server's default model. Pick a connection to use your own instead.",
+    "serverDefaultOnly": "Served by the server's default model.",
     "noConnectionsServerDefaultHint": "Some AI features already run on the server's default model. Add a connection to use your own instead.",
     "createFailed": "Could not create connection",
     "updateFailed": "Could not update connection",

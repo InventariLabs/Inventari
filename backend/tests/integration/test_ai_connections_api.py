@@ -665,6 +665,41 @@ class TestAiConnectionsBindings:
         assert vision['bound_connection_id'] is None
         assert vision['usable'] is True
 
+    def test_a_bound_purpose_still_says_whether_a_server_default_exists(
+        self, monkeypatch, db_session, test_household, client, auth_headers
+    ):
+        """The select's empty option stands for the server default, bound or not."""
+        from app.config import settings as app_settings
+
+        connection = AiConnection(
+            organization_id=test_household.id,
+            name='Own',
+            provider='openrouter',
+            capabilities=['vision'],
+        )
+        db_session.add(connection)
+        db_session.commit()
+        bound = client.put(
+            '/api/v1/ai-connections/bindings',
+            json={
+                'purpose_key': 'vision.extract',
+                'connection_id': str(connection.id),
+            },
+            headers=auth_headers,
+        )
+        assert bound.status_code == 200, bound.text
+
+        for key, expected in (('sk-or-test-fallback', True), ('', False)):
+            monkeypatch.setattr(app_settings, 'LLM_API_KEY', key)
+            response = client.get(
+                '/api/v1/ai-connections/purposes', headers=auth_headers
+            )
+            vision = next(
+                p for p in response.json()['items'] if p['key'] == 'vision.extract'
+            )
+            assert vision['bound_connection_id'] == str(connection.id)
+            assert vision['server_default'] is expected
+
     def test_rebind_existing_purpose_persists_new_connection(
         self, db_session, test_household, client, auth_headers
     ):

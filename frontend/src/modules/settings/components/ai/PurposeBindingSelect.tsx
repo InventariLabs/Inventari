@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { NativeSelect } from "@/components/ui/NativeSelect";
 import { useHasPermission } from "@/hooks/useHasPermission";
 import { useModuleLabels } from "@/hooks/useModuleLabels";
+import { cn } from "@/lib/utils";
 import { getProviderDescriptor } from "@/modules/settings/components/ai/providers";
 import { useSetAiBinding } from "@/modules/settings/hooks/useAiConnections";
 import type { AiConnection, AiPurpose } from "@/types/ai";
@@ -94,11 +95,17 @@ export function PurposeBindingSelect({
   }, [connections, purpose.bound_connection_id, eligible]);
 
   // Nothing chosen, yet the purpose runs: the server's own default model
-  // serves it (the verdict is the backend's `usable`, which for an unbound
-  // purpose is exactly the env fallback). Saying "not configured" here told
-  // an administrator who had set that default that it did not exist.
+  // serves it. The empty option names that default whether or not something
+  // is chosen now, because choosing it lands there.
   const servedByServerDefault =
-    purpose.bound_connection_id == null && purpose.usable;
+    purpose.bound_connection_id == null && purpose.server_default;
+  // "Pick a connection" is advice only to a reader who has one to pick.
+  const canPick = canWriteBinding && eligible.length > 0;
+  // With nothing to pick, the way to the screen that creates a connection:
+  // always when nothing runs, and under the server default for a reader who
+  // may bind what they create.
+  const offerSetUp =
+    eligible.length === 0 && (!servedByServerDefault || canWriteBinding);
 
   const handleChange = (value: string) => {
     setBinding.mutate({
@@ -140,7 +147,7 @@ export function PurposeBindingSelect({
         disabled={setBinding.isPending || !available || !canWriteBinding}
       >
         <option value="">
-          {servedByServerDefault
+          {purpose.server_default
             ? t("config.serverDefaultOption")
             : t("config.noBinding")}
         </option>
@@ -177,13 +184,22 @@ export function PurposeBindingSelect({
         </p>
       )}
       {available && servedByServerDefault && (
-        <p className="text-xs text-on-muted">{t("config.serverDefaultHint")}</p>
+        <p className="text-xs text-on-muted">
+          {canPick
+            ? t("config.serverDefaultHint")
+            : t("config.serverDefaultOnly")}
+        </p>
       )}
-      {available && eligible.length === 0 && !servedByServerDefault && (
+      {available && offerSetUp && (
         // Saying there is nothing to pick is only half an answer, so the
         // message carries the way to the screen that creates one rather than
         // leaving the reader to find it.
-        <p className="text-xs text-on-warning">
+        <p
+          className={cn(
+            "text-xs",
+            servedByServerDefault ? "text-on-muted" : "text-on-warning",
+          )}
+        >
           {t("config.noEligibleConnections", {
             capability: t(`config.capability.${purpose.capability}`),
           })}{" "}

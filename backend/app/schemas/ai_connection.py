@@ -153,6 +153,8 @@ class AiPurposeSchema(BaseModel):
     ``bound_connection_id`` is the raw choice from settings; ``usable``
     is the verdict from the same rules the client builder applies — the
     screens promise the purpose exactly when this is true.
+    ``server_default`` is whether the server's default model would serve
+    the purpose with nothing chosen.
     """
 
     key: str
@@ -162,6 +164,7 @@ class AiPurposeSchema(BaseModel):
     owner_module: str
     bound_connection_id: UUID | None = None
     usable: bool = False
+    server_default: bool = False
 
 
 class SetBindingRequest(BaseModel):

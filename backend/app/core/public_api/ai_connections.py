@@ -130,13 +130,14 @@ class CoreAIConnectionsAPI:
             bound_uuid = registry.binding_from_settings(
                 settings_dict, spec.key, spec.owner_module
             )
+            server_default = registry.env_fallback_serves(spec.key)
             if bound_uuid is not None:
                 served = await registry.connection_serves_async(
                     db, org_id, bound_uuid, spec.key
                 )
                 usable = served is not None
             else:
-                usable = registry.env_fallback_serves(spec.key)
+                usable = server_default
 
             result.append(
                 AiPurposeDTO(
@@ -147,6 +148,7 @@ class CoreAIConnectionsAPI:
                     owner_module=spec.owner_module,
                     bound_connection_id=bound_uuid,
                     usable=usable,
+                    server_default=server_default,
                 )
             )
         return result
