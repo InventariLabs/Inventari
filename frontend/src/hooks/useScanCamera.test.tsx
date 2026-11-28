@@ -14,6 +14,9 @@ import {
 import { useTorchAvailable } from "./useTorchAvailable";
 import { logger } from "@/utils/logger";
 
+const { jsQrMock } = vi.hoisted(() => ({ jsQrMock: vi.fn() }));
+vi.mock("jsqr", () => ({ default: jsQrMock }));
+
 vi.mock("html5-qrcode", () => {
   class MockHtml5Qrcode {
     static rejectError: unknown = null;
@@ -656,6 +659,85 @@ describe("useScanCamera — one presence is one read", () => {
     expect(onCodeScanned).toHaveBeenCalledTimes(2);
     expect(onCodeScanned).toHaveBeenNthCalledWith(1, EAN);
     expect(onCodeScanned).toHaveBeenNthCalledWith(2, OTHER_EAN);
+    await scanner.unmount();
+  });
+
+  it("reads a QR the library's own decoder reports it cannot read", async () => {
+    // The bundled zxing locator rejects some valid label matrices however
+    // clean the frame, and reports a miss for each one. The second reader
+    // gets the frames after such a miss, and a reading from it is the same
+    // reading as the library's: two of them make one report, and a code it
+    // keeps finding stays one presence.
+    jsQrMock.mockReset();
+    const onCodeScanned = vi.fn();
+    const scanner = await boot(onCodeScanned);
+
+    const canvas = document.createElement("canvas");
+    canvas.id = "qr-canvas";
+    const drawImage = vi.fn();
+    const context = {
+      drawImage,
+      getImageData: (
+        _x: number,
+        _y: number,
+        width: number,
+        height: number,
+      ) => ({
+        width,
+        height,
+        data: new Uint8ClampedArray(width * height * 4),
+      }),
+      putImageData: vi.fn(),
+    } as unknown as CanvasRenderingContext2D;
+    vi.spyOn(canvas, "getContext").mockReturnValue(context);
+    document.getElementById("qr-reader")!.appendChild(canvas);
+    await vi.waitFor(() => expect(context.drawImage).not.toBe(drawImage));
+
+    const video = document.createElement("video");
+    const drawFrame = () =>
+      (context.drawImage as unknown as (...a: unknown[]) => void)(
+        video,
+        0,
+        0,
+        296,
+        296,
+        0,
+        0,
+        296,
+        296,
+      );
+    let at = 1000;
+    const clock = vi.spyOn(performance, "now").mockImplementation(() => at);
+
+    jsQrMock.mockReturnValue({
+      data: "https://inventari.example.com/s/LBL-L67T8G",
+    });
+    // The library has not failed yet: the second reader is not asked.
+    drawFrame();
+    expect(jsQrMock).not.toHaveBeenCalled();
+
+    // It misses the frame; the next frame is offered to the second reader.
+    scanner.miss();
+    drawFrame();
+    at += 600;
+    drawFrame();
+
+    expect(onCodeScanned).toHaveBeenCalledTimes(1);
+    expect(onCodeScanned).toHaveBeenCalledWith(
+      "https://inventari.example.com/s/LBL-L67T8G",
+    );
+
+    // Held in front of the camera, the code is still there: the library
+    // keeps missing it, the second reader keeps finding it, and it is not
+    // a second piece.
+    for (let frame = 0; frame < 4; frame++) {
+      at += 600;
+      scanner.miss();
+      drawFrame();
+    }
+    expect(onCodeScanned).toHaveBeenCalledTimes(1);
+
+    clock.mockRestore();
     await scanner.unmount();
   });
 

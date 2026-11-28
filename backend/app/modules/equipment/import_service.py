@@ -313,7 +313,7 @@ def _sheet_price(row: Any, column: str | None, sheet: SheetColumns) -> Decimal |
     if not text:
         return None
     try:
-        price = sheet.number(text, column)
+        price = sheet.number(text, column, money=True)
     except ValueError as exc:
         raise ServiceRejectionError(
             'import_price_invalid', column=column, value=text

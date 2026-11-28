@@ -4,12 +4,14 @@ import { http, HttpResponse } from "msw";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import {
+  act,
   render as rtlRender,
   screen,
   waitFor,
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { toast } from "sonner";
 import { server } from "@/test/mocks/server";
 import type { WorkItem } from "@/modules/warehouse/types";
 import { PutawaySheet } from "./PutawaySheet";
@@ -295,6 +297,74 @@ describe("PutawaySheet", () => {
     rerender(<PutawaySheet item={rice} queue={[]} onClose={onClose} />);
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
+  });
+
+  describe("labels read faster than the lookups come back", () => {
+    const rice = task({
+      place: "Shelf A - Top",
+      place_id: "shelf-a",
+      place_code: "A-01-01",
+      place_source: "rule",
+      shelf_scan_required: true,
+    });
+
+    /** Each label's lookup stays out until the test lets it answer. */
+    function heldShelfLookups() {
+      const release: Record<string, () => void> = {};
+      server.use(
+        http.get(SCAN_PATH, async ({ params }) => {
+          const code = params.code as string;
+          await new Promise<void>((resolve) => (release[code] = resolve));
+          return HttpResponse.json(
+            code === "A-01-01"
+              ? scannedShelf("shelf-a", code, "Shelf A - Top")
+              : scannedShelf("shelf-b", code, "Shelf B"),
+          );
+        }),
+      );
+      return release;
+    }
+
+    async function answer(release: Record<string, () => void>, code: string) {
+      await waitFor(() => expect(release[code]).toBeDefined());
+      await act(async () => release[code]());
+    }
+
+    it("answers the wrong label and then the right one read behind it", async () => {
+      const release = heldShelfLookups();
+      render(<PutawaySheet item={rice} queue={[rice]} onClose={vi.fn()} />);
+      const dialog = screen.getByRole("dialog", { name: "Put away" });
+      await within(dialog).findByText("A-01-01");
+      vi.mocked(toast.error).mockClear();
+
+      act(() => cameraMock.onCodeScanned("A-02-01"));
+      act(() => cameraMock.onCodeScanned("A-01-01"));
+
+      await answer(release, "A-02-01");
+      await waitFor(() => expect(toast.error).toHaveBeenCalledTimes(1));
+      await answer(release, "A-01-01");
+      expect(
+        await within(dialog).findByText("Location confirmed"),
+      ).toBeInTheDocument();
+    });
+
+    it("holds the posting until the label read last is answered", async () => {
+      const release = heldShelfLookups();
+      render(<PutawaySheet item={rice} queue={[rice]} onClose={vi.fn()} />);
+      const dialog = screen.getByRole("dialog", { name: "Put away" });
+      await within(dialog).findByText("A-01-01");
+      const putAway = within(dialog).getByRole("button", { name: "Put away" });
+
+      // The camera, so the field the confirmation hides plays no part.
+      act(() => cameraMock.onCodeScanned("A-01-01"));
+      act(() => cameraMock.onCodeScanned("A-02-01"));
+      await answer(release, "A-01-01");
+      await within(dialog).findByText("Location confirmed");
+      expect(putAway).toBeDisabled();
+
+      await answer(release, "A-02-01");
+      await waitFor(() => expect(putAway).toBeEnabled());
+    });
   });
 
   describe("the home location it learns", () => {

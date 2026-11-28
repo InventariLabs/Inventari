@@ -29,6 +29,7 @@ from ._stock_executor_helpers import (
     _get_item_or_raise,
     _locked_quantity,
     _post_opening_balance_async,
+    _price_per_stock_unit,
     _resolve_lot,
 )
 from .document_profile_service import get_profile
@@ -463,21 +464,6 @@ async def _land_the_delivery_async(
         records=record_posts,
     )
     return row, lot_id
-
-
-def _price_per_stock_unit(
-    line: DocumentLine, stock_quantity: Decimal
-) -> Decimal | None:
-    """The line's price restated per unit of the product's stock.
-
-    The price on the line is per line unit, so this is the line's total value
-    spread over the converted quantity: 500 g at 0.02 is 10.00 for half a
-    kilogram, which is 20.00 a kilogram.
-    """
-    line_quantity = _executed_quantity(line)
-    if line.unit_price is None or stock_quantity in (Decimal('0'), line_quantity):
-        return line.unit_price
-    return (line_quantity * line.unit_price) / stock_quantity
 
 
 async def _refuse_a_cost_the_books_cannot_keep(
