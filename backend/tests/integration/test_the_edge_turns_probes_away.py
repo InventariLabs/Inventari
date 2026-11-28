@@ -147,17 +147,18 @@ class TestTheEdgeServesSecurityTxtOnlyWhenProvided:
         problems = checker.check_nginx_security_txt(conf)
         assert any('text/plain' in problem for problem in problems), repr(problems)
 
+    def test_the_check_refuses_a_security_txt_without_utf8(self) -> None:
+        """RFC 9116 §3: the file is UTF-8, and the answer says so."""
+        checker = _load_checker()
+        conf = _nginx_conf().replace('        charset utf-8;\n', '', 1)
+        problems = checker.check_nginx_security_txt(conf)
+        assert any('charset utf-8' in problem for problem in problems), repr(problems)
+
     def test_the_check_refuses_a_fallback_to_the_application(self) -> None:
         checker = _load_checker()
         conf = _nginx_conf().replace(
-            '    location = /.well-known/security.txt {\n'
-            '        default_type text/plain;\n'
-            '        alias /operator/security-txt/security.txt;\n'
-            '    }',
-            '    location = /.well-known/security.txt {\n'
-            '        default_type text/plain;\n'
-            '        try_files $uri /index.html;\n'
-            '    }',
+            '        alias /operator/security-txt/security.txt;',
+            '        try_files $uri /index.html;',
         )
         problems = checker.check_nginx_security_txt(conf)
         assert any('index.html' in problem for problem in problems), repr(problems)

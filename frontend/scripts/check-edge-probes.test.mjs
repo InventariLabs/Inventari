@@ -9,7 +9,12 @@ import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { makeRepo, runGate } from "./gate-fixture.mjs";
-import { blockedPaths, regexLocations } from "./check-edge-probes.mjs";
+import {
+  TEXT_VALUES,
+  blockedPaths,
+  exampleAddress,
+  regexLocations,
+} from "./check-edge-probes.mjs";
 import { routePaths } from "./check-route-reachability.mjs";
 
 const NGINX = `server {
@@ -17,7 +22,11 @@ const NGINX = `server {
         return 404;
     }
 
-    location ~* (?:\\.php|^/wp(?:-|/|$)|(?:\\.(?:bak|old|orig|save|swp)|~)$) {
+    location ~* ^/(?:s|labels/scan)/ {
+        try_files $uri /index.html;
+    }
+
+    location ~* (?:\\.(?:php|asp|aspx|jsp|cgi)(?:/|$)|^/wp(?:-|/|$)|(?:\\.(?:bak|old|orig|save|swp)|~)$) {
         return 404;
     }
 
@@ -34,10 +43,18 @@ export function AppRoutes() {
     <Routes>
       <Route path="/" element={<Shell />}>
         <Route path="login" element={<Login />} />
+        <Route path="labels/scan/:code" element={<Scan />} />
       </Route>
     </Routes>
   );
 }
+`;
+
+const LEGACY_REDIRECTS = `export const LEGACY_REDIRECTS = [
+  { from: "s/*", to: "/inventory/scan" },
+];
+
+export const LEGACY_SETTINGS_REDIRECTS = [];
 `;
 
 let repo;
@@ -48,6 +65,7 @@ const run = (files) => {
   repo.write({
     "frontend/nginx.conf": NGINX,
     "frontend/src/App.tsx": APP_TSX,
+    "frontend/src/lib/legacyRedirects.tsx": LEGACY_REDIRECTS,
     "frontend/src/modules/.gitkeep": "",
     "frontend/dist/index.html": "<!doctype html>",
     "frontend/dist/assets/app.js": "export {};",
@@ -109,6 +127,49 @@ describe("check-edge-probes", () => {
     expect(status).toBe(0);
   });
 
+  it("fails when a label code the app prints would be answered 404", () => {
+    // The probe rule is a pattern over the whole address; `/s/RACK-7.OLD` is
+    // a label code, not a backup copy. Without the scan-address location the
+    // rule takes it and the printed label opens a bare 404.
+    const { status, stderr } = run({
+      "frontend/nginx.conf": NGINX.replace(
+        "    location ~* ^/(?:s|labels/scan)/ {\n" +
+          "        try_files $uri /index.html;\n" +
+          "    }\n\n",
+        "",
+      ),
+    });
+
+    expect(status).toBe(1);
+    expect(stderr).toContain("/s/RACK-7.OLD");
+    expect(stderr).toContain("(/s/*)");
+  });
+
+  it("fails when a route carrying a person's text has no example value", () => {
+    const { status, stderr } = run({
+      "frontend/src/App.tsx": APP_TSX.replace(
+        '        <Route path="login" element={<Login />} />',
+        '        <Route path="login" element={<Login />} />\n' +
+          '        <Route path="codes/:code" element={<Codes />} />',
+      ),
+    });
+
+    expect(status).toBe(1);
+    expect(stderr).toContain("/codes/:code");
+    expect(stderr).toContain("no example");
+  });
+
+  it("fails when an example value names a route the app no longer serves", () => {
+    const { status, stderr } = run({
+      "frontend/src/lib/legacyRedirects.tsx":
+        LEGACY_REDIRECTS.replace('{ from: "s/*", to: "/inventory/scan" },', ""),
+    });
+
+    expect(status).toBe(1);
+    expect(stderr).toContain("/s/*");
+    expect(stderr).toContain("no longer serves");
+  });
+
   it("refuses a checkout with no 404 rule at all, rather than measure nothing", () => {
     const { status, stderr } = run({
       "frontend/nginx.conf":
@@ -136,16 +197,32 @@ describe("check-edge-probes", () => {
 });
 
 describe("the shipped edge", () => {
+  const nginx = readFileSync(
+    resolve(import.meta.dirname, "../nginx.conf"),
+    "utf8",
+  );
+
   it("answers no route the application mounts with 404", () => {
-    const nginx = readFileSync(
-      resolve(import.meta.dirname, "../nginx.conf"),
-      "utf8",
-    );
     const routes = routePaths();
 
     // The route table is the one check-route-reachability reads; an empty or
     // shrunken list would make this test pass by measuring nothing.
     expect(routes.length).toBeGreaterThan(100);
     expect(blockedPaths(regexLocations(nginx), routes).blocked).toEqual([]);
+  });
+
+  it("answers no value a data-carrying route accepts with 404", () => {
+    const addresses = TEXT_VALUES.map(exampleAddress);
+    expect(addresses.length).toBeGreaterThan(0);
+    expect(blockedPaths(regexLocations(nginx), addresses).blocked).toEqual([]);
+  });
+
+  it("reads an extension only at the end of a segment", () => {
+    // `VALVE.CGI2` holds `.CGI` inside a name; the rule names an extension,
+    // which ends its segment or the address, so a code is not another stack's
+    // file by its substring.
+    expect(
+      blockedPaths(regexLocations(nginx), ["/notes/VALVE.CGI2"]).blocked,
+    ).toEqual([]);
   });
 });

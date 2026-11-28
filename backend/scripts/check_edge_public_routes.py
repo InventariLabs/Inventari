@@ -9,13 +9,11 @@ has a ``/public`` entry, and nowhere behind a configured edge.
 It also refuses the quieter edge mistakes: a path naming another stack or a
 backup copy (``/wp-admin``, ``/config.php~``) or a dot-segment that the SPA
 fallback answers with the application start page and a 200, which a scanner
-reads as a hit; and ``/.well-known/security.txt`` falling back to that page
-instead of serving the operator's file or answering 404.
-
-It also refuses the quieter edge mistake: nginx drops *all* inherited
-``add_header`` directives the moment a location declares one of its own, so a
-location that adds only ``Cache-Control`` answers without CSP or
-X-Frame-Options. Every block that sets a header must repeat the whole security
+reads as a hit; ``/.well-known/security.txt`` falling back to that page instead
+of serving the operator's file or answering 404; and a location that adds only
+``Cache-Control``, which answers without CSP or X-Frame-Options because nginx
+drops *all* inherited ``add_header`` directives the moment a location declares
+one of its own. Every block that sets a header must repeat the whole security
 set; two locations used to answer that way.
 
 The address is shared. ``/public/attestation/<token>`` is also a page of the
@@ -384,6 +382,11 @@ def check_nginx_security_txt(text: str) -> list[str]:
         problems.append(
             'nginx.conf: the security.txt location does not declare '
             '`default_type text/plain;`, so the operator file may carry the wrong type'
+        )
+    if 'charset utf-8;' not in block:
+        problems.append(
+            'nginx.conf: the security.txt location does not declare `charset utf-8;`, '
+            'so the answer does not say what RFC 9116 §3 requires of the file'
         )
     if not re.search(r'^\s*alias\s+\S*security\.txt;', block, re.MULTILINE):
         problems.append(

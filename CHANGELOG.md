@@ -117,14 +117,15 @@ says what the release does rather than what changed since them.
   which tells a category's fields apart from the flags stored beside them.
 - Module authors: the backend module SDK exports `SheetColumns`, which reads
   a cell's number or date by what its whole column says — the decimal mark,
-  the thousands grouping, a day-first order, a currency code — so a module's
-  own import door reads a sheet the way every other door does.
+  the thousands grouping, a day-first order, and for a price (`money=True`) a
+  currency code — so a module's own import door reads a sheet the way every
+  other door does.
 - An instance can publish `/.well-known/security.txt` (RFC 9116). The image
   ships none, because the address belongs to whoever runs the instance: put a
   file in `security-txt/` (DEPLOYMENT.md, *security.txt*) and it is served as
-  `text/plain` from the next request. An instance that provides none answers
-  404 there instead of the application start page, and `git pull` leaves the
-  operator's file alone.
+  `text/plain; charset=utf-8` from the next request. An instance that provides
+  none answers 404 there instead of the application start page, and `git pull`
+  leaves the operator's file alone.
 
 ### Fixed
 
@@ -132,13 +133,9 @@ says what the release does rather than what changed since them.
   `/config.php`, `/config.php~`, `/backup.old`, anything under `/vendor/` —
   is answered by the Web server with a plain 404 instead of the application
   start page with a 200, so a scanner no longer reports the instance as
-  running WordPress or PHP.
-  the thousands grouping, a day-first order, and for a price (`money=True`) a
-  currency code — so a module's own import door reads a sheet the way every
-  other door does.
-
-### Fixed
-
+  running WordPress or PHP. A label or document code that reads like one of
+  those (`RACK-7.OLD`, `PALLET~`) still opens the scan screen at the address
+  its QR prints.
 - A partner's detail sheet shows notes with their line breaks, so the contact
   people a partner import writes there are a line each.
 - A code scanned while the one before it is still being looked up is no longer

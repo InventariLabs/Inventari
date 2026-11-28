@@ -215,14 +215,15 @@ EOF
 chmod 644 security-txt/security.txt
 ```
 
-The file is served as `text/plain` from the next request: a bind mount is
-live, so no recreate is needed unless the frontend container has not been
-started with the mount yet (a first-time install or the update that introduced
-it: `docker compose up -d frontend`). The address answers `404` again when the
-file is removed. `Expires` must be in the future and no more than a year ahead
-(RFC 9116), `Contact` and `Canonical` are the ones below, and `Contact` is the
-address you actually read. `security-txt/.gitignore` keeps your file out of
-`git status`, and `git pull` leaves it alone.
+The file is served as `text/plain; charset=utf-8` from the next request: a bind
+mount is live, so no recreate is needed unless the frontend container has not
+been started with the mount yet (a first-time install or the update that
+introduced it: `docker compose up -d frontend`). The address answers `404`
+again when the file is removed. The fields are the ones in the example above:
+`Expires` must be in the future and no more than a year ahead (RFC 9116),
+`Contact` is the address you actually read, and `Canonical` is the address this
+file is served at. `security-txt/.gitignore` keeps your file out of `git
+status`, and `git pull` leaves it alone.
 
 ### Database roles
 

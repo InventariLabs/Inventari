@@ -347,14 +347,40 @@ function readModules() {
 }
 
 /**
- * Every route pattern the app mounts: App.tsx's static table plus each
- * module's `routes`. The edge gate reads this list to prove that no Web-server
- * 404 rule answers one of them.
+ * Addresses the app forwards from, read from `src/lib/legacyRedirects.tsx`.
+ *
+ * App.tsx renders these from a table (`<Route path={alias.from}>`), so
+ * `extractRoutes` cannot see them and the reachability check never counts
+ * them. The edge gate needs them: `/s/*` is the address a printed QR opens,
+ * and it is the app's only address whose variable part takes slashes.
+ */
+function extractRedirectRoutes() {
+  const file = resolve(SRC, "lib", "legacyRedirects.tsx");
+  if (!existsSync(file)) return [];
+  const text = readFileSync(file, "utf8");
+  const settingsAt = text.indexOf("LEGACY_SETTINGS_REDIRECTS");
+  const top = settingsAt === -1 ? text : text.slice(0, settingsAt);
+  const settings = settingsAt === -1 ? "" : text.slice(settingsAt);
+  const froms = (chunk) =>
+    [...chunk.matchAll(/\bfrom:\s*"([^"]+)"/g)].map((match) => match[1]);
+  return [
+    ...froms(top).map((path) => joinPath("", path)),
+    ...froms(settings).map((path) => joinPath("/settings", path)),
+  ];
+}
+
+/**
+ * Every route pattern the app serves: App.tsx's static table, each module's
+ * `routes`, and the redirect table. The edge gate reads this list to prove
+ * that no Web-server 404 rule answers one of them.
  */
 export function routePaths() {
   return [
-    ...extractRoutes(),
-    ...readModules().routes.map((route) => route.path),
+    ...new Set([
+      ...extractRoutes(),
+      ...readModules().routes.map((route) => route.path),
+      ...extractRedirectRoutes(),
+    ]),
   ];
 }
 
