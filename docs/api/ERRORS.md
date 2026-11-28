@@ -695,7 +695,7 @@ apart.
 | `STOCK_INSUFFICIENT_FOR_TEMPLATE` | Insufficient stock for template {template_id}: requested {requested}, available {available} |
 | `STOCK_INSUFFICIENT_RECORD` | Insufficient stock for "{item}": available {available}, requested {requested}. |
 | `STOCK_LAYER_UNIT_COST_ABOVE_CEILING` | The cost of {product} comes to {cost} per stock unit, and a cost layer keeps at most {ceiling}. |
-| `STOCK_LAYER_VALUE_ABOVE_CEILING` | The value of {product} in this receipt comes to {value}, and a cost layer keeps at most {ceiling}. |
+| `STOCK_LAYER_VALUE_ABOVE_CEILING` | The value of {product} comes to {value}, and a cost layer keeps at most {ceiling}. |
 | `STOCK_LOT_NOT_CONSUMABLE` | Batch {lot} is {status} and cannot be consumed or reserved |
 | `STOCK_MOVES_EXPORT_TOO_MANY` | {total} movements match — more than the {limit} one sheet carries. Narrow the dates, the place or the product and export again. |
 | `STOCK_PRODUCT_NOT_FOUND` | The product {product} was not found. |

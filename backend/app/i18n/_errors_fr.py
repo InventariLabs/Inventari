@@ -360,7 +360,7 @@ ERRORS_FR: ErrorMessages = {
     'stock_product_not_found': 'Le produit {product} est introuvable.',
     'stock_insufficient_record': 'Stock insuffisant pour « {item} » : disponible {available}, demandé {requested}.',
     'stock_layer_unit_cost_above_ceiling': 'Le coût de {product} atteint {cost} par unité de stock, et une couche de coût contient au plus {ceiling}.',
-    'stock_layer_value_above_ceiling': 'La valeur de {product} sur cette réception atteint {value}, et une couche de coût contient au plus {ceiling}.',
+    'stock_layer_value_above_ceiling': 'La valeur de {product} atteint {value}, et une couche de coût contient au plus {ceiling}.',
     'receipt_needs_target_location': "Le document de réception n'a pas d'emplacement de destination.",
     'receipt_needs_quarantine_location': "La réception contient des marchandises endommagées ou bloquées pour la qualité, mais le profil des documents n'indique aucun emplacement de quarantaine. Indiquez-en un dans les paramètres des documents.",
     'transfer_needs_target_location': "Le document de transfert n'a pas d'emplacement de destination.",

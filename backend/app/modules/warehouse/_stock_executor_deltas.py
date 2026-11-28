@@ -400,22 +400,32 @@ async def execute_correction(
             # (a transfer correction moves stock between locations, net zero).
             if not is_int:
                 if effective_delta > 0:
+                    # Goods coming back onto the shelf because a dispatch
+                    # was overstated come back at what they cost when they
+                    # left, which the reversal reads off the outflow. The
+                    # correction line carries the dispatch's sales price —
+                    # what the goods sold for, never what they cost — so a
+                    # dispatch-like original states no price at all here:
+                    # where it posted an outflow the reversal replaces that
+                    # price, and where it posted none (a record that had no
+                    # card when it was dispatched) the layer falls back to
+                    # the organization's rate instead of putting the margin
+                    # back on the shelf. A receipt corrected upwards is a
+                    # receipt being restated, and keeps its line's price,
+                    # restated per the stock unit the layer keeps.
+                    unit_cost = (
+                        _price_per_stock_unit(line, effective_delta)
+                        if sign > 0
+                        else None
+                    )
                     await core_api.valuation.record_receipt_async(
                         db,
                         doc.organization_id,
                         stock_template_id,
                         effective_delta,
-                        # The line's price is per its own unit, and the layer
-                        # is kept per the stock unit: 500 g at 0.02 is half a
-                        # kilogram at 20, not at 0.02.
-                        _price_per_stock_unit(line, effective_delta),
+                        unit_cost,
                         document_line_id=line.id,
                         currency=line.currency or doc.currency,
-                        # Goods coming back onto the shelf because a dispatch
-                        # was overstated come back at what they cost when
-                        # they left, not at the sales price on the line. A
-                        # receipt corrected upwards names a receipt line,
-                        # which posted no outflow, and keeps its price.
                         reverses_line_id=line.corrects_line_id,
                     )
                 else:

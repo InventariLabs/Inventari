@@ -275,7 +275,7 @@ ERRORS_PT: ErrorMessages = {
     'stock_product_not_found': 'O produto {product} não foi encontrado.',
     'stock_insufficient_record': 'Estoque insuficiente para "{item}": disponível {available}, solicitado {requested}.',
     'stock_layer_unit_cost_above_ceiling': 'O custo de {product} chega a {cost} por unidade de stock, e uma camada de custo guarda no máximo {ceiling}.',
-    'stock_layer_value_above_ceiling': 'O valor de {product} nesta receção chega a {value}, e uma camada de custo guarda no máximo {ceiling}.',
+    'stock_layer_value_above_ceiling': 'O valor de {product} chega a {value}, e uma camada de custo guarda no máximo {ceiling}.',
     'receipt_needs_target_location': 'O documento de recebimento não tem local de destino.',
     'receipt_needs_quarantine_location': 'O recebimento inclui mercadorias avariadas ou em retenção de qualidade, mas o perfil do documento não indica nenhum local de quarentena. Defina um nas configurações do documento.',
     'transfer_needs_target_location': 'O documento de transferência não tem local de destino.',

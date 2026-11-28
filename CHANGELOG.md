@@ -116,8 +116,11 @@ says what the release does rather than what changed since them.
 
 - A stock correction or an adjustment written in a smaller unit than the
   product keeps values its cost layer in the product's own unit: half a
-  kilogram counted in grams is worth what a kilogram is worth, not a
-  thousandth of it, so the shelf and its value stop drifting apart. A receipt,
+  kilogram entered in grams carries half a kilogram's value, not a
+  thousandth of it, so the shelf and its value stop drifting apart. A dispatch
+  corrected downwards brings the goods back at what they cost when they left,
+  and where the books never recorded that cost the layer marks the value
+  unknown instead of taking the price the goods sold for. A receipt,
   a cost put on a batch after it was posted, or a production run whose figure
   outgrows what a cost layer or a stock record can store is refused with the
   product, the amount and the limit named, instead of ending in a server error.
