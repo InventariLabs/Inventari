@@ -92,7 +92,7 @@ class TestPartnerPricelistService:
         real_async_db_session.add_all([template, partner])
         await real_async_db_session.flush()
 
-        with pytest.raises(ValueError, match='unit_price'):
+        with pytest.raises(ValueError, match='unit price'):
             await create_async(
                 real_async_db_session,
                 organization_id=async_test_household.id,
@@ -124,7 +124,7 @@ class TestPartnerPricelistService:
         real_async_db_session.add_all([template, partner])
         await real_async_db_session.flush()
 
-        with pytest.raises(ValueError, match='valid_to'):
+        with pytest.raises(ValueError, match='stop being valid'):
             await create_async(
                 real_async_db_session,
                 organization_id=async_test_household.id,

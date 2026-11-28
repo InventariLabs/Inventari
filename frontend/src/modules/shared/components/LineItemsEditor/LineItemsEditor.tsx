@@ -248,6 +248,7 @@ export function LineItemsEditor({
             <Button
               type="button"
               variant={scan.open ? "primary" : "ghost"}
+              aria-expanded={scan.open}
               size="sm"
               onClick={scan.onToggle}
               className={scan.open ? "" : "text-on-secondary hover:text-on"}

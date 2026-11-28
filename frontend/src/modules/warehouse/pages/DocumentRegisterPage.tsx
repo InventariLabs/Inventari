@@ -854,6 +854,7 @@ export default function DocumentRegisterPage() {
                   key={t_opt}
                   type="button"
                   variant={typeFilter === t_opt ? "default" : "outline"}
+                  aria-pressed={typeFilter === t_opt}
                   size="sm"
                   onClick={() => setTypeFilter(t_opt)}
                   className={cn(
@@ -881,6 +882,7 @@ export default function DocumentRegisterPage() {
                   key={opt}
                   type="button"
                   variant={groupBy === opt ? "default" : "outline"}
+                  aria-pressed={groupBy === opt}
                   size="sm"
                   onClick={() => setGroupBy(opt)}
                   className={cn(

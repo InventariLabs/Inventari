@@ -116,7 +116,10 @@ def validate_payload_against_schema(
 
     for key in required:
         if key not in payload:
-            raise SchemaValidationError('settings_field_required', field=key)
+            raise SchemaValidationError(
+                'settings_field_required',
+                field=_name_for_the_reader(properties.get(key), key),
+            )
         if key not in properties:
             raise ContractViolationError(f'Required field {key!r} has no schema entry')
 
@@ -137,6 +140,16 @@ def validate_payload_against_schema(
             raise SchemaValidationError('settings_field_unknown', field=key)
 
     return cleaned
+
+
+def _name_for_the_reader(schema: object, path: str) -> str:
+    """What a refusal calls a setting: its declared title, else its dotted path.
+
+    The path is the module author's identifier (``warranty_warning_days``);
+    a property that declares a ``title`` is named by that.
+    """
+    title = schema.get('title') if isinstance(schema, dict) else None
+    return title if isinstance(title, str) and title else path
 
 
 def _refuse_the_reserved_key(schema: object) -> None:
@@ -205,42 +218,43 @@ def _validate_value(  # noqa: C901 - existing complexity/size
         return value  # no type constraint — accept anything
 
     dotted = '.'.join(path)
+    named = _name_for_the_reader(schema, dotted)
 
     if schema_type == 'string':
         if not isinstance(value, str):
-            raise SchemaValidationError('settings_value_not_string', path=dotted)
+            raise SchemaValidationError('settings_value_not_string', path=named)
         min_len = schema.get('minLength')
         max_len = schema.get('maxLength')
         if isinstance(min_len, int) and len(value) < min_len:
             raise SchemaValidationError(
-                'settings_text_too_short', path=dotted, limit=min_len
+                'settings_text_too_short', path=named, limit=min_len
             )
         if isinstance(max_len, int) and len(value) > max_len:
             raise SchemaValidationError(
-                'settings_text_too_long', path=dotted, limit=max_len
+                'settings_text_too_long', path=named, limit=max_len
             )
         return value
 
     if schema_type == 'integer':
         if not isinstance(value, int) or isinstance(value, bool):
-            raise SchemaValidationError('settings_value_not_integer', path=dotted)
+            raise SchemaValidationError('settings_value_not_integer', path=named)
         _check_min_max(value, schema, path)
         return value
 
     if schema_type == 'number':
         if isinstance(value, bool) or not isinstance(value, (int, float)):
-            raise SchemaValidationError('settings_value_not_number', path=dotted)
+            raise SchemaValidationError('settings_value_not_number', path=named)
         _check_min_max(value, schema, path)
         return value
 
     if schema_type == 'boolean':
         if not isinstance(value, bool):
-            raise SchemaValidationError('settings_value_not_boolean', path=dotted)
+            raise SchemaValidationError('settings_value_not_boolean', path=named)
         return value
 
     if schema_type == 'object':
         if not isinstance(value, dict):
-            raise SchemaValidationError('settings_value_not_object', path=dotted)
+            raise SchemaValidationError('settings_value_not_object', path=named)
         return validate_payload_against_schema(value, schema)
 
     if schema_type == 'enum':
@@ -250,7 +264,7 @@ def _validate_value(  # noqa: C901 - existing complexity/size
         if value not in values:
             raise SchemaValidationError(
                 'settings_value_not_allowed',
-                path=dotted,
+                path=named,
                 allowed=', '.join(str(v) for v in values),
                 value=value,
             )
@@ -258,7 +272,7 @@ def _validate_value(  # noqa: C901 - existing complexity/size
 
     if schema_type == 'array':
         if not isinstance(value, list):
-            raise SchemaValidationError('settings_value_not_array', path=dotted)
+            raise SchemaValidationError('settings_value_not_array', path=named)
         items_schema = schema.get('items')
         if isinstance(items_schema, dict):
             return [
@@ -277,11 +291,12 @@ def _check_min_max(
 ) -> None:
     minimum = schema.get('minimum')
     maximum = schema.get('maximum')
+    named = _name_for_the_reader(schema, '.'.join(path))
     if isinstance(minimum, (int, float)) and value < minimum:
         raise SchemaValidationError(
-            'settings_number_too_small', path='.'.join(path), limit=minimum, value=value
+            'settings_number_too_small', path=named, limit=minimum, value=value
         )
     if isinstance(maximum, (int, float)) and value > maximum:
         raise SchemaValidationError(
-            'settings_number_too_large', path='.'.join(path), limit=maximum, value=value
+            'settings_number_too_large', path=named, limit=maximum, value=value
         )

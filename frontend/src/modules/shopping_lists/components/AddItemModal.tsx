@@ -225,6 +225,7 @@ export default function AddItemModal({ listId, onClose, onSuccess }: Props) {
                   type="button"
                   size="sm"
                   variant={formData.priority === p.val ? "secondary" : "ghost"}
+                  aria-pressed={formData.priority === p.val}
                   onClick={() => setFormData({ ...formData, priority: p.val })}
                 >
                   {p.label}

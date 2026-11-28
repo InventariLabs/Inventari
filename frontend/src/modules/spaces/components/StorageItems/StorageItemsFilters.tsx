@@ -37,6 +37,7 @@ export function StorageItemsFilters({
       <Button
         onClick={() => onSelectCategory("ALL")}
         variant={selectedCategoryId === "ALL" ? "default" : "outline"}
+        aria-pressed={selectedCategoryId === "ALL"}
         className="shrink-0 whitespace-nowrap"
       >
         {t("common:filterAll")}
@@ -45,6 +46,7 @@ export function StorageItemsFilters({
         <Button
           key={cat.id}
           variant={selectedCategoryId === cat.id ? "secondary" : "outline"}
+          aria-pressed={selectedCategoryId === cat.id}
           onClick={() =>
             onSelectCategory(selectedCategoryId === cat.id ? "ALL" : cat.id)
           }
@@ -59,6 +61,7 @@ export function StorageItemsFilters({
       {hasUncategorized && (
         <Button
           variant={selectedCategoryId === "NONE" ? "default" : "outline"}
+          aria-pressed={selectedCategoryId === "NONE"}
           onClick={() =>
             onSelectCategory(selectedCategoryId === "NONE" ? "ALL" : "NONE")
           }

@@ -1013,6 +1013,22 @@ describe("StoragesPage — one screen", () => {
     ).toBeInTheDocument();
   });
 
+  it.each([
+    ["none exist", []],
+    [
+      "only module-owned ones exist",
+      [{ id: "rack", name: "Server rack", context_tag: "equipment" }],
+    ],
+  ])("keeps the way to the archived locations when %s", async (_why, rows) => {
+    serveLocations(rows);
+    server.use(http.get("/api/v1/locations/tree", () => HttpResponse.json([])));
+    renderPage("/inventory/locations");
+
+    expect(
+      await screen.findByRole("link", { name: "Archived locations" }),
+    ).toHaveAttribute("href", "/inventory/locations/archived");
+  });
+
   it("retries the tree and the selected location together after the tree failed to load", async () => {
     let failing = true;
     server.use(

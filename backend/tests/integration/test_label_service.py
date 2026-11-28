@@ -946,7 +946,7 @@ class TestCreateFromCodes:
 
         ctx = self._ctx(async_test_user, async_test_household)
         dup = _short('DUP')
-        with pytest.raises(ValueError, match='Duplicate short_code'):
+        with pytest.raises(ValueError, match='Duplicate short code'):
             await LabelService.create_from_codes_async(
                 real_async_db_session,
                 [LabelCodeItem(short_code=dup), LabelCodeItem(short_code=dup)],

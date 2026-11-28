@@ -76,7 +76,7 @@ class TestReorderService:
         real_async_db_session.add(template)
         await real_async_db_session.flush()
 
-        with pytest.raises(ValueError, match='max_quantity'):
+        with pytest.raises(ValueError, match='cannot be below the minimum'):
             await create_async(
                 real_async_db_session,
                 organization_id=async_test_household.id,
@@ -102,7 +102,7 @@ class TestReorderService:
         real_async_db_session.add(template)
         await real_async_db_session.flush()
 
-        with pytest.raises(ValueError, match='safety_stock'):
+        with pytest.raises(ValueError, match='safety stock'):
             await create_async(
                 real_async_db_session,
                 organization_id=async_test_household.id,

@@ -118,7 +118,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'reconciliation_pair_layer_quant': 'the cost history vs the shelf: {count}',
         'event_delivery_dead_title': 'A background task keeps failing',
         'event_delivery_dead_content': (
-            'The handler {handler} of the event {event} failed {attempts} times and was stopped. Last error: {error}. The event is kept in event_deliveries for inspection.'
+            'The handler {handler} of the event {event} failed {attempts} times and was stopped. Last error: {error}. The event is kept for inspection.'
         ),
         'field_required': 'This field is required',
         'invalid_email': 'Invalid email format',
@@ -488,12 +488,12 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'purchase_order_not_found': 'Purchase order not found',
         'reorder_rule_not_found': 'Reorder rule not found',
         'pricelist_entry_not_found': 'Pricelist entry not found',
-        'reorder_max_below_min': 'max_quantity ({max_quantity}) must be >= min_quantity ({min_quantity})',
-        'reorder_safety_stock_negative': 'safety_stock must be >= 0, got {safety_stock}',
-        'reorder_min_quantity_negative': 'min_quantity must be >= 0, got {min_quantity}',
-        'pricelist_unit_price_not_positive': 'unit_price must be > 0, got {unit_price}',
-        'pricelist_min_quantity_not_positive': 'min_quantity must be > 0, got {min_quantity}',
-        'pricelist_valid_to_before_valid_from': 'valid_to ({valid_to}) must be >= valid_from ({valid_from})',
+        'reorder_max_below_min': 'The maximum ({max_quantity}) cannot be below the minimum ({min_quantity})',
+        'reorder_safety_stock_negative': 'The safety stock cannot be negative, got {safety_stock}',
+        'reorder_min_quantity_negative': 'The minimum quantity cannot be negative, got {min_quantity}',
+        'pricelist_unit_price_not_positive': 'The unit price must be above 0, got {unit_price}',
+        'pricelist_min_quantity_not_positive': 'The minimum quantity must be above 0, got {min_quantity}',
+        'pricelist_valid_to_before_valid_from': 'The price cannot stop being valid ({valid_to}) before it starts ({valid_from})',
         'pricelist_duplicate': (
             'This supplier already has a price for this product over the same '
             'dates and the same minimum quantity. Edit that entry instead of '
@@ -1128,8 +1128,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'relocation_destination_foreign': 'Cannot move item: the destination is not this organization.',
         'relocation_blocked_by_reservations': 'Cannot move item: source stock has outstanding reservations. Release or fulfill them first.',
         'short_code_invalid_format': 'Invalid code format',
-        'short_code_duplicate_in_request': 'Duplicate short_code in request: {short_code}',
-        'short_codes_taken': 'short_code(s) already in use in this org: {codes}',
+        'short_code_duplicate_in_request': 'Duplicate short code in request: {short_code}',
+        'short_codes_taken': 'These short codes are already in use in this organization: {codes}',
         'onboarding_profile_unknown': "Unknown profile: '{profile}'",
         'storage_vanished_during_batch': 'Storage location {location} vanished during the batch.',
         'storage_archive_blocked_by_items': 'Cannot archive: {count} item(s) are still stored here. Move them first or archive with a target location.',
@@ -1270,7 +1270,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'reconciliation_pair_layer_quant': 'historia kosztu a półka: {count}',
         'event_delivery_dead_title': 'Zadanie w tle ciągle się nie udaje',
         'event_delivery_dead_content': (
-            'Obsługa {handler} zdarzenia {event} nie powiodła się {attempts} razy i została wstrzymana. Ostatni błąd: {error}. Zdarzenie zostało zachowane w event_deliveries do sprawdzenia.'
+            'Obsługa {handler} zdarzenia {event} nie powiodła się {attempts} razy i została wstrzymana. Ostatni błąd: {error}. Zdarzenie zostało zachowane do sprawdzenia.'
         ),
         'field_required': 'To pole jest wymagane',
         'invalid_email': 'Nieprawidłowy format email',
@@ -1649,12 +1649,12 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'purchase_order_not_found': 'Zamówienie zakupu nie zostało znalezione',
         'reorder_rule_not_found': 'Reguła uzupełniania nie została znaleziona',
         'pricelist_entry_not_found': 'Pozycja cennika nie została znaleziona',
-        'reorder_max_below_min': 'max_quantity ({max_quantity}) musi być >= min_quantity ({min_quantity})',
-        'reorder_safety_stock_negative': 'safety_stock musi być >= 0, otrzymano {safety_stock}',
-        'reorder_min_quantity_negative': 'min_quantity musi być >= 0, otrzymano {min_quantity}',
-        'pricelist_unit_price_not_positive': 'unit_price musi być > 0, otrzymano {unit_price}',
-        'pricelist_min_quantity_not_positive': 'min_quantity musi być > 0, otrzymano {min_quantity}',
-        'pricelist_valid_to_before_valid_from': 'valid_to ({valid_to}) musi być >= valid_from ({valid_from})',
+        'reorder_max_below_min': 'Maksimum ({max_quantity}) nie może być mniejsze niż minimum ({min_quantity})',
+        'reorder_safety_stock_negative': 'Zapas bezpieczeństwa nie może być ujemny, otrzymano {safety_stock}',
+        'reorder_min_quantity_negative': 'Ilość minimalna nie może być ujemna, otrzymano {min_quantity}',
+        'pricelist_unit_price_not_positive': 'Cena jednostkowa musi być większa od 0, otrzymano {unit_price}',
+        'pricelist_min_quantity_not_positive': 'Ilość minimalna musi być większa od 0, otrzymano {min_quantity}',
+        'pricelist_valid_to_before_valid_from': 'Cena nie może przestać obowiązywać ({valid_to}) przed rozpoczęciem ({valid_from})',
         'pricelist_duplicate': (
             'Ten dostawca ma już cenę tego produktu na te same daty i przy tej '
             'samej minimalnej ilości. Popraw tamtą pozycję, zamiast dodawać '

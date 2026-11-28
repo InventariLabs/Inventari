@@ -85,6 +85,7 @@ export function ScanModeSection({
           type="button"
           className="self-end sm:self-auto"
           variant={scanMode ? "primary" : "outline"}
+          aria-expanded={scanMode}
           size="sm"
           onClick={onToggleScanMode}
         >
@@ -128,6 +129,7 @@ export function ScanModeSection({
               <Button
                 type="button"
                 variant={cameraOpen ? "primary" : "outline"}
+                aria-expanded={cameraOpen}
                 onClick={onCameraToggle}
                 className="sm:mb-px"
                 leftIcon={

@@ -130,6 +130,7 @@ export function NewLocationSheet({
                 key={s}
                 type="button"
                 variant={name === s ? "secondary" : "outline"}
+                aria-pressed={name === s}
                 size="sm"
                 onClick={() => setName(nameAfterChip(name, s, suggestions))}
               >

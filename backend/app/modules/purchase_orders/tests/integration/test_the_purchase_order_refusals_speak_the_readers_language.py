@@ -302,7 +302,7 @@ class TestReorderRefusalsSpeakPolish:
         )
 
         assert resp.status_code == 400, resp.text
-        assert _message(resp) == ('max_quantity (5) musi być >= min_quantity (20)')
+        assert _message(resp) == ('Maksimum (5) nie może być mniejsze niż minimum (20)')
         assert resp.json()['detail']['lang'] == 'pl'
 
     def test_patching_a_rule_into_a_negative_safety_stock_speaks_polish(
@@ -321,7 +321,9 @@ class TestReorderRefusalsSpeakPolish:
         )
 
         assert resp.status_code == 400, resp.text
-        assert _message(resp) == 'safety_stock musi być >= 0, otrzymano -1'
+        assert _message(resp) == (
+            'Zapas bezpieczeństwa nie może być ujemny, otrzymano -1'
+        )
         assert resp.json()['detail']['lang'] == 'pl'
 
 
@@ -350,7 +352,8 @@ class TestPricelistRefusalsSpeakPolish:
 
         assert resp.status_code == 400, resp.text
         assert _message(resp) == (
-            'valid_to (2025-06-01) musi być >= valid_from (2026-01-01)'
+            'Cena nie może przestać obowiązywać (2025-06-01) '
+            'przed rozpoczęciem (2026-01-01)'
         )
         assert resp.json()['detail']['lang'] == 'pl'
 

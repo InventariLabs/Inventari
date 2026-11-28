@@ -95,6 +95,17 @@ describe("BasicInfoSection — every control reports under its own key", () => {
     expect(onSet).toHaveBeenCalledWith("barcode", "5901234123457");
   });
 
+  it.each([
+    [false, "Scan"],
+    [true, "Close scanner"],
+  ])("says whether the scanner is open (%s)", (scanOpen, name) => {
+    renderSection({ scanOpen, onToggleScan: vi.fn() });
+    expect(screen.getByRole("button", { name })).toHaveAttribute(
+      "aria-expanded",
+      String(scanOpen),
+    );
+  });
+
   it("asks the page for the quick location form", () => {
     const onShowAddLocation = vi.fn();
     renderSection({ onShowAddLocation });

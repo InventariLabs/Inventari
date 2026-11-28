@@ -182,7 +182,7 @@ ERRORS_FR: ErrorMessages = {
     'reconciliation_pair_layer_quant': 'historique des coûts vs étagère : {count}',
     'event_delivery_dead_title': 'Une tâche en arrière-plan échoue sans cesse',
     'event_delivery_dead_content': (
-        'Le gestionnaire {handler} de l’événement {event} a échoué {attempts} fois et a été arrêté. Dernière erreur : {error}. L’événement est conservé dans event_deliveries pour examen.'
+        'Le gestionnaire {handler} de l’événement {event} a échoué {attempts} fois et a été arrêté. Dernière erreur : {error}. L’événement est conservé pour examen.'
     ),
     'field_required': 'Ce champ est obligatoire',
     'invalid_email': "Format d'e-mail invalide",
@@ -553,12 +553,12 @@ ERRORS_FR: ErrorMessages = {
     'purchase_order_not_found': 'Bon de commande introuvable',
     'reorder_rule_not_found': 'Règle de réapprovisionnement introuvable',
     'pricelist_entry_not_found': 'Entrée de liste de prix introuvable',
-    'reorder_max_below_min': 'max_quantity ({max_quantity}) doit être >= min_quantity ({min_quantity})',
-    'reorder_safety_stock_negative': 'safety_stock doit être >= 0, valeur {safety_stock}',
-    'reorder_min_quantity_negative': 'min_quantity doit être >= 0, valeur {min_quantity}',
-    'pricelist_unit_price_not_positive': 'unit_price doit être > 0, valeur {unit_price}',
-    'pricelist_min_quantity_not_positive': 'min_quantity doit être > 0, valeur {min_quantity}',
-    'pricelist_valid_to_before_valid_from': 'valid_to ({valid_to}) doit être >= valid_from ({valid_from})',
+    'reorder_max_below_min': 'Le maximum ({max_quantity}) ne peut pas être inférieur au minimum ({min_quantity})',
+    'reorder_safety_stock_negative': 'Le stock de sécurité ne peut pas être négatif, valeur {safety_stock}',
+    'reorder_min_quantity_negative': 'La quantité minimale ne peut pas être négative, valeur {min_quantity}',
+    'pricelist_unit_price_not_positive': 'Le prix unitaire doit être supérieur à 0, valeur {unit_price}',
+    'pricelist_min_quantity_not_positive': 'La quantité minimale doit être supérieure à 0, valeur {min_quantity}',
+    'pricelist_valid_to_before_valid_from': 'La validité du prix ne peut pas se terminer ({valid_to}) avant de commencer ({valid_from})',
     'pricelist_duplicate': (
         'Ce fournisseur a déjà un prix pour ce produit sur les mêmes dates et '
         'avec la même quantité minimale. Modifiez cette entrée au lieu d’en '

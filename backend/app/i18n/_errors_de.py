@@ -186,7 +186,7 @@ ERRORS_DE: ErrorMessages = {
     'reconciliation_pair_layer_quant': 'Kostenhistorie vs. Regal: {count}',
     'event_delivery_dead_title': 'Eine Hintergrundaufgabe schlägt wiederholt fehl',
     'event_delivery_dead_content': (
-        'Der Handler {handler} für das Ereignis {event} ist {attempts}-mal fehlgeschlagen und wurde angehalten. Letzter Fehler: {error}. Das Ereignis bleibt zur Prüfung in event_deliveries erhalten.'
+        'Der Handler {handler} für das Ereignis {event} ist {attempts}-mal fehlgeschlagen und wurde angehalten. Letzter Fehler: {error}. Das Ereignis bleibt zur Prüfung erhalten.'
     ),
     'field_required': 'Dieses Feld ist erforderlich',
     'invalid_email': 'Ungültiges E-Mail-Format',
@@ -557,12 +557,12 @@ ERRORS_DE: ErrorMessages = {
     'purchase_order_not_found': 'Bestellung nicht gefunden',
     'reorder_rule_not_found': 'Nachbestellregel nicht gefunden',
     'pricelist_entry_not_found': 'Preislisteneintrag nicht gefunden',
-    'reorder_max_below_min': 'max_quantity ({max_quantity}) muss >= min_quantity ({min_quantity}) sein',
-    'reorder_safety_stock_negative': 'safety_stock muss >= 0 sein, erhalten {safety_stock}',
-    'reorder_min_quantity_negative': 'min_quantity muss >= 0 sein, erhalten {min_quantity}',
-    'pricelist_unit_price_not_positive': 'unit_price muss > 0 sein, erhalten {unit_price}',
-    'pricelist_min_quantity_not_positive': 'min_quantity muss > 0 sein, erhalten {min_quantity}',
-    'pricelist_valid_to_before_valid_from': 'valid_to ({valid_to}) muss >= valid_from ({valid_from}) sein',
+    'reorder_max_below_min': 'Das Maximum ({max_quantity}) darf nicht unter dem Minimum ({min_quantity}) liegen',
+    'reorder_safety_stock_negative': 'Der Sicherheitsbestand darf nicht negativ sein, erhalten {safety_stock}',
+    'reorder_min_quantity_negative': 'Die Mindestmenge darf nicht negativ sein, erhalten {min_quantity}',
+    'pricelist_unit_price_not_positive': 'Der Stückpreis muss größer als 0 sein, erhalten {unit_price}',
+    'pricelist_min_quantity_not_positive': 'Die Mindestmenge muss größer als 0 sein, erhalten {min_quantity}',
+    'pricelist_valid_to_before_valid_from': 'Das Ende der Preisgültigkeit ({valid_to}) darf nicht vor ihrem Beginn ({valid_from}) liegen',
     'pricelist_duplicate': (
         'Dieser Lieferant hat für dieses Produkt bereits einen Preis über '
         'denselben Zeitraum und dieselbe Mindestmenge. Bearbeiten Sie diesen '

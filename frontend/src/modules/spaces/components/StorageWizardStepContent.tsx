@@ -168,6 +168,7 @@ export function StepContent({
                 variant={
                   parentName === s && !parentId ? "secondary" : "outline"
                 }
+                aria-pressed={parentName === s && !parentId}
                 size="sm"
                 onClick={() => onParentChip(s)}
               >
@@ -200,6 +201,7 @@ export function StepContent({
             <Button
               key={s}
               variant={locationName === s ? "secondary" : "outline"}
+              aria-pressed={locationName === s}
               size="sm"
               onClick={() => onLocationChip(s)}
             >
@@ -310,6 +312,7 @@ export function StepContent({
             <Button
               key={key}
               variant={checked ? "secondary" : "outline"}
+              aria-pressed={checked}
               onClick={() => toggleField(key)}
               className="w-full justify-start"
             >

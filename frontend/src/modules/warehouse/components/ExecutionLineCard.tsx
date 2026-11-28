@@ -183,6 +183,7 @@ function LineQuantityControls({
           <Button
             type="button"
             variant={isReasonEditorOpen ? "outline" : "ghost"}
+            aria-expanded={isReasonEditorOpen}
             size="sm"
             className="self-start"
             onClick={() => onReasonToggle(line.id)}

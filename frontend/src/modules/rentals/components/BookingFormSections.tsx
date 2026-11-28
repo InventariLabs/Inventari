@@ -72,6 +72,7 @@ export function BorrowerSection({
             key={kind}
             type="button"
             variant={who === kind ? "primary" : "outline"}
+            aria-pressed={who === kind}
             className="rounded-full"
             onClick={() => onWho(kind)}
           >
@@ -262,6 +263,7 @@ function LineEditor({
               type="button"
               size="sm"
               variant={line.kind === "model" ? "primary" : "outline"}
+              aria-pressed={line.kind === "model"}
               onClick={() => onUpdate({ kind: "model" })}
             >
               {t("form.modelLine")}
@@ -270,6 +272,7 @@ function LineEditor({
               type="button"
               size="sm"
               variant={line.kind === "asset" ? "primary" : "outline"}
+              aria-pressed={line.kind === "asset"}
               onClick={() => onUpdate({ kind: "asset" })}
             >
               {t("form.assetLine")}

@@ -162,6 +162,7 @@ export function BasicInfoSection({
               <Button
                 type="button"
                 variant={scanOpen ? "default" : "ghost"}
+                aria-expanded={scanOpen}
                 size="sm"
                 onClick={onToggleScan}
                 className={scanOpen ? "" : "text-on-secondary hover:text-on"}

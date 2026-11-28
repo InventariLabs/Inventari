@@ -82,7 +82,9 @@ class TestReorderGuardsInReadersLanguage:
                 safety_stock=Decimal('-1'),
             )
 
-        assert str(refusal.value) == 'safety_stock musi być >= 0, otrzymano -1'
+        assert str(refusal.value) == (
+            'Zapas bezpieczeństwa nie może być ujemny, otrzymano -1'
+        )
 
     @pytest.mark.asyncio
     async def test_creating_a_rule_below_zero_minimum_speaks_polish(self) -> None:
@@ -98,7 +100,9 @@ class TestReorderGuardsInReadersLanguage:
                 max_quantity=Decimal('20'),
             )
 
-        assert str(refusal.value) == 'min_quantity musi być >= 0, otrzymano -1'
+        assert str(refusal.value) == (
+            'Ilość minimalna nie może być ujemna, otrzymano -1'
+        )
 
 
 @pytest.mark.unit
@@ -117,7 +121,9 @@ class TestPricelistGuardsInReadersLanguage:
                 valid_from=date(2026, 1, 1),
             )
 
-        assert str(refusal.value) == 'unit_price musi być > 0, otrzymano 0'
+        assert str(refusal.value) == (
+            'Cena jednostkowa musi być większa od 0, otrzymano 0'
+        )
 
     @pytest.mark.asyncio
     async def test_creating_an_entry_with_a_zero_minimum_speaks_polish(self) -> None:
@@ -134,7 +140,9 @@ class TestPricelistGuardsInReadersLanguage:
                 min_quantity=Decimal('0'),
             )
 
-        assert str(refusal.value) == 'min_quantity musi być > 0, otrzymano 0'
+        assert str(refusal.value) == (
+            'Ilość minimalna musi być większa od 0, otrzymano 0'
+        )
 
     @pytest.mark.asyncio
     async def test_patching_an_entry_to_a_zero_price_speaks_polish(self) -> None:
@@ -143,7 +151,9 @@ class TestPricelistGuardsInReadersLanguage:
         with pytest.raises(ServiceRejectionError) as refusal:
             await _update(unit_price=Decimal('0'))
 
-        assert str(refusal.value) == 'unit_price musi być > 0, otrzymano 0'
+        assert str(refusal.value) == (
+            'Cena jednostkowa musi być większa od 0, otrzymano 0'
+        )
 
     @pytest.mark.asyncio
     async def test_patching_an_entry_to_a_zero_minimum_speaks_polish(self) -> None:
@@ -152,7 +162,9 @@ class TestPricelistGuardsInReadersLanguage:
         with pytest.raises(ServiceRejectionError) as refusal:
             await _update(min_quantity=Decimal('0'))
 
-        assert str(refusal.value) == 'min_quantity musi być > 0, otrzymano 0'
+        assert str(refusal.value) == (
+            'Ilość minimalna musi być większa od 0, otrzymano 0'
+        )
 
 
 @pytest.mark.unit

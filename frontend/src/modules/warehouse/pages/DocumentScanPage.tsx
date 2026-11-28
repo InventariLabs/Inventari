@@ -155,6 +155,7 @@ export default function DocumentScanPage() {
       <div className="flex gap-2">
         <Button
           variant={isCameraRunning ? "default" : "outline"}
+          aria-expanded={isCameraActive}
           size="sm"
           leftIcon={
             isCameraRunning ? <CameraOff size={16} /> : <Camera size={16} />

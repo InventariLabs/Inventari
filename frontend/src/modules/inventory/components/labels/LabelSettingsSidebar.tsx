@@ -134,6 +134,10 @@ export function LabelSettingsSidebar({
                   ? "default"
                   : "outline"
               }
+              aria-pressed={
+                printSettings.width === preset.width &&
+                printSettings.height === preset.height
+              }
               size="sm"
               onClick={() =>
                 setPrintSettings({

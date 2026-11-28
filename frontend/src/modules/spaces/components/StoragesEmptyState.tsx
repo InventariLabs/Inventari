@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { EyeOff, MapPin, Plus, Settings } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Archive, EyeOff, MapPin, Plus, Settings } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 
@@ -19,6 +19,9 @@ interface StoragesEmptyStateProps {
  * locations all belong to a module the policy keeps off general lists.
  * Answering the second with "no storages defined" read as the app losing
  * data, and its create button read as an invitation to make duplicates.
+ *
+ * Both carry the way to the archived locations: the tree, which holds that
+ * link otherwise, is not drawn without a row.
  */
 export function StoragesEmptyState({
   hasHidden,
@@ -27,21 +30,34 @@ export function StoragesEmptyState({
   const { t } = useTranslation(["locations"]);
   const navigate = useNavigate();
 
+  const archivedLink = (
+    <Link
+      to="/inventory/locations/archived"
+      className="inline-flex min-h-11 items-center gap-1.5 px-1 text-sm text-on-muted hover:text-on"
+    >
+      <Archive size={14} aria-hidden="true" />
+      {t("locations:tree.archivedLink")}
+    </Link>
+  );
+
   if (hasHidden) {
     return (
-      <EmptyState
-        icon={EyeOff}
-        title={t("locations:hidden.title")}
-        description={t("locations:hidden.description")}
-        primaryAction={
-          <Button
-            onClick={() => navigate("/settings#module-data")}
-            leftIcon={<Settings size={16} />}
-          >
-            {t("locations:hidden.openSettings")}
-          </Button>
-        }
-      />
+      <div className="flex flex-col items-center">
+        <EmptyState
+          icon={EyeOff}
+          title={t("locations:hidden.title")}
+          description={t("locations:hidden.description")}
+          primaryAction={
+            <Button
+              onClick={() => navigate("/settings#module-data")}
+              leftIcon={<Settings size={16} />}
+            >
+              {t("locations:hidden.openSettings")}
+            </Button>
+          }
+        />
+        {archivedLink}
+      </div>
     );
   }
 
@@ -63,6 +79,7 @@ export function StoragesEmptyState({
       >
         {t("locations:empty.addFirst")}
       </Button>
+      <div className="mt-4">{archivedLink}</div>
     </div>
   );
 }

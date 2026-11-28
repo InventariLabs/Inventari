@@ -149,6 +149,36 @@ def test_a_refusal_carries_its_key_and_the_values_it_names() -> None:
     assert exc.value.kwargs == {'path': 'n', 'limit': 5, 'value': 1}
 
 
+@pytest.mark.parametrize(
+    ('payload', 'required'),
+    [
+        ({'warranty_warning_days': 1.5}, []),
+        ({'warranty_warning_days': 0}, []),
+        ({}, ['warranty_warning_days']),
+    ],
+)
+def test_a_refusal_names_a_setting_by_its_title(
+    payload: dict[str, object], required: list[str]
+) -> None:
+    schema = {
+        'type': 'object',
+        'properties': {
+            'warranty_warning_days': {
+                'type': 'integer',
+                'minimum': 1,
+                'title': 'Warranty warning window (days)',
+            },
+        },
+        'required': required,
+    }
+
+    with pytest.raises(SchemaValidationError) as exc:
+        validate_payload_against_schema(payload, schema)
+
+    assert 'Warranty warning window (days)' in str(exc.value)
+    assert 'warranty_warning_days' not in str(exc.value)
+
+
 def test_a_schema_the_validator_cannot_read_is_the_authors_mistake() -> None:
     schema = {'type': 'object', 'properties': {'x': {'type': 'tuple'}}}
 

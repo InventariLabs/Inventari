@@ -557,6 +557,7 @@ function UnitReturnBlock({
               key={condition}
               type="button"
               variant={active ? "primary" : "outline"}
+              aria-pressed={active}
               className={
                 active && condition === "NEEDS_REPAIR"
                   ? "rounded-full border-amber-700 bg-amber-50 text-amber-900 hover:bg-amber-100"

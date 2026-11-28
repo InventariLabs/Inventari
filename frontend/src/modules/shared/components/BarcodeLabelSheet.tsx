@@ -136,6 +136,10 @@ export function BarcodeLabelSheet({
                   ? "default"
                   : "outline"
               }
+              aria-pressed={
+                options.width === preset.width &&
+                options.height === preset.height
+              }
               onClick={() =>
                 setOptions((o) => ({
                   ...o,

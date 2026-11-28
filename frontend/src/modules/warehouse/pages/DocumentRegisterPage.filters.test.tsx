@@ -176,6 +176,18 @@ describe.each([
     expect(lastRegisterParams()).toMatchObject({ group_by: "partner" });
   });
 
+  it("says which type chip and which grouping are chosen", async () => {
+    const user = userEvent.setup();
+    render(<DocumentRegisterPage />);
+    const chip = (name: string) => screen.getByRole("button", { name });
+    expect(chip("All")).toHaveAttribute("aria-pressed", "true");
+    await user.click(chip("Delivery"));
+    expect(chip("Delivery")).toHaveAttribute("aria-pressed", "true");
+    expect(chip("All")).toHaveAttribute("aria-pressed", "false");
+    await user.click(chip("Partner"));
+    expect(chip("Partner")).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("asks for the window between the two dates", () => {
     render(<DocumentRegisterPage />);
     fireEvent.change(screen.getByLabelText("From"), {
