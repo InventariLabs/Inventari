@@ -140,6 +140,9 @@ says what the release does rather than what changed since them.
   a cost put on a batch after it was posted, or a production run whose figure
   outgrows what a cost layer or a stock record can store is refused with the
   product, the amount and the limit named, instead of ending in a server error.
+- An asset held through a partner is listed in **My assets** of the user whose
+  e-mail address the partner carries, however either address is capitalised,
+  and the asset page words its return as the holder's.
 - A receipt written in another unit than the product is kept in records the
   price per the product's unit: 500 g at 0.02 opens a record at 20.00 a
   kilogram, not 0.02. A price, or a share of the delivery's costs, that comes
