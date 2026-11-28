@@ -123,6 +123,11 @@ says what the release does rather than what changed since them.
   other screen that looks codes up this way, codes are answered one at a time
   in the order they were read. A symbol the camera keeps reading is still one
   lookup, and the put-away button waits until the scan is answered.
+- A printed label's QR code is read by the phone camera in every browser. The
+  bundled scanner's zxing port fails to locate some valid matrices however
+  clean the picture — about one label in a hundred — so a second reader now
+  reads the frames it reports it cannot, a few times a second. Labels printed
+  before this change scan too.
 - A receipt written in another unit than the product is kept in records the
   price per the product's unit: 500 g at 0.02 opens a record at 20.00 a
   kilogram, not 0.02. A price, or a share of the delivery's costs, that comes

@@ -162,6 +162,8 @@ export interface FakeCamera {
   showEan13(code: string): Promise<void>;
   /** Put a QR code (up to 32 bytes of text) in front of the camera. */
   showQr(text: string): Promise<void>;
+  /** Put a QR's matrix, rows of dark modules, in front of the camera. */
+  showQrRows(rows: boolean[][]): Promise<void>;
   /** Take the code out of view. */
   hide(): Promise<void>;
   /** Whether the camera reports a torch (the default is none). */
@@ -196,6 +198,11 @@ async function attach(page: Page): Promise<FakeCamera> {
   return {
     showEan13: (code) => page.evaluate((bars) => (window as unknown as { __fakeCamera: Control }).__fakeCamera.showBars(bars), ean13Modules(code)),
     showQr: (text) => page.evaluate((all) => (window as unknown as { __fakeCamera: Control }).__fakeCamera.showMatrices(all), qrDrawings(text)),
+    showQrRows: (rows) =>
+      page.evaluate(
+        (matrix) => (window as unknown as { __fakeCamera: Control }).__fakeCamera.showMatrices([matrix]),
+        rows,
+      ),
     hide: () => page.evaluate(() => (window as unknown as { __fakeCamera: Control }).__fakeCamera.hide()),
     setTorch: (available) =>
       page.evaluate((on) => {
