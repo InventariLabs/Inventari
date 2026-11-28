@@ -24,7 +24,7 @@ from sqlalchemy.dialects import postgresql
 
 revision: str = '002_kits_and_reminders'
 down_revision: str | None = '001_initial'
-branch_labels: str | Sequence[str] | None = ('rentals',)
+branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 
