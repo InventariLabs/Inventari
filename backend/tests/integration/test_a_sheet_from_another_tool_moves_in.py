@@ -140,10 +140,15 @@ class TestEachToolsShapeMovesIn:
         self, real_async_db_session, async_test_user, async_test_storage_location
     ):
         db = real_async_db_session
+        # The product export moves the catalogue in first: the stock sheet's
+        # brackets name a reference only where a product already carries it.
         await _import(
             db,
             async_test_user,
-            [{'Name': 'Odoo Gouda', 'Internal Reference': 'CHE-002'}],
+            [
+                {'Name': 'Odoo Gouda', 'Internal Reference': 'CHE-002'},
+                {'Name': 'Odoo Brie', 'Internal Reference': 'CHE-003'},
+            ],
             {'name': 'Name', 'sku': 'Internal Reference'},
         )
         result = await _import(
@@ -676,10 +681,68 @@ class TestUnitsByTheirOtherNames:
         assert found == expected, written
 
 
+class TestABracketedNameIsAReferenceOnlyWhenItNamesOne:
+    async def test_a_bracket_holding_words_is_the_products_own_name(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ):
+        db = real_async_db_session
+        result = await _import(
+            db,
+            async_test_user,
+            [{'Name': '[2 pcs] Rv AA Batteries', 'Quantity': '3'}],
+            {'name': 'Name', 'quantity': 'Quantity'},
+        )
+
+        assert (result['imported'], result['failed']) == (1, 0), result
+        [product] = await _products(db, async_test_user)
+        assert (product.name, product.sku) == ('[2 pcs] Rv AA Batteries', None)
+        [item] = await _records(db, async_test_user, '[2 pcs] Rv AA Batteries')
+        assert item.quantity == Decimal('3')
+
+    async def test_a_bracket_holding_a_code_shaped_word_is_a_name_too(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ):
+        db = real_async_db_session
+        result = await _import(
+            db,
+            async_test_user,
+            [{'Name': '[A4] Rv Paper', 'Quantity': '2'}],
+            {'name': 'Name', 'quantity': 'Quantity'},
+        )
+
+        assert (result['imported'], result['failed']) == (1, 0), result
+        [product] = await _products(db, async_test_user)
+        assert (product.name, product.sku) == ('[A4] Rv Paper', None)
+
+    async def test_a_bracket_naming_a_products_code_is_read_as_its_reference(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ):
+        """The Odoo reading stays where it can be seen: the product carries the code."""
+        db = real_async_db_session
+        await _import(
+            db,
+            async_test_user,
+            [{'Name': 'Odoo Gouda', 'Internal Reference': 'CHE-002'}],
+            {'name': 'Name', 'sku': 'Internal Reference'},
+        )
+        result = await _import(
+            db,
+            async_test_user,
+            [{'Name': '[CHE-002] Gouda renamed in Odoo', 'Quantity': '3'}],
+            {'name': 'Name', 'quantity': 'Quantity'},
+        )
+
+        assert (result['imported'], result['failed']) == (1, 0), result
+        [product] = await _products(db, async_test_user)
+        assert (product.name, product.sku) == ('Odoo Gouda', 'CHE-002')
+        [item] = await _records(db, async_test_user, 'Odoo Gouda')
+        assert item.quantity == Decimal('3')
+
+
 class TestASkuFromASheet:
     MAPPING = {'name': 'Name', 'sku': 'Ref', 'quantity': 'Quantity'}
 
-    @pytest.mark.parametrize('code', ['LAMP.01', 'LAMP 01', '[LAMP.01] Lamp'])
+    @pytest.mark.parametrize('code', ['LAMP.01', 'LAMP 01'])
     async def test_a_code_the_form_cannot_hold_refuses_the_row_by_name(
         self,
         real_async_db_session,

@@ -35,7 +35,7 @@ from app.core.refused_rows import refused_rows_file
 from app.i18n._types import Language
 from app.i18n.service import get_current_lang, get_error_message
 from app.models.partner import Partner
-from app.schemas.partner import PartnerAddress, PartnerCreate
+from app.schemas.partner import PartnerAddress, PartnerCreate, PartnerUpdate
 from app.services import partner_service
 
 #: Address columns the sheet may carry; they fold into ``PartnerCreate.address``.
@@ -102,6 +102,8 @@ class _Known:
 
     by_name: dict[str, str] = field(default_factory=dict)
     by_tax: dict[str, str] = field(default_factory=dict)
+    #: The partner a contact person's row joins when its company is here.
+    ids: dict[str, UUID] = field(default_factory=dict)
 
     def remember(self, name: str, tax_id: str | None) -> None:
         self.by_name[_name_key(name)] = name
@@ -124,10 +126,13 @@ class _Known:
 async def _preload_known(db: AsyncSession, org_id: UUID | None) -> _Known:
     known = _Known()
     rows = await db.execute(
-        select(Partner.name, Partner.tax_id).where(Partner.organization_id == org_id)
+        select(Partner.name, Partner.tax_id, Partner.id)
+        .where(Partner.organization_id == org_id)
+        .order_by(Partner.created_at)
     )
-    for name, tax_id in rows.all():
+    for name, tax_id, partner_id in rows.all():
         known.remember(name, tax_id)
+        known.ids.setdefault(_name_key(name), partner_id)
     return known
 
 
@@ -175,6 +180,21 @@ def _contact_rows(
     return contacts
 
 
+def _contact_lines(
+    rows: list[tuple[int, str, pd.Series]], mapping: dict[str, Any]
+) -> tuple[str, list[str]]:
+    """The first contact person's name, and one line per person for the notes."""
+    names: list[str] = []
+    lines: list[str] = []
+    for _, _, row in rows:
+        cells = [
+            cell_text(row_get(row, mapping, key)) for key in ('name', 'email', 'phone')
+        ]
+        names.append(cells[0] or '')
+        lines.append(', '.join(cell for cell in cells if cell))
+    return names[0], lines
+
+
 def _with_contacts(
     partner_in: PartnerCreate,
     rows: list[tuple[int, str, pd.Series]],
@@ -182,21 +202,47 @@ def _with_contacts(
 ) -> PartnerCreate:
     """The company with its contact persons: the first one as its contact
     person, and each one's name, e-mail and phone as a line of its notes."""
-    names: list[str] = []
-    lines = [partner_in.notes] if partner_in.notes else []
-    for _, _, row in rows:
-        cells = [
-            cell_text(row_get(row, mapping, key)) for key in ('name', 'email', 'phone')
-        ]
-        names.append(cells[0] or '')
-        lines.append(', '.join(cell for cell in cells if cell))
+    first, lines = _contact_lines(rows, mapping)
+    notes = [partner_in.notes] if partner_in.notes else []
     return PartnerCreate.model_validate(
         partner_in.model_dump(exclude_unset=True)
         | {
-            'contact_person': partner_in.contact_person or names[0],
-            'notes': '\n'.join(lines),
+            'contact_person': partner_in.contact_person or first,
+            'notes': '\n'.join([*notes, *lines]),
         }
     )
+
+
+async def _attach_to_existing(
+    db: AsyncSession,
+    org_id: UUID,
+    partner_id: UUID,
+    rows: list[tuple[int, str, pd.Series]],
+    mapping: dict[str, Any],
+    user: UserContextDTO,
+) -> bool:
+    """Put the contacts onto the company the organization already has.
+
+    The first contact person fills an empty contact person; every one of them
+    becomes a line of the company's notes, the way it does for a company the
+    same file adds. ``False`` says the partner is gone, so the caller refuses
+    the rows by their company name.
+    """
+    partner = await partner_service.get_async(db, org_id, partner_id, for_update=True)
+    if partner is None:
+        return False
+    first, lines = _contact_lines(rows, mapping)
+    changes: dict[str, Any] = {}
+    if not partner.contact_person and first:
+        changes['contact_person'] = first
+    if lines:
+        notes = [partner.notes] if partner.notes else []
+        changes['notes'] = '\n'.join([*notes, *lines])
+    if changes:
+        await partner_service.update_async(
+            db, org_id, partner_id, PartnerUpdate(**changes), user_id=user.id
+        )
+    return True
 
 
 async def import_partners(
@@ -249,8 +295,24 @@ async def import_partners(
         imported += 1
         folded += len(contacts.pop(_name_key(partner_in.name), []))
 
-    # What is left belongs to a company this file did not add.
+    # What is left belongs to a company this file did not add: it joins the
+    # company the organization already has, by the same name key the file
+    # matches with, or is refused by its company's name.
     for rows in contacts.values():
+        partner_id = known.ids.get(_name_key(rows[0][1]))
+        if partner_id is not None:
+            try:
+                async with db.begin_nested():
+                    attached = await _attach_to_existing(
+                        db, org_id, partner_id, rows, mapping, user
+                    )
+            except Exception as exc:  # noqa: BLE001 — per-row errors are reported so the batch can continue
+                for index, _, _ in rows:
+                    errors.append({'row': index + 1, 'error': explain(exc, mapping)})
+                continue
+            if attached:
+                folded += len(rows)
+                continue
         for index, company, _ in rows:
             reason = get_error_message(
                 'partner_import_company_missing', get_current_lang(), company=company

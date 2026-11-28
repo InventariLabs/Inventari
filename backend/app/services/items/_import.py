@@ -716,6 +716,22 @@ class _RowResult:
         self.joined_existing = joined_existing
 
 
+async def _names_a_new_shelf(
+    ctx: _ImportContext, row: pd.Series, found: list[StockRecord]
+) -> bool:
+    """Whether the row names a shelf where the product it names has no record.
+
+    Leave alone tells the shelves apart as Overwrite does: a corrected sheet
+    is uploaded whole, and the shelf the product already sits on is left
+    alone while a shelf new to that product still arrives.
+    """
+    cells = _location_cells(ctx, row)
+    if not cells:
+        return False
+    location_id = await ctx.locations.resolve(cells)
+    return all(record.location_id != location_id for record in found)
+
+
 async def _record_to_overwrite(
     ctx: _ImportContext, row: pd.Series, found: list[StockRecord], name: str
 ) -> UUID:
@@ -837,9 +853,11 @@ async def _import_one_row(
     assert name is not None
     if ctx.on_label_match != 'add' and (found := ctx.existing.named_by_code(identity)):
         if ctx.on_label_match == 'skip':
-            return _RowResult(outcome='skipped')
-        record_id = await _record_to_overwrite(ctx, row, found, name)
-        return await _overwrite_existing(ctx, row, record_id, name, identity.sku)
+            if not await _names_a_new_shelf(ctx, row, found):
+                return _RowResult(outcome='skipped')
+        else:
+            record_id = await _record_to_overwrite(ctx, row, found, name)
+            return await _overwrite_existing(ctx, row, record_id, name, identity.sku)
 
     shelves = _shelves(ctx, row)
     if not shelves:

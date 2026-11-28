@@ -37,16 +37,21 @@ says what the release does rather than what changed since them.
 - Moving in from another tool: the product import suggests the columns of the
   exports of Odoo (products and stock), Sortly, inFlow, Zoho, Katana, BoxHero
   and Homebox, and maps the SKU, the description, the stock alert and a
-  sublocation. It finds a product by its SKU, reads Odoo's `[REF] Name`, puts
-  the stock of BoxHero's `Qty(<location>)` columns at each location, reads a
-  location written with slashes as nested locations (or as one name, by the
-  reader's choice), takes the last step of a category path, and knows units
-  such as `Units`, `ea` and `each` and their names in all six languages. A
-  row whose file names no location goes to the oldest real location, never to
-  one of the virtual places. The partner import reads a country by its name
-  and files a contact person's row with the company it belongs to. The
-  export's Read me sheet now says SKU, stock alert and description are read
-  back.
+  sublocation. It finds a product by its SKU, reads Odoo's `[REF] Name` where
+  the catalogue already carries that reference (a bracket naming no product
+  stays the name the sheet gives it, so `[2 pcs] Batteries` arrives as
+  written), puts the stock of BoxHero's `Qty(<location>)` columns at each
+  location, reads a location written with slashes as nested locations (or as
+  one name, by the reader's choice), takes the last step of a category path,
+  and knows units such as `Units`, `ea` and `each` and their names in all six
+  languages. A row whose file names no location goes to the oldest real
+  location, never to one of the virtual places. A repeated sheet in Leave
+  alone mode still adds a shelf the product has no record on, and a name too
+  long for the product's column is refused with that column and its limit
+  rather than as an internal error. The partner import reads a country by its
+  name and files a contact person's row with the company it belongs to,
+  including a company already in the database. The export's Read me sheet now
+  says SKU, stock alert and description are read back.
 - Inventari installs with one command, on a server with a domain or on a
   Linux computer at home:
   `curl -fsSL https://github.com/InventariLabs/Inventari/releases/latest/download/install.sh | sh -s -- vps`

@@ -165,7 +165,7 @@ class TestAContactPersonRow:
             'Jan Kowalski',
         ]
 
-    def test_a_contact_whose_company_the_file_does_not_add_is_named(
+    def test_a_contact_whose_company_is_already_here_joins_it(
         self, client: TestClient, auth_headers: dict, db_session: Session
     ):
         _import(client, auth_headers, [_odoo(Name='Here Already')])
@@ -174,15 +174,61 @@ class TestAContactPersonRow:
             client,
             auth_headers,
             [
-                _odoo(**{'Name': 'Eva', 'Related Company': 'Here Already'}),
-                _odoo(**{'Name': 'Ola', 'Related Company': 'Unlisted'}),
+                _odoo(
+                    **{
+                        'Name': 'Eva',
+                        'Related Company': 'Here Already',
+                        'Email': 'eva@here.example',
+                    }
+                ),
             ],
         )
 
-        assert (result['contacts'], result['failed']) == (0, 2), result
-        assert [e['row'] for e in result['errors']] == [1, 2]
-        assert 'Unlisted' in result['errors'][1]['error']
-        assert 'Eva' not in _partners(db_session)
+        assert (result['imported'], result['contacts'], result['failed']) == (
+            0,
+            1,
+            0,
+        ), result
+        partners = _partners(db_session)
+        assert 'Eva' not in partners
+        company = partners['Here Already']
+        assert company.contact_person == 'Eva'
+        assert company.notes == 'Eva, eva@here.example'
+
+    def test_a_contact_joins_the_notes_of_a_company_that_has_a_contact_person(
+        self, client: TestClient, auth_headers: dict, db_session: Session
+    ):
+        _import(client, auth_headers, [_odoo(Name='Here Already')])
+        company = _partners(db_session)['Here Already']
+        company.contact_person = 'Maria'
+        company.notes = 'Pays in 14 days'
+        db_session.commit()
+
+        result = _import(
+            client,
+            auth_headers,
+            [_odoo(**{'Name': 'Eva', 'Related Company': 'Here Already'})],
+        )
+
+        assert (result['contacts'], result['failed']) == (1, 0), result
+        db_session.expire_all()
+        company = _partners(db_session)['Here Already']
+        assert company.contact_person == 'Maria'
+        assert company.notes.split('\n') == ['Pays in 14 days', 'Eva']
+
+    def test_a_contact_whose_company_is_found_nowhere_is_named(
+        self, client: TestClient, auth_headers: dict, db_session: Session
+    ):
+        result = _import(
+            client,
+            auth_headers,
+            [_odoo(**{'Name': 'Ola', 'Related Company': 'Unlisted'})],
+        )
+
+        assert (result['contacts'], result['failed']) == (0, 1), result
+        assert result['errors'][0]['row'] == 1
+        assert 'Unlisted' in result['errors'][0]['error']
+        assert 'Ola' not in _partners(db_session)
 
     def test_a_company_naming_itself_is_a_partner(
         self, client: TestClient, auth_headers: dict, db_session: Session
