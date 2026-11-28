@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { FileDown, FileUp, MoreVertical, Plus } from "lucide-react";
 
 import Button from "@/components/ui/Button";
+import { useExportPreparing } from "@/modules/shared/lib/exportProgress";
 
 interface ItemsHeaderActionsProps {
   selectionMode: boolean;
@@ -45,6 +46,7 @@ export function ItemsHeaderActions({
   const disabledReason = t(
     listFailed ? "items:exportListFailed" : "items:exportNeedsProducts",
   );
+  const exporting = useExportPreparing("items-export");
 
   if (selectionMode) {
     // In selection mode the header's only job is to offer the way out.
@@ -89,6 +91,7 @@ export function ItemsHeaderActions({
           variant="outline"
           onClick={onExport}
           disabled={!hasRows}
+          isLoading={exporting}
           leftIcon={<FileDown size={16} className="text-amber-600" />}
           aria-describedby={hasRows ? undefined : "export-disabled-reason"}
         >

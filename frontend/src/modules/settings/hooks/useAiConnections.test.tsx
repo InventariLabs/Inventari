@@ -35,6 +35,7 @@ const purpose = (over: Partial<AiPurpose>): AiPurpose =>
   ({
     key: "vision.extract",
     usable: true,
+    server_default: false,
     bound_connection_id: null,
     ...over,
   }) as AiPurpose;

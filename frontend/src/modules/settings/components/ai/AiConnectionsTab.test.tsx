@@ -49,6 +49,7 @@ const purposes: AiPurpose[] = [
     capability: "vision",
     bound_connection_id: "conn-1",
     usable: true,
+    server_default: false,
   },
 ];
 
@@ -72,6 +73,7 @@ vi.mock("@/modules/settings/hooks/useAiConnections", () => ({
                   ...purposes[0],
                   bound_connection_id: null,
                   usable: noConnections.serverDefault,
+                  server_default: false,
                 },
               ]
             : purposes,

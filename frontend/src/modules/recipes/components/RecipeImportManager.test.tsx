@@ -80,6 +80,7 @@ function purposeBound(
     capability: "text",
     bound_connection_id,
     usable,
+    server_default: false,
   };
 }
 

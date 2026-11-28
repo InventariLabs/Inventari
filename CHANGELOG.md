@@ -118,6 +118,29 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Buttons that mark a choice by colour (category chips, a document's type and
+  grouping, label sizes, name suggestions, who borrows and in what condition a
+  unit came back) say to a screen reader which one is chosen, the buttons that
+  open a camera or a reason field say whether it is open, and the small text
+  actions on cards are readable in the light theme.
+- An empty location list keeps the link to the archived locations. Empty
+  partner, purchase order and reorder rule lists show their create button as an
+  outline, under the one in the page header.
+- A refused module setting names it by its title, and the reorder rule and
+  supplier price refusals speak in words instead of field names.
+- A missing-staple alert has the information colour. The Export buttons are
+  disabled, with a spinner, while their file is being prepared.
+- The AI model select calls its empty option *Server default model* whenever
+  choosing it lands there, and asks for a connection to be picked only where
+  one can be. For module authors and API clients, an AI purpose carries
+  `server_default`.
+- A session that ends under unsaved work says so even when the news arrives
+  with a late background read. A name typed on the registration form is not
+  replaced by the one from the approved request, a partner's name is saved
+  without surrounding spaces, and the sign-in page waits to know whether it is
+  a demo before showing the account form.
+- The frontend module SDK hands a module `useQueuedSearchParams`, which edits
+  the address without undoing a write the screen has not rendered yet.
 - A receipt written in another unit than the product is kept in records the
   price per the product's unit: 500 g at 0.02 opens a record at 20.00 a
   kilogram, not 0.02. A price, or a share of the delivery's costs, that comes

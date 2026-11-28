@@ -3,6 +3,7 @@ import { CheckSquare, FileDown, FileUp, Tag } from "lucide-react";
 
 import Button from "@/components/ui/Button";
 import { Sheet, SheetBody } from "@/components/ui/Sheet";
+import { useExportPreparing } from "@/modules/shared/lib/exportProgress";
 
 interface ItemsMobileActionsSheetProps {
   open: boolean;
@@ -41,6 +42,7 @@ export function ItemsMobileActionsSheet({
   onSelectItems,
 }: ItemsMobileActionsSheetProps) {
   const { t } = useTranslation(["items", "common"]);
+  const exporting = useExportPreparing("items-export");
 
   return (
     <Sheet
@@ -69,6 +71,7 @@ export function ItemsMobileActionsSheet({
             onExport();
           }}
           disabled={!hasRows}
+          isLoading={exporting}
           leftIcon={<FileDown size={16} className="text-amber-600" />}
           className="w-full justify-start"
         >

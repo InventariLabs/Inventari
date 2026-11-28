@@ -79,6 +79,32 @@ describe("SettingsDataTab", () => {
     );
   });
 
+  it("cannot start a second export while one is being prepared", async () => {
+    let answer!: () => void;
+    const answered = new Promise<void>((resolve) => {
+      answer = resolve;
+    });
+    server.use(
+      http.get("*/api/v1/items/export/xlsx", async () => {
+        await answered;
+        return HttpResponse.json(
+          { detail: { code: "FORBIDDEN", message: "No." } },
+          { status: 403 },
+        );
+      }),
+    );
+    renderTab();
+    const button = screen.getByRole("button", { name: /Export/ });
+
+    fireEvent.click(button);
+
+    expect(button).toBeDisabled();
+    expect(button.querySelector(".animate-spin")).not.toBeNull();
+    answer();
+    await waitFor(() => expect(button).toBeEnabled());
+    expect(button.querySelector(".animate-spin")).toBeNull();
+  });
+
   it("has no button that only looks disabled", () => {
     // `opacity-50 cursor-not-allowed` without `disabled`: greyed out to the
     // eye, focusable and clickable to everything else, including a screen

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Download, Upload } from "lucide-react";
+import { Download, Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 import { Card } from "@/components/ui/Card";
@@ -10,6 +10,7 @@ import { extractApiError } from "@/lib/errors";
 import {
   onePreparedAtATime,
   showExportProgress,
+  useExportPreparing,
 } from "@/modules/shared/lib/exportProgress";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { downloadBlob } from "@/utils/helpers";
@@ -22,6 +23,7 @@ export default function SettingsDataTab() {
   // single-product form asks for — a role that cannot add one product gets
   // no tile pointing at a wizard that would refuse every row.
   const canWriteItems = useCanWrite("items");
+  const exporting = useExportPreparing("export");
 
   const handleExport = () =>
     onePreparedAtATime("export", async () => {
@@ -52,12 +54,17 @@ export default function SettingsDataTab() {
         <Button
           type="button"
           onClick={handleExport}
+          disabled={exporting}
           variant="ghost"
           size="row"
           className="gap-4 px-4 py-4 rounded-none group"
         >
           <div className="w-9 h-9 rounded-xl bg-surface-raised flex items-center justify-center text-on-muted group-hover:text-accent-600 transition-colors shrink-0">
-            <Download size={17} />
+            {exporting ? (
+              <Loader2 size={17} className="animate-spin" />
+            ) : (
+              <Download size={17} />
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-on">

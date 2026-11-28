@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from "react";
 import type { TFunction } from "i18next";
 import { toast } from "sonner";
 import type { ExportProgress } from "@/lib/api/items";
@@ -21,6 +22,18 @@ export function showExportProgress(
 
 /** The exports being prepared, by the id of the notice each one reports to. */
 const preparing = new Set<string>();
+const watchers = new Set<() => void>();
+
+function watch(onChange: () => void): () => void {
+  watchers.add(onChange);
+  return () => watchers.delete(onChange);
+}
+
+/** Whether the export reporting to `toastId` is being prepared, for the
+ *  button that starts it to show. */
+export function useExportPreparing(toastId: string): boolean {
+  return useSyncExternalStore(watch, () => preparing.has(toastId));
+}
 
 /**
  * Runs `work` — a screen's export, from the first notice to the download —
@@ -35,9 +48,11 @@ export async function onePreparedAtATime(
 ): Promise<void> {
   if (preparing.has(toastId)) return;
   preparing.add(toastId);
+  watchers.forEach((changed) => changed());
   try {
     await work();
   } finally {
     preparing.delete(toastId);
+    watchers.forEach((changed) => changed());
   }
 }

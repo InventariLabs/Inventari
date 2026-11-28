@@ -1,9 +1,10 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { signInWith, signOut } from "@/test/auth";
 import { AssetListHeaderActions } from "../components/AssetListHeaderActions";
+import { onePreparedAtATime } from "@/modules/shared/lib/exportProgress";
 
 function renderActions(canWrite: boolean, canExport = true) {
   signInWith(canExport ? ["items:read"] : []);
@@ -49,6 +50,32 @@ describe("AssetListHeaderActions", () => {
     expect(
       screen.queryByRole("link", { name: /Add Asset/ }),
     ).not.toBeInTheDocument();
+  });
+
+  it("shows Export busy while the equipment export is being prepared", async () => {
+    let finish!: () => void;
+    renderActions(true);
+    const button = screen.getByRole("button", { name: "Export" });
+    let running!: Promise<void>;
+
+    act(() => {
+      running = onePreparedAtATime(
+        "eq-export",
+        () =>
+          new Promise<void>((resolve) => {
+            finish = resolve;
+          }),
+      );
+    });
+
+    expect(button).toBeDisabled();
+    expect(button.querySelector(".animate-spin")).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Import" })).toBeEnabled();
+    await act(async () => {
+      finish();
+      await running;
+    });
+    expect(button).toBeEnabled();
   });
 
   it("disables Export, with the reason, for an account the export would refuse", async () => {

@@ -64,6 +64,7 @@ describe("PurposeBindingSelect", () => {
       capability: "vision",
       bound_connection_id: null,
       usable: false,
+      server_default: false,
     };
 
     render(
@@ -85,6 +86,7 @@ describe("PurposeBindingSelect", () => {
       capability: "vision",
       bound_connection_id: "conn-1",
       usable: true,
+      server_default: false,
     };
 
     render(
@@ -111,6 +113,7 @@ describe("PurposeBindingSelect", () => {
       capability: "vision",
       bound_connection_id: null,
       usable: false,
+      server_default: false,
     };
 
     const user = userEvent.setup();
@@ -143,6 +146,7 @@ describe("PurposeBindingSelect", () => {
       capability: "text",
       bound_connection_id: null,
       usable: false,
+      server_default: false,
     };
 
     render(
@@ -168,6 +172,7 @@ describe("PurposeBindingSelect", () => {
       capability: "text",
       bound_connection_id: null,
       usable: false,
+      server_default: false,
     };
 
     // Only the vision connection exists, so nothing answers for text — the
@@ -197,6 +202,7 @@ describe("PurposeBindingSelect", () => {
       capability: "text",
       bound_connection_id: null,
       usable: false,
+      server_default: false,
     };
 
     render(
@@ -228,6 +234,7 @@ describe("PurposeBindingSelect", () => {
       capability: "vision",
       bound_connection_id: null,
       usable: false,
+      server_default: false,
     };
 
     render(
@@ -251,6 +258,7 @@ describe("PurposeBindingSelect", () => {
       capability: "vision",
       bound_connection_id: null,
       usable: false,
+      server_default: false,
     };
 
     render(
@@ -276,6 +284,7 @@ describe("whose purpose this is", () => {
       capability: "text",
       bound_connection_id: null,
       usable: false,
+      server_default: false,
     };
 
     render(
@@ -297,6 +306,7 @@ describe("PurposeBindingSelect — telling the options apart", () => {
     capability: "vision",
     bound_connection_id: null,
     usable: false,
+    server_default: false,
   };
 
   const conn = (over: Partial<AiConnection>): AiConnection => ({
@@ -392,6 +402,7 @@ describe("PurposeBindingSelect — telling the options apart", () => {
             ...visionPurpose,
             bound_connection_id: "c1",
             usable: false,
+            server_default: false,
           }}
           connections={[
             conn({

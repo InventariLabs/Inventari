@@ -22,6 +22,7 @@ const mockPurposes = vi.hoisted(() => ({
       owner_module: "recipes",
       bound_connection_id: null,
       usable: false,
+      server_default: false,
     },
     {
       key: "recipes.url_fetch",
@@ -31,6 +32,7 @@ const mockPurposes = vi.hoisted(() => ({
       owner_module: "recipes",
       bound_connection_id: null,
       usable: false,
+      server_default: false,
     },
   ],
   connections: [],

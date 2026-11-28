@@ -4,6 +4,7 @@ import { Plus, FileDown, Upload } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { useHasPermission } from "@/module-sdk";
+import { useExportPreparing } from "@/modules/shared/lib/exportProgress";
 
 interface AssetListHeaderActionsProps {
   canWrite: boolean;
@@ -31,6 +32,7 @@ export function AssetListHeaderActions({
   // The export runs through the Core items export, which checks `items:read`.
   const canExport = useHasPermission("items:read");
   const disabledReason = t("list.export_needs_read");
+  const exporting = useExportPreparing("eq-export");
   const tools = [
     {
       id: "export",
@@ -38,6 +40,7 @@ export function AssetListHeaderActions({
       icon: <FileDown size={16} className="text-amber-600" />,
       onSelect: onExport,
       disabled: !canExport,
+      busy: exporting,
     },
     ...(canWrite
       ? [
@@ -47,6 +50,7 @@ export function AssetListHeaderActions({
             icon: <Upload size={16} />,
             onSelect: onImport,
             disabled: false,
+            busy: false,
           },
         ]
       : []),
@@ -54,7 +58,7 @@ export function AssetListHeaderActions({
 
   return (
     <div className="flex items-center justify-end gap-2 ml-auto min-w-0">
-      {tools.map(({ id, label, icon, onSelect, disabled }) => (
+      {tools.map(({ id, label, icon, onSelect, disabled, busy }) => (
         // A disabled button takes no pointer events, so the reason rides on
         // the wrapper.
         <span
@@ -68,6 +72,7 @@ export function AssetListHeaderActions({
             leftIcon={icon}
             onClick={onSelect}
             disabled={disabled}
+            isLoading={busy}
             aria-label={label}
             aria-describedby={
               disabled ? "asset-export-disabled-reason" : undefined
