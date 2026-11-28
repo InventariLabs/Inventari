@@ -118,6 +118,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A code scanned while the one before it is still being looked up is no longer
+  dropped without a word: on the put-away sheet, phone receiving and every
+  other screen that looks codes up this way, codes are answered one at a time
+  in the order they were read. A symbol the camera keeps reading is still one
+  lookup, and the put-away button waits until the scan is answered.
 - A receipt written in another unit than the product is kept in records the
   price per the product's unit: 500 g at 0.02 opens a record at 20.00 a
   kilogram, not 0.02. A price, or a share of the delivery's costs, that comes
