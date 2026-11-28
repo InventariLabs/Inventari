@@ -3,12 +3,12 @@
  * check-empty-state.mjs
  *
  * A page's empty state is the first screen a new organization sees of a
- * module, and UI_GUIDELINES §11.7 asks it to read as an invitation: a title,
- * a description, and an action. The `<EmptyState>` component takes
- * `description` as an optional prop, so nothing stopped a page from shipping
- * the description inside the title — "No locations yet. Add your first."
- * rendered as one heading, in heading weight, over a button repeating the
- * second half.
+ * module, and UI_GUIDELINES §11.7 asks it for a title and a separate
+ * description; whether it also carries the call to action is the page's
+ * choice, so this gate does not look for one. The `<EmptyState>` component
+ * takes `description` as an optional prop, so without the gate a page can
+ * ship the description inside the title — "No locations yet. Add your first."
+ * rendered as one heading, in heading weight.
  *
  * The rule is about pages, not about panels: a compact empty state inside a
  * card, a tab or a modal may stand as a single line. So this gate scans the
@@ -41,7 +41,7 @@ const PAGE = /^modules\/[^/]+\/pages\/.*Page\.tsx$/;
  * extractions do this) keeps the page's duty, so a module file named
  * `*EmptyState.tsx` is scanned wherever it sits.
  */
-const EMPTY_STATE_HELPER = /^modules\/[^/]+\/(?:.*\/)?[A-Za-z]*EmptyState\.tsx$/;
+const EMPTY_STATE_HELPER = /^modules\/[^/]+\/(?:.*\/)?[^/]*EmptyState\.tsx$/;
 
 export function isScanned(rel) {
   return (
@@ -113,7 +113,7 @@ function runCli() {
       );
       for (const f of findings) console.error(`  ${f}`);
       console.error(
-        "Give the page's empty state a description — title, description and action are the shape UI_GUIDELINES §11.7 asks of it (panels and cards keep theirs optional).",
+        "Give the page's empty state a description — UI_GUIDELINES §11.7 asks a page for a title and a description (panels and cards keep theirs optional).",
       );
     }
     process.exit(1);

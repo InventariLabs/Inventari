@@ -94,6 +94,8 @@ describe("check-empty-state", () => {
     for (const path of [
       "modules/recipes/pages/UnitConversionsEmptyState.tsx",
       "modules/inventory/components/items/ItemsEmptyState.tsx",
+      "modules/recipes/pages/Step2EmptyState.tsx",
+      "modules/recipes/components/bulk-import.EmptyState.tsx",
     ]) {
       const findings = findViolations([{ path, text: helper }]);
       expect(findings.length).toBe(1);
