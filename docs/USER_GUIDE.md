@@ -388,8 +388,12 @@ alert** and a **Sublocation**.
   location, **Leave alone** adds the row there, so a corrected sheet can be
   uploaded whole, and **Overwrite** refuses the row and names the location. A
   row that cannot say which of several records it means is refused by
-  **Overwrite**. In **Add anyway** mode, a file whose every row finds stock
-  already here says so before it is imported.
+  **Overwrite**. In a file with a quantity column per location, **Leave
+  alone** adds the filled cells of the locations where a product named by SKU
+  or barcode has no record and leaves the others, and **Overwrite** writes no
+  stock into any location: it writes the other columns onto the product's
+  record. In **Add anyway** mode, a file whose every row finds stock already
+  here says so before it is imported.
 - The result counts every refused row and lists the first few.
   **Download refused rows** gives all of them back in the format you uploaded,
   with your columns and the reason beside each: correct them and upload that

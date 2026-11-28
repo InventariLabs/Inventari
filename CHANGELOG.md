@@ -174,7 +174,10 @@ says what the release does rather than what changed since them.
   (`POST /items/import/check`). Where a product found by its SKU or barcode has
   no record at the location a row names, **Leave alone** adds the row there and
   **Overwrite** refuses it, naming the location, instead of moving the record;
-  a Label Code names one record in both modes, wherever it stands.
+  a Label Code names one record in both modes, wherever it stands. In a file
+  with a quantity column per location, **Leave alone** adds the quantities for
+  the locations where the product has no record, and **Overwrite** writes no
+  stock.
 
 ### Fixed
 

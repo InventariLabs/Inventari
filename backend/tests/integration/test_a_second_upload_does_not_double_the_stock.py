@@ -255,6 +255,85 @@ class TestASecondUploadDoesNotDoubleTheStock:
         assert (result['imported'], result['joined_existing']) == (1, 1), result
 
 
+_PER_LOCATION_MAPPING = {
+    'name': 'Name',
+    'sku': 'SKU',
+    'barcode': 'Barcode',
+    'brand': 'Brand',
+    'stock_at:Shop': 'Qty(Shop)',
+    'stock_at:Van': 'Qty(Van)',
+}
+
+
+async def _upload_per_location(db, user, shop, van, mode, **extra):
+    row = {
+        'Name': 'Rice',
+        'SKU': '',
+        'Barcode': '',
+        'Brand': '',
+        'Qty(Shop)': shop,
+        'Qty(Van)': van,
+        **extra,
+    }
+    result = await import_items(
+        db,
+        _csv([row]),
+        'stock.csv',
+        _PER_LOCATION_MAPPING,
+        _ctx(user),
+        on_label_match=mode,
+    )
+    await db.commit()
+    return result
+
+
+@pytest.mark.integration
+@pytest.mark.asyncio
+class TestASheetWithAQuantityColumnPerLocation:
+    @pytest.mark.parametrize('code', [{'SKU': 'RI-1'}, {'Barcode': '5901234123457'}])
+    async def test_skip_mode_adds_only_the_locations_new_to_the_product(
+        self, real_async_db_session, async_test_user, code
+    ):
+        db = real_async_db_session
+        await _upload_per_location(db, async_test_user, '5', '', 'skip', **code)
+
+        second = await _upload_per_location(
+            db, async_test_user, '99', '3', 'skip', **code
+        )
+        third = await _upload_per_location(
+            db, async_test_user, '99', '3', 'skip', **code
+        )
+
+        assert (second['imported'], second['skipped'], second['total']) == (
+            1,
+            0,
+            1,
+        ), second
+        assert second['joined_existing'] == 1, second
+        assert (third['imported'], third['skipped']) == (0, 1), third
+        assert await _shelves(db, async_test_user.organization_id) == [
+            ('Shop', Decimal('5')),
+            ('Van', Decimal('3')),
+        ]
+
+    async def test_overwrite_writes_the_product_columns_and_no_stock(
+        self, real_async_db_session, async_test_user
+    ):
+        db = real_async_db_session
+        await _upload_per_location(db, async_test_user, '5', '', 'add', SKU='RI-1')
+
+        result = await _upload_per_location(
+            db, async_test_user, '99', '3', 'overwrite', SKU='RI-1', Brand='Mill'
+        )
+
+        assert (result['updated'], result['imported']) == (1, 0), result
+        assert await _shelves(db, async_test_user.organization_id) == [
+            ('Shop', Decimal('5'))
+        ]
+        branded = await db.execute(select(Item.quantity).where(Item.brand == 'Mill'))
+        assert branded.scalars().all() == [Decimal('5')]
+
+
 @pytest.mark.integration
 @pytest.mark.asyncio
 class TestTheSheetIsToldWhatItWillAddAgain:
