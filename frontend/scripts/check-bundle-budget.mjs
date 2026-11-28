@@ -720,7 +720,9 @@ const dist = join(root, "dist");
  * scanner, not with the first paint: app first paint (415.2 of 420), login
  * (420.1 of 425), launcher (435.0 of 440) and receive (492.5 of 495) stand
  * as they were, and initial is 194.6 of 245. The four budgets move by the
- * reading plus a step of five, to 705, 650, 675 and 685.
+ * reading plus a step of five, to 705, 650, 675 and 685. Merged with the
+ * development line at 7907aca735, the same screens measure 701.2, 647.4,
+ * 672.7 and 680.6, still inside those.
  */
 const BUDGETS = {
   initial: 245,
