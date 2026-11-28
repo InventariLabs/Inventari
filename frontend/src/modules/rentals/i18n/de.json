@@ -121,11 +121,12 @@
     "removeLine": "Position entfernen",
     "doesNotFit": "In diesem Zeitraum sind nur {{available}} von {{requested}} frei",
     "blocked": "Im Service bis {{date}} · {{reason}}",
+    "heldOpen": "{{name}}, ab {{from}} bis zur Rückgabe",
     "busy": "{{name}}, {{from}} – {{to}}",
     "reduceTo_one": "Auf {{count}} Gerät reduzieren",
     "reduceTo_other": "Auf {{count}} Geräte reduzieren",
     "moveTo": "Auf {{from}} – {{to}} verschieben, wenn genug frei sind",
-    "addLine": "Gerät hinzufügen (Modell oder konkretes Gerät)",
+    "addLine": "Ausrüstung hinzufügen (ein Modell, ein bestimmtes Stück oder ein Set)",
     "note": "Notiz (optional)",
     "notePlaceholder": "z. B. Herr Nowak holt es ab",
     "needBorrower": "Wählen Sie, wer nimmt",
@@ -278,7 +279,7 @@
       },
       "borrower": {
         "title": "Ausleihende ohne Konto",
-        "body": "Eine Buchung kann einen Partner, ein Mitglied oder eine Person außerhalb des Systems mit Name und E-Mail nennen. Die Partnerseite zeigt vergangene und kommende Ausleihen, die Zeitleiste eines Gegenstands die Buchungen, an denen er beteiligt war."
+        "body": "Eine Buchung kann einen Partner, ein Mitglied oder eine Person außerhalb des Systems nennen. Ein Name mit E-Mail-Adresse wird als Partner gespeichert, wenn Sie Partner anlegen dürfen, sodass die nächste Buchung zur selben Historie gehört. Die Partnerseite zeigt vergangene und kommende Ausleihen, und der Verlauf eines Geräts zeigt die Buchungen, an denen es beteiligt war."
       }
     },
     "rulesTitle": "Regeln des Moduls",
@@ -287,7 +288,7 @@
       "block": "Eine manuelle oder Service-Sperre darf keine bestehende Buchung treffen, und in eine Sperre darf nicht gebucht werden.",
       "overdue": "Überfällig wird aus Zeitraum und Status gelesen, nie gespeichert; Verlängern verschiebt auch die erwartete Rückgabe der Ausgabe.",
       "partial": "Eine Buchung kann in Teilen zurückkommen: Die noch draußen befindlichen Stücke halten sie ausgegeben und überfällig, die zurückgegebenen sind sofort frei.",
-      "kits": "Ein Set kann nicht gebucht werden, solange ein Bestandteil belegt ist; es wird als Ganzes ausgegeben und zurückgenommen.",
+      "kits": "Ein Set kann nicht gebucht werden, solange eines seiner Teile belegt ist. Es wird als Ganzes gebucht und ausgegeben; seine Teile können gemeinsam oder einzeln zurückkommen.",
       "reminders": "Die ausleihende Person wird vor dem Ende des Zeitraums per E-Mail erinnert und danach einmal täglich, solange die Buchung überfällig ist — nach der Uhr der Organisation.",
       "bookAgain": "„Erneut buchen“ kopiert Ausleihende und Positionen einer abgeschlossenen Buchung in einen neuen Entwurf mit neuen Daten; gespeichert wird erst mit „Buchen“."
     },

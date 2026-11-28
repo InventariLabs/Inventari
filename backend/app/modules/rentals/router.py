@@ -150,7 +150,7 @@ async def create_booking_endpoint(
     org_id: UUID = Depends(require_org),
 ) -> BookingSchema:
     try:
-        booking = await service.create_booking(db, org_id, data, current_user.id)
+        booking = await service.create_booking(db, org_id, data, current_user)
     except RentalConflictError as exc:
         raise _conflict(exc) from exc
     assets = await equipment_api.list_bookable_assets_async(

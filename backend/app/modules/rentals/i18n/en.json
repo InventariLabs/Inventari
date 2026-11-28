@@ -20,7 +20,6 @@
   "rental_kit_name_taken": "A kit with this name already exists.",
   "rental_kit_needs_name": "Give the kit a name.",
   "rental_kit_not_found": "Kit not found.",
-  "rental_kit_not_in_booking": "This kit is not part of the booking.",
   "rental_line_names_one_kind": "A line names one thing: a unit, a model, or a kit.",
   "rental_model_line_needs_model": "Choose a model for the line.",
   "rental_model_not_in_fleet": "No unit of this model is in the register.",

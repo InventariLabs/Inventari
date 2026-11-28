@@ -1152,7 +1152,6 @@ ERRORS_DE: ErrorMessages = {
     'rental_kit_member_on_two_lines': 'Ein Gegenstand steht auf zwei Positionen des Sets.',
     'rental_kit_name_taken': 'Ein Set mit diesem Namen existiert bereits.',
     'rental_kit_needs_name': 'Geben Sie dem Set einen Namen.',
-    'rental_kit_not_in_booking': 'Dieses Set gehört nicht zur Buchung.',
     'rental_model_not_in_fleet': 'Kein Gegenstand dieses Modells ist im Register.',
     'rental_return_unknown_unit': 'Wählen Sie die Gegenstände, die zurückkommen.',
 }

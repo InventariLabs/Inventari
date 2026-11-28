@@ -131,13 +131,14 @@
     "removeLine": "Usuń pozycję",
     "doesNotFit": "W tym czasie wolne są tylko {{available}} z {{requested}}",
     "blocked": "W serwisie do {{date}} · {{reason}}",
+    "heldOpen": "{{name}}, od {{from}} do czasu zwrotu",
     "busy": "{{name}}, {{from}} – {{to}}",
     "reduceTo_one": "Zmniejsz do {{count}} sztuki",
     "reduceTo_few": "Zmniejsz do {{count}} sztuk",
     "reduceTo_many": "Zmniejsz do {{count}} sztuk",
     "reduceTo_other": "Zmniejsz do {{count}} sztuki",
     "moveTo": "Przesuń na {{from}} – {{to}}, gdy wolne są wszystkie",
-    "addLine": "Dodaj sprzęt (model albo konkretną sztukę)",
+    "addLine": "Dodaj sprzęt (model, konkretną sztukę lub zestaw)",
     "note": "Notatka (opcjonalnie)",
     "notePlaceholder": "np. odbierze pan Nowak",
     "needBorrower": "Wybierz, kto bierze",
@@ -298,7 +299,7 @@
       },
       "borrower": {
         "title": "Biorący bez konta",
-        "body": "Rezerwacja może wskazać partnera, członka organizacji albo osobę spoza systemu z imieniem i adresem e-mail. Strona partnera pokazuje jego minione i nadchodzące wypożyczenia, a oś czasu zasobu — rezerwacje, w których brał udział."
+        "body": "Rezerwacja może wskazywać kontrahenta, członka organizacji albo osobę spoza systemu. Imię i nazwisko podane z adresem e-mail zostaje zapisane jako kontrahent, jeśli masz prawo dodawać kontrahentów, więc kolejna rezerwacja trafia do tej samej historii. Strona kontrahenta pokazuje jego przeszłe i nadchodzące wypożyczenia, a oś czasu zasobu – rezerwacje, w których brał udział."
       }
     },
     "rulesTitle": "Zasady, których moduł pilnuje",
@@ -307,7 +308,7 @@
       "block": "Blokada ręczna ani serwisowa nie może objąć istniejącej rezerwacji, a rezerwacji nie można zrobić w blokadzie.",
       "overdue": "Spóźnienie czyta się z terminu i statusu, nigdy nie jest zapisywane; przedłużenie przesuwa też oczekiwany zwrot wydania.",
       "partial": "Rezerwacja może wracać częściami: zasoby, które zostały na zewnątrz, utrzymują status wydania i spóźnienie, a zwrócone są wolne od razu.",
-      "kits": "Zestawu nie można zarezerwować, gdy któryś z jego elementów jest zajęty; zestaw wydaje się i przyjmuje jako całość.",
+      "kits": "Zestawu nie można zarezerwować, gdy którykolwiek z jego elementów jest zajęty. Rezerwuje się go i wydaje jako całość; jego sztuki mogą wrócić razem albo pojedynczo.",
       "reminders": "Biorący dostaje przypomnienie e-mailem przed końcem okna i raz dziennie, gdy rezerwacja jest spóźniona — według zegara organizacji.",
       "bookAgain": "„Zarezerwuj ponownie” kopiuje biorącego i pozycje zakończonej rezerwacji do nowego szkicu z nowymi datami; nic nie zostaje zapisane, dopóki nie naciśniesz Zarezerwuj."
     },

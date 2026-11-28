@@ -19,8 +19,9 @@ from sqlalchemy.orm import selectinload
 
 from app.core.module_sdk import format_datetime_for, get_logger
 from app.core.public_api import core_api
+from app.modules.equipment.equipment_api import EquipmentAssetDTO, equipment_api
 
-from .models import RentalBooking, RentalBookingLine
+from .models import RentalBooking
 
 logger = get_logger(__name__)
 
@@ -45,6 +46,8 @@ LABELS: dict[str, dict[str, str]] = {
             'The rental of <b>{what}</b> was due on <b>{due}</b> and is '
             '<b>{days}</b> late. Please return it as soon as possible.'
         ),
+        'day_one': 'day',
+        'day_other': 'days',
         'footer': 'This is an automated message from Inventari.',
     },
     'pl': {
@@ -61,6 +64,8 @@ LABELS: dict[str, dict[str, str]] = {
             'Wypożyczenie <b>{what}</b> miało zostać zwrócone <b>{due}</b> '
             'i jest spóźnione o <b>{days}</b>. Zwróć je jak najszybciej.'
         ),
+        'day_one': 'dzień',
+        'day_other': 'dni',
         'footer': 'To jest automatyczna wiadomość z systemu Inventari.',
     },
     'de': {
@@ -79,6 +84,8 @@ LABELS: dict[str, dict[str, str]] = {
             'ist <b>{days}</b> überfällig. Bitte geben Sie sie so bald wie '
             'möglich zurück.'
         ),
+        'day_one': 'Tag',
+        'day_other': 'Tage',
         'footer': 'Dies ist eine automatische Nachricht von Inventari.',
     },
     'fr': {
@@ -96,6 +103,8 @@ LABELS: dict[str, dict[str, str]] = {
             'La location de <b>{what}</b> devait être rendue le <b>{due}</b> '
             'et a <b>{days}</b> de retard. Veuillez la rapporter dès que possible.'
         ),
+        'day_one': 'jour',
+        'day_other': 'jours',
         'footer': "Ceci est un message automatique d'Inventari.",
     },
     'es': {
@@ -112,6 +121,8 @@ LABELS: dict[str, dict[str, str]] = {
             'El alquiler de <b>{what}</b> debía devolverse el <b>{due}</b> y '
             'lleva <b>{days}</b> de retraso. Devuélvalo lo antes posible.'
         ),
+        'day_one': 'día',
+        'day_other': 'días',
         'footer': 'Este es un mensaje automático de Inventari.',
     },
     'pt': {
@@ -128,6 +139,8 @@ LABELS: dict[str, dict[str, str]] = {
             'O aluguer de <b>{what}</b> devia ser devolvido a <b>{due}</b> e '
             'está <b>{days}</b> atrasado. Devolva-o o mais depressa possível.'
         ),
+        'day_one': 'dia',
+        'day_other': 'dias',
         'footer': 'Esta é uma mensagem automática do Inventari.',
     },
 }
@@ -143,19 +156,23 @@ def _late_days(ends_at: datetime, now: datetime) -> int:
     return max(1, (now.date() - ends_at.date()).days)
 
 
-def _what(booking: RentalBooking) -> str:
+def _what(booking: RentalBooking, assets: dict[UUID, EquipmentAssetDTO]) -> str:
+    """The units still out, by name and serial: what has to come back."""
     parts: list[str] = []
-    seen_kits: set[UUID] = set()
-    for line in booking.lines:
-        if line.kit_id is not None:
-            if line.kit_id in seen_kits:
-                continue
-            seen_kits.add(line.kit_id)
-            parts.append(line.kit_name or '')
+    for unit in booking.units:
+        asset = assets.get(unit.item_id)
+        if unit.returned_at is not None or asset is None:
             continue
-        if line.model:
-            parts.append(line.model)
-    return ', '.join(part for part in parts if part) or '—'
+        serial = f' ({asset.serial_number})' if asset.serial_number else ''
+        parts.append(asset.name + serial)
+    return ', '.join(parts) or '—'
+
+
+async def _assets(db: AsyncSession, org_id: UUID) -> dict[UUID, EquipmentAssetDTO]:
+    assets = await equipment_api.list_bookable_assets_async(
+        db, org_id, include_retired=True
+    )
+    return {asset.id: asset for asset in assets}
 
 
 def _html(
@@ -184,7 +201,10 @@ async def _language_of_creator(db: AsyncSession, booking: RentalBooking) -> str:
 
 
 async def _send_end_reminder(
-    db: AsyncSession, booking: RentalBooking, now: datetime
+    db: AsyncSession,
+    booking: RentalBooking,
+    assets: dict[UUID, EquipmentAssetDTO],
+    now: datetime,
 ) -> bool:
     lang = await _language_of_creator(db, booking)
     labels = _labels(lang)
@@ -192,7 +212,7 @@ async def _send_end_reminder(
         lang, booking.ends_at.astimezone(await _timezone(db, booking.organization_id))
     )
     body = labels['end_body'].format(
-        what=markupsafe.escape(_what(booking)),
+        what=markupsafe.escape(_what(booking, assets)),
         until=markupsafe.escape(until),
     )
     sent = await core_api.email.send_async(
@@ -207,16 +227,21 @@ async def _send_end_reminder(
 
 
 async def _send_late_reminder(
-    db: AsyncSession, booking: RentalBooking, now: datetime
+    db: AsyncSession,
+    booking: RentalBooking,
+    assets: dict[UUID, EquipmentAssetDTO],
+    now: datetime,
 ) -> bool:
     lang = await _language_of_creator(db, booking)
     labels = _labels(lang)
     tz = await _timezone(db, booking.organization_id)
     due = format_datetime_for(lang, booking.ends_at.astimezone(tz))
+    days = _late_days(booking.ends_at, now)
+    unit = labels['day_one' if days == 1 else 'day_other']
     body = labels['late_body'].format(
-        what=markupsafe.escape(_what(booking)),
+        what=markupsafe.escape(_what(booking, assets)),
         due=markupsafe.escape(due),
-        days=_late_days(booking.ends_at, now),
+        days=f'{days} {unit}',
     )
     sent = await core_api.email.send_async(
         booking.borrower_email or '',
@@ -240,11 +265,7 @@ async def _outstanding_bookings(
         (
             await db.execute(
                 select(RentalBooking)
-                .options(
-                    selectinload(RentalBooking.lines).selectinload(
-                        RentalBookingLine.units
-                    )
-                )
+                .options(selectinload(RentalBooking.units))
                 .where(
                     RentalBooking.organization_id == org_id,
                     RentalBooking.status == 'PICKED_UP',
@@ -253,7 +274,6 @@ async def _outstanding_bookings(
                 )
             )
         )
-        .unique()
         .scalars()
         .all()
     )
@@ -289,17 +309,18 @@ async def check_organization_reminders(
             ),
         ),
     )
+    assets = await _assets(db, org_id) if due_end or late else {}
     end_sent = 0
     late_sent = 0
     for booking in due_end:
         try:
-            if await _send_end_reminder(db, booking, now):
+            if await _send_end_reminder(db, booking, assets, now):
                 end_sent += 1
         except Exception:
             logger.exception('[rentals] end reminder failed for %s', booking.id)
     for booking in late:
         try:
-            if await _send_late_reminder(db, booking, now):
+            if await _send_late_reminder(db, booking, assets, now):
                 late_sent += 1
         except Exception:
             logger.exception('[rentals] late reminder failed for %s', booking.id)

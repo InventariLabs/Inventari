@@ -137,7 +137,9 @@ function BookingHeader({
     .join(", ");
   return (
     <header className="flex flex-wrap items-center gap-3">
-      <div className="min-w-0 flex-1">
+      {/* The basis makes the buttons wrap under the title on a narrow screen
+          instead of squeezing it to a word per line. */}
+      <div className="min-w-0 flex-1 basis-64">
         <h2 className="m-0 text-xl font-semibold">
           {booking.borrower_name} · {summary}
         </h2>

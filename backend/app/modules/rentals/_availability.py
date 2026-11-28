@@ -14,6 +14,7 @@ endpoint loads the same world and writes nothing.
 
 from __future__ import annotations
 
+from collections.abc import Container
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
@@ -1025,6 +1026,7 @@ def nearest_window_for_lines(
             cursor,
             candidate_end,
             exclude_booking_id=exclude_booking_id,
+            without_way_out=range(len(lines)),
         )
         if all(check.ok for check in world_checks):
             return WindowSuggestion(starts_at=cursor, ends_at=candidate_end)
@@ -1040,7 +1042,13 @@ def checks_for_lines(
     ends_at: datetime,
     *,
     exclude_booking_id: UUID | None = None,
+    without_way_out: Container[int] = (),
 ) -> list[LineCheck]:
+    """One check per line, with the way out of each line that does not fit.
+
+    A line in ``without_way_out`` is only judged: searching for its nearest
+    window costs hundreds of checks, and nobody reads the answer.
+    """
     # A request's own lines compete for the same units: an asset line pins
     # one, a model line promises its count. Each line is judged against what
     # its siblings leave, not against the whole fleet — a pinned unit line
@@ -1078,12 +1086,13 @@ def checks_for_lines(
             pinned_beside=beside,
         )
         check.index = index
-        if line.item_id is not None and seen_units.get(line.item_id, 0) > 1:
-            asset = world.assets_by_id.get(line.item_id)
+        unit_id = line.item_id
+        duplicate = unit_id is not None and seen_units[unit_id] > 1
+        if unit_id is not None and duplicate:
+            asset = world.assets_by_id.get(unit_id)
             check.ok = False
             check.available = 0
             check.max_quantity = 0
-            check.nearest_window = None
             check.conflicts.append(
                 ConflictDetail(
                     item_id=line.item_id,
@@ -1095,7 +1104,8 @@ def checks_for_lines(
                     label=asset.name if asset is not None else '',
                 )
             )
-        results.append(
+        # No other window helps a unit that stands on two lines.
+        if not duplicate and index not in without_way_out:
             attach_way_out(
                 world,
                 check,
@@ -1106,7 +1116,7 @@ def checks_for_lines(
                 taken=taken,
                 pinned_beside=beside,
             )
-        )
+        results.append(check)
     return results
 
 

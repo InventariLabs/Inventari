@@ -20,7 +20,6 @@
   "rental_kit_name_taken": "Ein Set mit diesem Namen existiert bereits.",
   "rental_kit_needs_name": "Geben Sie dem Set einen Namen.",
   "rental_kit_not_found": "Set nicht gefunden.",
-  "rental_kit_not_in_booking": "Dieses Set gehört nicht zur Buchung.",
   "rental_line_names_one_kind": "Eine Position nennt eine Sache: einen Gegenstand, ein Modell oder ein Set.",
   "rental_model_line_needs_model": "Wählen Sie ein Modell für die Position.",
   "rental_model_not_in_fleet": "Kein Gegenstand dieses Modells ist im Register.",

@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { http, HttpResponse } from "msw";
 
 import { server } from "@/test/mocks/server";
+import { formatDateInZone } from "@/utils/formatters";
 import { signInWith, signOut } from "@/test/auth";
 import { withModules } from "@/test/moduleList";
 import { ModulesProvider } from "@/contexts/ModulesContext";
@@ -253,6 +254,7 @@ function renderPage(
   element: React.ReactElement,
   route = "/rentals",
   path?: string,
+  { headerActions = false } = {},
 ) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
@@ -261,6 +263,7 @@ function renderPage(
     const [data, setData] = React.useState<PageHeaderData>({});
     return (
       <PageHeaderContext.Provider value={{ data, setHeader: setData }}>
+        {headerActions ? data.actions : null}
         {children}
       </PageHeaderContext.Provider>
     );
@@ -645,5 +648,164 @@ describe("rentals screens", () => {
         /No buffer rules; bookings may follow one another immediately/,
       ),
     ).toBeInTheDocument();
+  });
+
+  it.each([
+    {
+      hold: "an early hand-out",
+      until: daysFromNow(4, 16),
+      said: `V2 early, ${formatDateInZone(daysFromNow(0), "UTC")} – ${formatDateInZone(daysFromNow(4, 16), "UTC")}`,
+    },
+    {
+      hold: "a loan past its due date",
+      until: null,
+      said: `V2 early, from ${formatDateInZone(daysFromNow(0), "UTC")} until it is returned`,
+    },
+  ])(
+    "a block refused over $hold names the time the unit is held",
+    async ({ until, said }) => {
+      server.use(
+        http.post("/api/v1/rentals/blocks", () =>
+          HttpResponse.json(
+            {
+              detail: {
+                code: "RENTAL_BLOCK_CONFLICT",
+                message: "A booking holds this asset.",
+                conflicts: [
+                  {
+                    borrower_name: "V2 early",
+                    starts_at: daysFromNow(9),
+                    ends_at: daysFromNow(10, 16),
+                    held_from: daysFromNow(0),
+                    held_until: until,
+                  },
+                ],
+              },
+            },
+            { status: 409 },
+          ),
+        ),
+      );
+      const user = renderPage(<BlocksPage />, "/rentals/blocks", undefined, {
+        headerActions: true,
+      });
+      await user.click(
+        await screen.findByRole("button", { name: "New block" }),
+      );
+      await user.type(screen.getByLabelText(/^Reason/), "Service");
+      await user.click(
+        screen.getByRole("button", { name: "Create the block" }),
+      );
+      expect(await screen.findByText(said)).toBeInTheDocument();
+    },
+  );
+
+  it("a line held by an overdue loan says it is held until the return", async () => {
+    server.use(
+      http.post("/api/v1/rentals/bookings/check", () =>
+        HttpResponse.json({
+          ok: false,
+          lines: [
+            {
+              index: 0,
+              ok: false,
+              label: "Projektor 4K ×1",
+              requested: 1,
+              available: 0,
+              conflicts: [
+                {
+                  item_id: ITEM_ID,
+                  item_name: "Projektor 4K #1",
+                  kind: "late",
+                  label: "Jan Wiśniewski",
+                  starts_at: daysFromNow(-3),
+                  ends_at: daysFromNow(0),
+                  held_from: daysFromNow(-3),
+                  held_until: null,
+                },
+              ],
+              max_quantity: 0,
+              nearest_window: null,
+            },
+          ],
+        }),
+      ),
+    );
+    const user = renderPage(<NewBookingPage />);
+    await screen.findByRole("option", { name: "Szkoła Podstawowa nr 3" });
+    await user.selectOptions(screen.getByLabelText("Partner"), PARTNER_ID);
+    expect(
+      await screen.findByText(
+        `Projektor 4K #1: Jan Wiśniewski, from ${formatDateInZone(daysFromNow(-3), "UTC")} until it is returned`,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("one scan of a kit's code hands every unit of the set out", async () => {
+    const second = {
+      ...asset,
+      id: UNIT_ID,
+      name: "Projektor 4K #2",
+      serial_number: "PRJ-2",
+      barcode: "PRJ-2",
+    };
+    const kitLine = {
+      ...booking.lines[0],
+      quantity: 1,
+      kit_id: LINE_ID,
+      kit_name: "Loan kit",
+    };
+    let posted: { item_ids: string[] } | null = null;
+    server.use(
+      http.get("/api/v1/rentals/assets", () =>
+        HttpResponse.json([asset, second]),
+      ),
+      http.get("/api/v1/rentals/calendar", () =>
+        HttpResponse.json({ ...calendar, groups: [] }),
+      ),
+      http.get("/api/v1/rentals/kits", () =>
+        HttpResponse.json([
+          {
+            id: LINE_ID,
+            name: "Loan kit",
+            code: "KIT-0000AB12",
+            member_count: 2,
+            summary: "",
+          },
+        ]),
+      ),
+      http.get("/api/v1/rentals/bookings/:id", () =>
+        HttpResponse.json({
+          ...booking,
+          lines: [
+            { ...kitLine, model: null, item_id: ITEM_ID },
+            { ...kitLine, id: PARTNER_ID },
+          ],
+        }),
+      ),
+      http.post("/api/v1/rentals/bookings/:id/pickup", async ({ request }) => {
+        posted = (await request.json()) as { item_ids: string[] };
+        return HttpResponse.json(pickedBooking);
+      }),
+    );
+    const user = renderPage(
+      <PickupPage />,
+      `/rentals/bookings/${BOOKING_ID}/pickup`,
+      "/rentals/bookings/:id/pickup",
+    );
+    await screen.findByText("To hand out · 0 of 2");
+    await screen.findAllByRole("option", { name: /Projektor 4K #2/ });
+    await user.type(
+      screen.getByRole("textbox", { name: "Scan" }),
+      "kit-0000ab12{Enter}",
+    );
+    await user.click(
+      await screen.findByRole("button", { name: "Confirm the hand-out" }),
+    );
+    await waitFor(() => expect(posted).not.toBeNull());
+    expect((posted as unknown as { item_ids: string[] }).item_ids).toEqual([
+      ITEM_ID,
+      UNIT_ID,
+    ]);
   });
 });

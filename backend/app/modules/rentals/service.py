@@ -17,7 +17,13 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.core.contracts import AuditAction, AuditTargetType
+from app.core.contracts import (
+    AuditAction,
+    AuditTargetType,
+    PartnerCreateDTO,
+    SystemPermission,
+    UserContextDTO,
+)
 from app.core.db_utils import acquire_advisory_lock, paginate_async
 from app.core.module_sdk import (
     NotFoundException,
@@ -301,6 +307,35 @@ async def _resolve_borrower(
     return name, (data.borrower_email or '').strip().lower() or None
 
 
+async def _borrower_profile(
+    db: AsyncSession, org_id: UUID, name: str, email: str, user: UserContextDTO
+) -> UUID | None:
+    """The partner a name and an e-mail stand for, created when none carries it.
+
+    The address names the person, in any casing, so their next booking lands
+    on the same profile and its history. Adding a partner takes the right to
+    add partners; without it an unknown borrower stays on the booking alone.
+    """
+    await acquire_advisory_lock(db, f'rentals:borrower:{org_id}:{email}')
+    matches = await core_api.partners.list_by_email_async(db, org_id, email)
+    if matches:
+        namesakes = (p for p in matches if p.name.casefold() == name.casefold())
+        return next(namesakes, matches[0]).id
+    if not user.has_permission(SystemPermission.PARTNERS_WRITE):
+        return None
+    data = PartnerCreateDTO(name=name, type='CUSTOMER', email=email)
+    try:
+        partner = await core_api.partners.create_async(db, org_id, data, user)
+    except ServiceRejectionError as exc:
+        if exc.key != 'partner_name_exists':
+            raise
+        # Somebody else of this name is in the book: the address tells the
+        # two apart.
+        data.name = f'{name} ({email})'[:255]
+        partner = await core_api.partners.create_async(db, org_id, data, user)
+    return partner.id
+
+
 @dataclass
 class LockLine:
     """The part of a line a lock key is built from."""
@@ -402,6 +437,11 @@ async def _expand_lines(
     return expanded, spans
 
 
+def _kit_members(resolved: list[ResolvedLine]) -> set[int]:
+    """The expanded lines that are a kit's members: their way out is the kit's."""
+    return {index for index, item in enumerate(resolved) if item.kit_id is not None}
+
+
 def _aggregate_checks(
     checks: list[LineCheck],
     spans: list[tuple[int, int]],
@@ -442,7 +482,7 @@ async def create_booking(
     db: AsyncSession,
     org_id: UUID,
     data: BookingCreate,
-    user_id: UUID,
+    user: UserContextDTO,
 ) -> RentalBooking:
     starts_at = data.starts_at
     ends_at = data.ends_at
@@ -471,7 +511,13 @@ async def create_booking(
     )
 
     world = await load_world(db, org_id, starts_at, ends_at, cover_bookings=True)
-    checks = checks_for_lines(world, expanded_lines, starts_at, ends_at)
+    checks = checks_for_lines(
+        world,
+        expanded_lines,
+        starts_at,
+        ends_at,
+        without_way_out=_kit_members(resolved),
+    )
     checks = _aggregate_checks(checks, spans, resolved, data.lines)
     if any(not check.ok for check in checks):
         raise RentalConflictError(
@@ -480,17 +526,21 @@ async def create_booking(
             details=_conflict_payload(checks),
         )
 
+    partner_id = data.borrower_partner_id
+    if data.borrower_name is not None and email:
+        partner_id = await _borrower_profile(db, org_id, name, email, user)
+
     booking = RentalBooking(
         organization_id=org_id,
         status='RESERVED',
-        borrower_partner_id=data.borrower_partner_id,
+        borrower_partner_id=partner_id,
         borrower_user_id=data.borrower_user_id,
         borrower_name=name,
         borrower_email=email,
         starts_at=starts_at,
         ends_at=ends_at,
         note=data.note,
-        created_by=user_id,
+        created_by=user.id,
     )
     db.add(booking)
     await db.flush()
@@ -519,7 +569,7 @@ async def create_booking(
             )
     await db.flush()
     fresh = await _require_booking(db, org_id, booking.id)
-    await _journal(db, fresh, AuditAction.CREATE, user_id)
+    await _journal(db, fresh, AuditAction.CREATE, user.id)
     return fresh
 
 
@@ -551,6 +601,7 @@ async def check_booking(
         data.starts_at,
         data.ends_at,
         exclude_booking_id=data.booking_id,
+        without_way_out=_kit_members(resolved),
     )
     checks = _aggregate_checks(expanded_checks, spans, resolved, data.lines)
     for index, (start, end) in enumerate(spans):
@@ -702,7 +753,6 @@ async def pickup_booking(
         cover_bookings=True,
     )
 
-    scanned = _expand_kit_scans(booking, data.kit_ids, scanned, world, by_id)
     remaining = list(scanned)
     new_units, missing_count = _assign_scans(db, booking, remaining, by_id)
     if remaining or missing_count:
@@ -754,60 +804,6 @@ async def pickup_booking(
     await db.flush()
     await _journal(db, booking, AuditAction.UPDATE, user_id, extra={'action': 'PICKUP'})
     return booking
-
-
-def _expand_kit_scans(
-    booking: RentalBooking,
-    kit_ids: list[UUID],
-    scanned: list[UUID],
-    world: World,
-    by_id: dict[UUID, EquipmentAssetDTO],
-) -> list[UUID]:
-    """Turn one kit scan into the member units it needs.
-
-    An asset member is the unit itself. A model member lets the kit promise
-    *some* unit of the model, so the scan picks the first free ones for this
-    booking's hold: the kit is handed out whole or not at all.
-    """
-    if not kit_ids:
-        return scanned
-    booked_kits = {line.kit_id for line in booking.lines if line.kit_id is not None}
-    for kit_id in kit_ids:
-        if kit_id not in booked_kits:
-            raise ServiceRejectionError('rental_kit_not_in_booking')
-    result = list(scanned)
-    for kit_id in dict.fromkeys(kit_ids):
-        for line in booking.lines:
-            if line.kit_id != kit_id:
-                continue
-            if line.item_id is not None:
-                if line.item_id not in result:
-                    result.append(line.item_id)
-                continue
-            need = line.quantity - len(line.units)
-            if need <= 0:
-                continue
-            candidates = sorted(
-                (
-                    asset
-                    for asset in by_id.values()
-                    if asset.model == line.model and asset.id not in result
-                ),
-                key=lambda asset: asset.name,
-            )
-            free = [
-                asset
-                for asset in candidates
-                if not item_busy_conflicts(
-                    world,
-                    asset.id,
-                    booking.held_from,
-                    booking.ends_at,
-                    exclude_booking_id=booking.id,
-                )
-            ]
-            result.extend(asset.id for asset in free[:need])
-    return result
 
 
 def _assign_scans(
@@ -1471,6 +1467,8 @@ async def extend_booking(
         )
 
     booking.ends_at = data.ends_at
+    # The borrower is owed a reminder before the new end too.
+    booking.end_reminder_sent_at = None
     for unit in booking.units:
         if unit.assignment_id is not None:
             await equipment_api.set_expected_return_async(
@@ -1522,7 +1520,6 @@ def _today_item(
         at=booking.starts_at,
         until=booking.ends_at,
         late_days=_late_days(booking.ends_at, now),
-        can_pickup=booking.status == 'RESERVED' and booking.ends_at > now,
     )
 
 
@@ -1558,7 +1555,9 @@ async def today_view(db: AsyncSession, org_id: UUID) -> TodayResponse:
         [
             b
             for b in bookings
-            if b.status == 'RESERVED' and day_start <= b.starts_at < day_end
+            if b.status == 'RESERVED'
+            and day_start <= b.starts_at < day_end
+            and b.ends_at > now
         ],
         key=lambda b: b.starts_at,
     )

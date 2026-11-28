@@ -20,7 +20,6 @@
   "rental_kit_name_taken": "Ya existe un kit con este nombre.",
   "rental_kit_needs_name": "Ponle nombre al kit.",
   "rental_kit_not_found": "Kit no encontrado.",
-  "rental_kit_not_in_booking": "Este kit no forma parte de la reserva.",
   "rental_line_names_one_kind": "Una línea nombra una cosa: un activo, un modelo o un kit.",
   "rental_model_line_needs_model": "Elige un modelo para la línea.",
   "rental_model_not_in_fleet": "Ningún activo de este modelo está en el registro.",

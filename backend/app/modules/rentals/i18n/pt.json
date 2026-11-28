@@ -20,7 +20,6 @@
   "rental_kit_name_taken": "Já existe um conjunto com este nome.",
   "rental_kit_needs_name": "Dê um nome ao conjunto.",
   "rental_kit_not_found": "Conjunto não encontrado.",
-  "rental_kit_not_in_booking": "Este conjunto não faz parte da reserva.",
   "rental_line_names_one_kind": "Uma linha indica uma coisa: um equipamento, um modelo ou um conjunto.",
   "rental_model_line_needs_model": "Escolha um modelo para a linha.",
   "rental_model_not_in_fleet": "Nenhum equipamento deste modelo está no registo.",

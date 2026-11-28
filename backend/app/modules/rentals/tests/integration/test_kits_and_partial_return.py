@@ -7,6 +7,7 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from fastapi.testclient import TestClient
 
+from app.modules.rentals import _availability
 from app.modules.rentals.tests.conftest import END, START, booking_payload
 
 pytestmark = pytest.mark.integration
@@ -114,13 +115,12 @@ class TestKitBooking:
         )
         assert refused.status_code == 409, refused.text
 
-    def test_one_scan_hands_out_the_whole_kit(
+    def test_a_kit_books_and_hands_out_member_by_member(
         self,
         client: TestClient,
         rental_auth: dict[str, str],
         screen,
         projectors,
-        db_session,
     ) -> None:
         kit = _create_kit(client, rental_auth, _kit_members(screen, projectors)).json()
         created = client.post(
@@ -134,40 +134,60 @@ class TestKitBooking:
         assert {line['kit_id'] for line in booking['lines']} == {kit['id']}
         assert {line['kit_name'] for line in booking['lines']} == {'Conference kit'}
 
+        # The screen resolves one kit scan to these units and sends them.
         picked = client.post(
             f'{RENTALS}/bookings/{booking["id"]}/pickup',
             headers=rental_auth,
-            json={'kit_ids': [kit['id']]},
+            json={'item_ids': [str(screen.id), str(projectors[0].id)]},
         )
         assert picked.status_code == 200, picked.text
-        handed = picked.json()
-        assert handed['status'] == 'PICKED_UP'
-        assert len(handed['lines']) == 2
-        unit_items = {
-            unit['item_id'] for line in handed['lines'] for unit in line['units']
-        }
-        assert str(screen.id) in unit_items
-        assert len(unit_items) == 2
+        assert picked.json()['status'] == 'PICKED_UP'
 
-    def test_a_kit_scan_cannot_hand_out_another_booking(
+    def test_a_busy_kit_is_checked_without_a_search_per_member(
         self,
         client: TestClient,
         rental_auth: dict[str, str],
         screen,
         projectors,
+        monkeypatch,
     ) -> None:
+        """The kit has one way out; a member's own way out is never shown."""
         kit = _create_kit(client, rental_auth, _kit_members(screen, projectors)).json()
-        other = client.post(
-            f'{RENTALS}/bookings',
+        blocked = client.post(
+            f'{RENTALS}/blocks',
             headers=rental_auth,
-            json=booking_payload(item_id=projectors[0].id),
-        ).json()
-        response = client.post(
-            f'{RENTALS}/bookings/{other["id"]}/pickup',
-            headers=rental_auth,
-            json={'kit_ids': [kit['id']]},
+            json={
+                'item_id': str(screen.id),
+                'starts_at': START.isoformat(),
+                'ends_at': END.isoformat(),
+                'reason': 'Service',
+            },
         )
-        assert response.status_code == 400, response.text
+        assert blocked.status_code == 201, blocked.text
+        searched: list[object] = []
+        search = _availability.nearest_window
+
+        def spy(world, line, *args, **kwargs):
+            searched.append(line)
+            return search(world, line, *args, **kwargs)
+
+        monkeypatch.setattr(_availability, 'nearest_window', spy)
+
+        check = client.post(
+            f'{RENTALS}/bookings/check',
+            headers=rental_auth,
+            json={
+                'starts_at': START.isoformat(),
+                'ends_at': END.isoformat(),
+                'lines': [{'kit_id': kit['id']}],
+            },
+        )
+
+        assert check.status_code == 200, check.text
+        line = check.json()['lines'][0]
+        assert line['ok'] is False
+        assert line['nearest_window'] is not None
+        assert searched == []
 
 
 class TestPartialReturn:
@@ -187,7 +207,7 @@ class TestPartialReturn:
         picked = client.post(
             f'{RENTALS}/bookings/{booking["id"]}/pickup',
             headers=rental_auth,
-            json={'kit_ids': [kit['id']]},
+            json={'item_ids': [str(screen.id), str(projectors[0].id)]},
         ).json()
         units = [unit for line in picked['lines'] for unit in line['units']]
         assert len(units) == 2

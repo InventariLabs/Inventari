@@ -87,7 +87,6 @@ function linesOf(booking: Booking): LineDraft[] {
         model: "",
         itemId: "",
         kitId: line.kit_id,
-        kitName: line.kit_name ?? undefined,
         quantity: 1,
       });
     } else if (line.item_id) {

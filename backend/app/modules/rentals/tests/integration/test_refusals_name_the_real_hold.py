@@ -116,6 +116,8 @@ def test_the_sheet_marks_one_unit_on_two_lines(
         assert any(
             conflict['kind'] == 'duplicate_unit' for conflict in line['conflicts']
         ), line
+        # No other window helps: the unit stays on two lines in all of them.
+        assert line['nearest_window'] is None, line
 
 
 class TestAReservationWhoseWindowPassed:
@@ -146,12 +148,8 @@ class TestAReservationWhoseWindowPassed:
         assert refused.json()['detail']['code'] == 'RENTAL_PICKUP_WINDOW_PASSED'
 
         today = client.get(f'{RENTALS}/today', headers=rental_auth).json()
-        row = next(
-            item for item in today['expired'] if item['booking_id'] == detail['id']
-        )
-        assert row['can_pickup'] is False
-        # A reservation that started earlier today may also sit in the day's
-        # pickups; there it must still offer Extend, never Hand out.
-        for item in today['pickups']:
-            if item['booking_id'] == detail['id']:
-                assert item['can_pickup'] is False
+        assert detail['id'] in [item['booking_id'] for item in today['expired']]
+        # It is listed once: not among the day's pickups as well, whatever
+        # day it started on.
+        assert detail['id'] not in [item['booking_id'] for item in today['pickups']]
+        assert today['pickups_count'] == len(today['pickups'])

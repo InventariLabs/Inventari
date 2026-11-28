@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.pool import NullPool
 
 from app.config import settings
+from app.core.contracts import UserContextDTO
 from app.models.category import Category
 from app.models.item import Item
 from app.models.organization import Organization
@@ -132,14 +133,13 @@ class TestOneWindowAdmitsOneBooking:
         )
         first = factory()
         second = factory()
+        user = UserContextDTO(
+            id=one_projector.user_id, organization_id=one_projector.org_id
+        )
         try:
-            await service.create_booking(
-                first, one_projector.org_id, payload, one_projector.user_id
-            )
+            await service.create_booking(first, one_projector.org_id, payload, user)
             task = asyncio.create_task(
-                service.create_booking(
-                    second, one_projector.org_id, payload, one_projector.user_id
-                )
+                service.create_booking(second, one_projector.org_id, payload, user)
             )
             # The second is inside the lock, not decided yet. Without the lock
             # it would already have written its own booking.

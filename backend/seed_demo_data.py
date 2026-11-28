@@ -3834,6 +3834,10 @@ DEMO_RENTAL_BORROWERS = [
     ('Studio Foto', 'studio@foto.example.com'),
 ]
 
+#: The borrower without an account the demo keeps a partner profile for, as a
+#: booking made with a name and an e-mail does.
+DEMO_RENTAL_PROFILE_CODE = 'BRW-001'
+
 
 def _organization_day(db, org_id):
     """The organization's clock and two ways to name a moment inside its day.
@@ -3871,7 +3875,9 @@ def _organization_day(db, org_id):
     return local_at, later_today
 
 
-def _create_rentals_kit_demo(db, org_id, created_by, assets, local_at) -> int:
+def _create_rentals_kit_demo(
+    db, org_id, created_by, assets, local_at, profile_id
+) -> int:
     """A kit and a borrower without an account, for the set's screen and guide.
 
     The kit is one line on the booking sheet and one scan at the hand-out;
@@ -3890,9 +3896,9 @@ def _create_rentals_kit_demo(db, org_id, created_by, assets, local_at) -> int:
     kit = RentalKit(
         id=kit_id,
         organization_id=org_id,
-        name='Conference kit',
+        name='Loan kit',
         code=f'KIT-{kit_id.hex[:8].upper()}',
-        note='A projector and a screen, handed out together.',
+        note='Two units handed out together, with one scan.',
     )
     db.add(kit)
     db.add(
@@ -3923,11 +3929,12 @@ def _create_rentals_kit_demo(db, org_id, created_by, assets, local_at) -> int:
         id=uuid.uuid4(),
         organization_id=org_id,
         status='RESERVED',
+        borrower_partner_id=profile_id,
         borrower_name=kit_name,
         borrower_email=kit_email,
         starts_at=kit_start,
         ends_at=kit_end,
-        note='conference kit, borrower without an account',
+        note='loan kit, borrower without an account',
         created_by=created_by,
     )
     kit_line = RentalBookingLine(
@@ -3961,6 +3968,32 @@ def _create_rentals_kit_demo(db, org_id, created_by, assets, local_at) -> int:
         )
     db.flush()
     return 1
+
+
+def _rental_borrower_profile(db, org_id, created_by) -> Partner:
+    """The partner profile of the borrower without an account."""
+    name, email = DEMO_RENTAL_BORROWERS[2]
+    profile = (
+        db.query(Partner)
+        .filter(
+            Partner.organization_id == org_id,
+            Partner.code == DEMO_RENTAL_PROFILE_CODE,
+        )
+        .first()
+    )
+    if profile is None:
+        profile = Partner(
+            id=uuid.uuid4(),
+            organization_id=org_id,
+            name=name,
+            code=DEMO_RENTAL_PROFILE_CODE,
+            type='CUSTOMER',
+            email=email,
+            created_by=created_by,
+        )
+        db.add(profile)
+        db.flush()
+    return profile
 
 
 def _create_rentals_demo(db, org_id, created_by) -> int:
@@ -4009,6 +4042,8 @@ def _create_rentals_demo(db, org_id, created_by) -> int:
     local_at, later_today = _organization_day(db, org_id)
     created = 0
 
+    profile = _rental_borrower_profile(db, org_id, created_by)
+
     def booking_for(
         item,
         *,
@@ -4026,6 +4061,7 @@ def _create_rentals_demo(db, org_id, created_by) -> int:
             id=uuid.uuid4(),
             organization_id=org_id,
             status=status,
+            borrower_partner_id=profile.id if name == profile.name else None,
             borrower_name=name,
             borrower_email=email,
             starts_at=starts_at,
@@ -4171,7 +4207,9 @@ def _create_rentals_demo(db, org_id, created_by) -> int:
         )
         _set_equipment_status(assets[4], 'MAINTENANCE')
 
-    created += _create_rentals_kit_demo(db, org_id, created_by, assets, local_at)
+    created += _create_rentals_kit_demo(
+        db, org_id, created_by, assets, local_at, profile.id
+    )
 
     # A buffer on the first model: the booking sheet explains the gap after a
     # return, and the calendar draws it.
@@ -5075,7 +5113,10 @@ def clean_seed_data(db, org_id):
         db.query(Partner)
         .filter(
             Partner.organization_id == org_id,
-            or_(*[Partner.code == p[2] for p in DEMO_PARTNERS]),
+            or_(
+                Partner.code == DEMO_RENTAL_PROFILE_CODE,
+                *[Partner.code == p[2] for p in DEMO_PARTNERS],
+            ),
         )
         .delete(synchronize_session=False)
     )

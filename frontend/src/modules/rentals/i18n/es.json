@@ -121,11 +121,12 @@
     "removeLine": "Quitar línea",
     "doesNotFit": "Solo {{available}} de {{requested}} están libres en este periodo",
     "blocked": "En servicio hasta {{date}} · {{reason}}",
+    "heldOpen": "{{name}}, desde el {{from}} hasta su devolución",
     "busy": "{{name}}, {{from}} – {{to}}",
     "reduceTo_one": "Reducir a {{count}} unidad",
     "reduceTo_other": "Reducir a {{count}} unidades",
     "moveTo": "Mover a {{from}} – {{to}}, cuando haya suficientes libres",
-    "addLine": "Añadir equipo (un modelo o una unidad concreta)",
+    "addLine": "Añadir equipo (un modelo, una unidad concreta o un kit)",
     "note": "Nota (opcional)",
     "notePlaceholder": "p. ej. lo recogerá el Sr. Nowak",
     "needBorrower": "Elige quién lo lleva",
@@ -278,7 +279,7 @@
       },
       "borrower": {
         "title": "Prestatarios sin cuenta",
-        "body": "Una reserva puede nombrar a un socio, a un miembro o a alguien de fuera con nombre y correo. La ficha del socio muestra sus alquileres pasados y próximos, y la cronología de un activo las reservas en las que participó."
+        "body": "Una reserva puede indicar un socio, un miembro o una persona ajena al sistema. Un nombre dado con una dirección de correo se guarda como socio, si usted puede añadir socios, y la siguiente reserva se suma al mismo historial. La ficha de un socio muestra sus alquileres pasados y próximos, y la cronología de un activo muestra las reservas en las que participó."
       }
     },
     "rulesTitle": "Reglas que mantiene el módulo",
@@ -287,7 +288,7 @@
       "block": "Un bloqueo manual o de servicio no puede cubrir una reserva existente, y no se puede reservar dentro de un bloqueo.",
       "overdue": "El retraso se lee del periodo y del estado, nunca se guarda; ampliar también mueve la devolución esperada de la entrega.",
       "partial": "Una reserva puede volver por partes: las unidades que siguen fuera la mantienen entregada y atrasada, y las devueltas quedan libres al momento.",
-      "kits": "Un kit no se puede reservar mientras alguno de sus miembros esté ocupado; se entrega y se devuelve como un todo.",
+      "kits": "Un kit no se puede reservar mientras alguno de sus elementos esté ocupado. Se reserva y se entrega como un solo conjunto; sus unidades pueden volver todas juntas o de una en una.",
       "reminders": "El prestatario recibe un recordatorio por correo antes de que termine el periodo y una vez al día mientras la reserva esté atrasada, según el reloj de la organización.",
       "bookAgain": "«Reservar de nuevo» copia el prestatario y las líneas de una reserva terminada a un borrador nuevo con fechas nuevas; nada se guarda hasta pulsar Reservar."
     },

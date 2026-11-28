@@ -159,10 +159,6 @@ class LineSchema(BaseModel):
     kit_name: str | None = None
     units: list[UnitSchema] = Field(default_factory=list)
 
-    @property
-    def out_count(self) -> int:
-        return sum(1 for unit in self.units if unit.is_out)
-
 
 class BookingSchema(BaseModel):
     id: UUID
@@ -210,11 +206,8 @@ class BookingListRow(BaseModel):
 
 class PickupRequest(BaseModel):
     # Each scanned or chosen asset, in scan order. A model line takes the
-    # units that match its model until its count is met. A scanned kit is
-    # one entry here; the service resolves every member the booking holds
-    # from it, so one scan hands the whole set out.
+    # units that match its model until its count is met.
     item_ids: list[UUID] = Field(default_factory=list)
-    kit_ids: list[UUID] = Field(default_factory=list)
 
 
 class ReturnUnitIn(BaseModel):
@@ -383,8 +376,6 @@ class TodayItem(BaseModel):
     at: datetime
     until: datetime | None = None
     late_days: int = 0
-    # A reservation whose window has passed is extended, never handed out.
-    can_pickup: bool = True
 
 
 class TodayResponse(BaseModel):

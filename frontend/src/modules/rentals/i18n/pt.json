@@ -121,11 +121,12 @@
     "removeLine": "Remover linha",
     "doesNotFit": "Só {{available}} de {{requested}} estão livres neste período",
     "blocked": "Em serviço até {{date}} · {{reason}}",
+    "heldOpen": "{{name}}, desde {{from}} até à devolução",
     "busy": "{{name}}, {{from}} – {{to}}",
     "reduceTo_one": "Reduzir para {{count}} unidade",
     "reduceTo_other": "Reduzir para {{count}} unidades",
     "moveTo": "Mover para {{from}} – {{to}}, quando houver suficientes livres",
-    "addLine": "Adicionar equipamento (um modelo ou uma unidade concreta)",
+    "addLine": "Adicionar equipamento (um modelo, uma unidade específica ou um conjunto)",
     "note": "Nota (opcional)",
     "notePlaceholder": "p. ex. o Sr. Nowak vem buscá-lo",
     "needBorrower": "Escolha quem leva",
@@ -278,7 +279,7 @@
       },
       "borrower": {
         "title": "Requerentes sem conta",
-        "body": "Uma reserva pode indicar um parceiro, um membro ou alguém de fora com nome e e-mail. A página do parceiro mostra os alugueres passados e futuros, e a cronologia de um equipamento as reservas em que participou."
+        "body": "Uma reserva pode indicar um parceiro, um membro ou uma pessoa de fora do sistema. Um nome dado com um e-mail é guardado como parceiro, se puder adicionar parceiros, e a reserva seguinte junta-se ao mesmo histórico. A página de um parceiro mostra os seus alugueres passados e futuros, e a cronologia de um equipamento mostra as reservas em que participou."
       }
     },
     "rulesTitle": "Regras que o módulo mantém",
@@ -287,7 +288,7 @@
       "block": "Um bloqueio manual ou de serviço não pode cobrir uma reserva existente, e não se reserva dentro de um bloqueio.",
       "overdue": "O atraso lê-se do período e do estado, nunca é guardado; prolongar também move a devolução esperada da entrega.",
       "partial": "Uma reserva pode voltar por partes: as unidades que continuam fora mantêm-na entregue e atrasada, e as devolvidas ficam livres de imediato.",
-      "kits": "Um conjunto não pode ser reservado enquanto algum membro estiver ocupado; é entregue e recebido como um todo.",
+      "kits": "Um conjunto não pode ser reservado enquanto algum dos seus elementos estiver ocupado. É reservado e entregue como um todo; as suas unidades podem regressar todas juntas ou uma de cada vez.",
       "reminders": "O requerente recebe um lembrete por e-mail antes do fim do período e uma vez por dia enquanto a reserva estiver atrasada, segundo o relógio da organização.",
       "bookAgain": "«Reservar novamente» copia o requerente e as linhas de uma reserva terminada para um novo rascunho com novas datas; nada é guardado até premir Reservar."
     },

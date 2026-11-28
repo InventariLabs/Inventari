@@ -941,7 +941,6 @@ ERRORS_PT: ErrorMessages = {
     'rental_kit_member_on_two_lines': 'Um equipamento está em duas linhas do conjunto.',
     'rental_kit_name_taken': 'Já existe um conjunto com este nome.',
     'rental_kit_needs_name': 'Dê um nome ao conjunto.',
-    'rental_kit_not_in_booking': 'Este conjunto não faz parte da reserva.',
     'rental_model_not_in_fleet': 'Nenhum equipamento deste modelo está no registo.',
     'rental_return_unknown_unit': 'Escolha os equipamentos que voltam.',
 }

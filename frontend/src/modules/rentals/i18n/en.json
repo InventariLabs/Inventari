@@ -121,11 +121,12 @@
     "removeLine": "Remove line",
     "doesNotFit": "Only {{available}} of {{requested}} are free in this window",
     "blocked": "In service until {{date}} · {{reason}}",
+    "heldOpen": "{{name}}, from {{from}} until it is returned",
     "busy": "{{name}}, {{from}} – {{to}}",
     "reduceTo_one": "Reduce to {{count}} unit",
     "reduceTo_other": "Reduce to {{count}} units",
     "moveTo": "Move to {{from}} – {{to}}, when enough are free",
-    "addLine": "Add equipment (a model or a specific unit)",
+    "addLine": "Add equipment (a model, a specific unit or a kit)",
     "note": "Note (optional)",
     "notePlaceholder": "e.g. Mr Nowak will collect it",
     "needBorrower": "Choose who is taking it",
@@ -278,7 +279,7 @@
       },
       "borrower": {
         "title": "Borrowers without an account",
-        "body": "A booking can name a partner, a member, or somebody outside the system with a name and an e-mail. A partner's page shows their past and upcoming rentals, and an asset's timeline shows the bookings it was part of."
+        "body": "A booking can name a partner, a member, or somebody outside the system. A name given with an e-mail is saved as a partner, if you may add partners, so their next booking joins the same history. A partner's page shows their past and upcoming rentals, and an asset's timeline shows the bookings it was part of."
       }
     },
     "rulesTitle": "Rules the module keeps",
@@ -287,7 +288,7 @@
       "block": "A manual or service block cannot cover an existing booking, and a booking cannot be made into a block.",
       "overdue": "Overdue is read from the window and the status, never stored; extending moves the expected return of the hand-out too.",
       "partial": "A booking can come back in parts: the units still out keep it handed out and late, and the units that came back are free at once.",
-      "kits": "A kit cannot be booked while any of its members is busy, and a kit is handed out or returned as the whole set.",
+      "kits": "A kit cannot be booked while any of its members is busy. It is booked and handed out as one set; its units can come back all together or one at a time.",
       "reminders": "The borrower is reminded by e-mail before the window ends, and once a day while the booking is late, on the organization's own clock.",
       "bookAgain": "'Book again' copies a finished booking's borrower and lines into a new draft with new dates; nothing is saved until you press Book."
     },

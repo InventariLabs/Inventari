@@ -1,5 +1,6 @@
 import { test, expect } from "./fixtures/auth";
 import { ApiHelper } from "./helpers/api";
+import { pickDay } from "./helpers/date-picker";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
 
 /**
@@ -24,22 +25,6 @@ function dateInput(value: Date): string {
 
 function at(value: Date): string {
   return value.toISOString();
-}
-
-/** Pick a day in the app's calendar field, stepping a month when needed. */
-async function pickDate(page: import("@playwright/test").Page, field: string, day: Date) {
-  await page.getByLabel(field).click();
-  const today = new Date();
-  if (
-    today.getFullYear() !== day.getFullYear() ||
-    today.getMonth() !== day.getMonth()
-  ) {
-    await page.getByRole("button", { name: "Next month" }).click();
-  }
-  const label = new Intl.DateTimeFormat("en-US", {
-    dateStyle: "long",
-  }).format(day);
-  await page.getByRole("button", { name: label, exact: true }).click();
 }
 
 test.describe("Rentals — booking sheet, phone hand-out and a service return", () => {
@@ -261,7 +246,11 @@ test.describe("Rentals — booking sheet, phone hand-out and a service return", 
     ).toBeVisible();
     await page.getByRole("button", { name: "Needs service" }).click();
     await page.getByLabel("What happened").fill("Lens cracked");
-    await pickDate(page, "Unavailable until: date", daysFromNow(15));
+    await pickDay(
+      page,
+      page.getByLabel("Unavailable until: date"),
+      dateInput(daysFromNow(15)),
+    );
     await page.getByLabel("Unavailable until: time").fill("16:00");
 
     await page.getByRole("button", { name: "Confirm the return" }).click();

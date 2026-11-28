@@ -161,33 +161,18 @@ export default function TodayPage() {
                         item={item}
                         badge="RESERVED"
                         action={
-                          item.can_pickup ? (
-                            <Link
-                              to={`/rentals/bookings/${item.booking_id}/pickup`}
-                              aria-label={t("today.handOutNamed", {
-                                name: item.what,
-                              })}
-                              className={buttonVariants({
-                                variant: "outline",
-                                size: "sm",
-                              })}
-                            >
-                              {t("today.handOut")}
-                            </Link>
-                          ) : (
-                            <Link
-                              to={`/rentals/bookings/${item.booking_id}`}
-                              aria-label={t("today.extendNamed", {
-                                name: item.what,
-                              })}
-                              className={buttonVariants({
-                                variant: "outline",
-                                size: "sm",
-                              })}
-                            >
-                              {t("today.extend")}
-                            </Link>
-                          )
+                          <Link
+                            to={`/rentals/bookings/${item.booking_id}/pickup`}
+                            aria-label={t("today.handOutNamed", {
+                              name: item.what,
+                            })}
+                            className={buttonVariants({
+                              variant: "outline",
+                              size: "sm",
+                            })}
+                          >
+                            {t("today.handOut")}
+                          </Link>
                         }
                       />
                     ))

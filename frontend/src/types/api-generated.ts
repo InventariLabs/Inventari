@@ -23344,8 +23344,6 @@ export interface components {
         PickupRequest: {
             /** Item Ids */
             item_ids?: string[];
-            /** Kit Ids */
-            kit_ids?: string[];
         };
         /**
          * PlaceholderInfo
@@ -30125,11 +30123,6 @@ export interface components {
              * @default 0
              */
             late_days: number;
-            /**
-             * Can Pickup
-             * @default true
-             */
-            can_pickup: boolean;
         };
         /** TodayResponse */
         TodayResponse: {

@@ -34,6 +34,16 @@ says what the release does rather than what changed since them.
   in service, and overdue is read from the window rather than stored. The
   module needs the equipment register and is switched off on its own; it ships
   in the six maintained languages with demo data and a guide page.
+- Rentals kits: a named set of units and models is booked as one line, is free
+  only when every member is, and one scan of its code takes the whole set at
+  the hand-out. A loan can come back in parts, the units still out keeping it
+  handed out and late. A borrower given with a name and an e-mail is saved as a
+  partner by anyone who may add partners, and the partner's page and a unit's
+  timeline list their past and upcoming bookings. The borrower is reminded by
+  e-mail of the units to bring back a day before the return, again before a new
+  return after an extension, and once a day while late. A booking prints a pick
+  list and a hand-over sheet, and "Book again" copies a finished one into a new
+  draft.
 - Moving in from another tool: the product import suggests the columns of the
   exports of Odoo (products and stock), Sortly, inFlow, Zoho, Katana, BoxHero
   and Homebox, and maps the SKU, the description, the stock alert and a

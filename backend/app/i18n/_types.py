@@ -66,7 +66,6 @@ class ErrorMessages(TypedDict):
     rental_kit_member_on_two_lines: str
     rental_kit_name_taken: str
     rental_kit_needs_name: str
-    rental_kit_not_in_booking: str
     rental_model_not_in_fleet: str
     rental_return_unknown_unit: str
     equipment_module_unavailable: str

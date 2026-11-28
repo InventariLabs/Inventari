@@ -121,11 +121,12 @@
     "removeLine": "Retirer la ligne",
     "doesNotFit": "Seuls {{available}} sur {{requested}} sont libres sur cette période",
     "blocked": "En service jusqu’au {{date}} · {{reason}}",
+    "heldOpen": "{{name}}, depuis le {{from}} jusqu'au retour",
     "busy": "{{name}}, {{from}} – {{to}}",
     "reduceTo_one": "Réduire à {{count}} bien",
     "reduceTo_other": "Réduire à {{count}} biens",
     "moveTo": "Déplacer au {{from}} – {{to}}, quand assez sont libres",
-    "addLine": "Ajouter du matériel (un modèle ou un bien précis)",
+    "addLine": "Ajouter du matériel (un modèle, une unité précise ou un kit)",
     "note": "Note (facultatif)",
     "notePlaceholder": "p. ex. M. Nowak viendra le chercher",
     "needBorrower": "Choisissez qui le prend",
@@ -278,7 +279,7 @@
       },
       "borrower": {
         "title": "Emprunteurs sans compte",
-        "body": "Une réservation peut nommer un partenaire, un membre ou une personne extérieure avec un nom et un e-mail. La fiche du partenaire montre ses locations passées et à venir, et la chronologie d'un équipement les réservations auxquelles il a participé."
+        "body": "Une réservation peut désigner un partenaire, un membre ou une personne extérieure au système. Un nom donné avec une adresse e-mail est enregistré comme partenaire, si vous avez le droit d'en ajouter, et la réservation suivante rejoint le même historique. La fiche d'un partenaire montre ses locations passées et à venir, et la chronologie d'un équipement montre les réservations dont il a fait partie."
       }
     },
     "rulesTitle": "Règles tenues par le module",
@@ -287,7 +288,7 @@
       "block": "Un blocage manuel ou de service ne peut pas couvrir une réservation existante, et une réservation ne peut pas entrer dans un blocage.",
       "overdue": "Le retard se lit dans la période et le statut, jamais stocké ; prolonger déplace aussi le retour attendu de la remise.",
       "partial": "Une réservation peut revenir en partie : les unités encore dehors la gardent remise et en retard, celles qui sont revenues sont libres aussitôt.",
-      "kits": "Un kit ne peut pas être réservé tant qu'un de ses membres est pris ; il se remet et se reprend en entier.",
+      "kits": "Un kit ne peut pas être réservé tant que l'un de ses éléments est occupé. Il se réserve et se remet en un seul ensemble ; ses unités peuvent revenir ensemble ou une par une.",
       "reminders": "L'emprunteur reçoit un rappel par e-mail avant la fin de la période, puis une fois par jour tant que la réservation est en retard, à l'heure de l'organisation.",
       "bookAgain": "« Réserver à nouveau » copie l'emprunteur et les lignes d'une réservation terminée dans un nouveau brouillon avec de nouvelles dates ; rien n'est enregistré avant « Réserver »."
     },

@@ -14,11 +14,13 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.module_sdk import format_date_for, format_datetime_for
+from app.core.module_sdk import format_date_for, format_datetime_for, get_logger
 from app.core.public_api import core_api
 from app.modules.equipment.equipment_api import EquipmentAssetDTO, equipment_api
 
 from .models import RentalBooking
+
+logger = get_logger(__name__)
 
 DOCUMENT_PICK_LIST = 'PICK_LIST'
 DOCUMENT_HANDOVER = 'HANDOVER'
@@ -33,6 +35,7 @@ LABELS: dict[str, dict[str, str]] = {
         'from': 'From',
         'to': 'Until',
         'lines': 'To prepare',
+        'handed_lines': 'Handed out',
         'item': 'Item',
         'model': 'Model',
         'quantity': 'Qty',
@@ -57,6 +60,7 @@ LABELS: dict[str, dict[str, str]] = {
         'from': 'Od',
         'to': 'Do',
         'lines': 'Do przygotowania',
+        'handed_lines': 'Wydane',
         'item': 'Zasób',
         'model': 'Model',
         'quantity': 'Ilość',
@@ -81,6 +85,7 @@ LABELS: dict[str, dict[str, str]] = {
         'from': 'Von',
         'to': 'Bis',
         'lines': 'Vorzubereiten',
+        'handed_lines': 'Ausgegeben',
         'item': 'Gegenstand',
         'model': 'Modell',
         'quantity': 'Menge',
@@ -105,6 +110,7 @@ LABELS: dict[str, dict[str, str]] = {
         'from': 'Du',
         'to': "Jusqu'au",
         'lines': 'À préparer',
+        'handed_lines': 'Remis',
         'item': 'Équipement',
         'model': 'Modèle',
         'quantity': 'Qté',
@@ -129,6 +135,7 @@ LABELS: dict[str, dict[str, str]] = {
         'from': 'Desde',
         'to': 'Hasta',
         'lines': 'Por preparar',
+        'handed_lines': 'Entregado',
         'item': 'Activo',
         'model': 'Modelo',
         'quantity': 'Cant.',
@@ -153,6 +160,7 @@ LABELS: dict[str, dict[str, str]] = {
         'from': 'De',
         'to': 'Até',
         'lines': 'A preparar',
+        'handed_lines': 'Entregue',
         'item': 'Equipamento',
         'model': 'Modelo',
         'quantity': 'Qtd.',
@@ -239,7 +247,7 @@ _HANDOVER_HTML = """\
     <tr><th>{{L.handed_out}}</th><td>{{handed_out_at}}</td></tr>
     {% if note %}<tr><th>{{L.note}}</th><td>{{note}}</td></tr>{% endif %}
   </table>
-  <h2>{{L.lines}}</h2>
+  <h2>{{L.handed_lines}}</h2>
   <table>
     <thead><tr>
       <th>{{L.item}}</th><th>{{L.model}}</th><th>{{L.serial}}</th><th>{{L.condition}}</th>
@@ -371,8 +379,14 @@ async def render_document_html(
     if stored:
         try:
             return core_api.pdf.render_html(stored, context)
-        except Exception:  # noqa: BLE001 — a broken layout must not kill the print
-            pass
+        except Exception:
+            # A broken layout must not kill the print.
+            logger.warning(
+                '[rentals] the stored %s layout of %s did not render',
+                document_type,
+                org_id,
+                exc_info=True,
+            )
     return core_api.pdf.render_html(
         _HANDOVER_HTML if handover else _PICK_LIST_HTML, context
     )

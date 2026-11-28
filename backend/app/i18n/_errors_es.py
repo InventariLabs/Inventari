@@ -1148,7 +1148,6 @@ ERRORS_ES: ErrorMessages = {
     'rental_kit_member_on_two_lines': 'Un activo está en dos líneas del kit.',
     'rental_kit_name_taken': 'Ya existe un kit con este nombre.',
     'rental_kit_needs_name': 'Ponle nombre al kit.',
-    'rental_kit_not_in_booking': 'Este kit no forma parte de la reserva.',
     'rental_model_not_in_fleet': 'Ningún activo de este modelo está en el registro.',
     'rental_return_unknown_unit': 'Elige los activos que vuelven.',
 }

@@ -75418,14 +75418,6 @@
             },
             "type": "array",
             "title": "Item Ids"
-          },
-          "kit_ids": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "title": "Kit Ids"
           }
         },
         "type": "object",
@@ -93990,11 +93982,6 @@
             "type": "integer",
             "title": "Late Days",
             "default": 0
-          },
-          "can_pickup": {
-            "type": "boolean",
-            "title": "Can Pickup",
-            "default": true
           }
         },
         "type": "object",

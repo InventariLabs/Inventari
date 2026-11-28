@@ -18,12 +18,13 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from sqlalchemy.orm import Session
 
+from app.models.partner import Partner
 from app.modules.rentals.models import (
     RentalBlock,
     RentalBooking,
     RentalBufferRule,
 )
-from seed_demo_data import clean_seed_data
+from seed_demo_data import DEMO_RENTAL_PROFILE_CODE, clean_seed_data
 from tests.integration._demo_world import ids, seeded_organization
 
 pytestmark = pytest.mark.integration
@@ -117,6 +118,25 @@ class TestTheRentalWeek:
         ):
             assert not (booking.note or '').startswith('SEED-'), booking.note
 
+    def test_a_borrower_without_an_account_has_a_profile_with_their_bookings(
+        self, db_session: Session, seeded: uuid.UUID
+    ) -> None:
+        profile = (
+            db_session.query(Partner)
+            .filter(
+                Partner.organization_id == seeded,
+                Partner.code == DEMO_RENTAL_PROFILE_CODE,
+            )
+            .one()
+        )
+        notes = {
+            booking.note
+            for booking in db_session.query(RentalBooking)
+            .filter(RentalBooking.borrower_partner_id == profile.id)
+            .all()
+        }
+        assert notes == {'late loan', 'loan kit, borrower without an account'}
+
 
 class TestCleanLeavesNoRentalsBehind:
     def test_cleaning_removes_bookings_blocks_and_buffer_rules(
@@ -130,3 +150,12 @@ class TestCleanLeavesNoRentalsBehind:
                 db_session.query(model).filter(model.organization_id == seeded).count()
             )
             assert left == 0, f'{model.__tablename__} left {left} row(s)'
+        assert (
+            db_session.query(Partner)
+            .filter(
+                Partner.organization_id == seeded,
+                Partner.code == DEMO_RENTAL_PROFILE_CODE,
+            )
+            .count()
+            == 0
+        )

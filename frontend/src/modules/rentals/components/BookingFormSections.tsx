@@ -16,6 +16,7 @@ import type {
   LineCheck,
   ModelOption,
 } from "../api/rentals";
+import { holdText } from "../lib/hold";
 import { DateTimeField } from "./DateTimeField";
 
 export type Who = "partner" | "member" | "external";
@@ -33,7 +34,6 @@ export type LineDraft = {
   itemId: string;
   kitId: string;
   /** The kit's name as the booking carried it, for a kit deleted since. */
-  kitName?: string;
   quantity: number;
 };
 
@@ -413,15 +413,12 @@ function LinePicker({
     );
   }
   const selectedKit = kits.find((kit) => kit.id === line.kitId);
-  const kitGone = Boolean(line.kitId) && !selectedKit && Boolean(line.kitName);
   return (
     <>
       <NativeSelect
         aria-label={t("form.chooseKit")}
         value={line.kitId}
-        onChange={(event) =>
-          onUpdate({ kitId: event.target.value, kitName: undefined })
-        }
+        onChange={(event) => onUpdate({ kitId: event.target.value })}
       >
         <option value="">{t("form.chooseKit")}</option>
         {kits.map((kit) => (
@@ -429,7 +426,6 @@ function LinePicker({
             {kit.name} · {t("kits.memberCount", { count: kit.member_count })}
           </option>
         ))}
-        {kitGone ? <option value={line.kitId}>{line.kitName}</option> : null}
       </NativeSelect>
       <span className="mt-1 block text-xs text-zinc-500">
         {t("form.kitHint")}
@@ -500,15 +496,16 @@ function LineConflict({
                 count: Number(conflict.reason ?? 0),
               });
             } else {
-              text = t("form.busy", {
-                name: conflict.label,
-                from: conflict.starts_at
-                  ? formatDateInZone(conflict.starts_at, timezone)
-                  : "",
-                to: conflict.ends_at
-                  ? formatDateInZone(conflict.ends_at, timezone)
-                  : "",
-              });
+              // A hold that says when it began and not when it ends lasts
+              // until the return.
+              const open = conflict.held_from && !conflict.held_until;
+              text = holdText(
+                t,
+                timezone,
+                conflict.label,
+                conflict.starts_at,
+                open ? null : (conflict.ends_at ?? ""),
+              );
             }
             return (
               <li key={`${conflict.kind}-${conflictIndex}`}>

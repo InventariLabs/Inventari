@@ -1150,7 +1150,6 @@ ERRORS_FR: ErrorMessages = {
     'rental_kit_member_on_two_lines': 'Un équipement figure sur deux lignes du kit.',
     'rental_kit_name_taken': 'Un kit portant ce nom existe déjà.',
     'rental_kit_needs_name': 'Donnez un nom au kit.',
-    'rental_kit_not_in_booking': 'Ce kit ne fait pas partie de la réservation.',
     'rental_model_not_in_fleet': "Aucun équipement de ce modèle n'est au registre.",
     'rental_return_unknown_unit': 'Choisissez les équipements qui reviennent.',
 }

@@ -36,6 +36,7 @@ import {
 } from "../hooks/useRentals";
 import { queryKeys } from "../queryKeys";
 import { wallTimeToIso } from "../lib/datetime";
+import { holdText } from "../lib/hold";
 
 const SOURCE_KEYS: Record<string, string> = {
   MANUAL: "blocks.source.manual",
@@ -44,8 +45,8 @@ const SOURCE_KEYS: Record<string, string> = {
 
 type BlockConflict = {
   borrower_name: string;
-  starts_at: string;
-  ends_at: string;
+  held_from: string;
+  held_until: string | null;
 };
 
 function conflictsOf(error: unknown): BlockConflict[] {
@@ -267,9 +268,13 @@ function BlockSheet({
               <ul className="m-0 mt-1 list-disc pl-4 text-xs">
                 {conflicts.map((conflict, index) => (
                   <li key={index}>
-                    {conflict.borrower_name} ·{" "}
-                    {formatDateInZone(conflict.starts_at, timezone)} –{" "}
-                    {formatDateInZone(conflict.ends_at, timezone)}
+                    {holdText(
+                      t,
+                      timezone,
+                      conflict.borrower_name,
+                      conflict.held_from,
+                      conflict.held_until,
+                    )}
                   </li>
                 ))}
               </ul>
