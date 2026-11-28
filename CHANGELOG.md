@@ -114,6 +114,16 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A receipt written in another unit than the product is kept in records the
+  price per the product's unit: 500 g at 0.02 opens a record at 20.00 a
+  kilogram, not 0.02. A price, or a share of the delivery's costs, that comes
+  to more than a record can keep once restated is refused with the figure and
+  the limit named, not with a server error.
+- Ordering what a recipe or a production plan is missing works with a price of
+  more than two decimals: the order line takes it rounded to two, and a price
+  that rounds to nothing leaves the line unpriced for the buyer to fill in.
+- A line price a new document or purchase order refuses is marked on that
+  line's price field, and the message names the field.
 - When saving a product's edit form is refused — for example a unit changed
   while the product holds stock — the form scrolls to the sentence that says
   why and screen readers announce it. It stood above the fields, out of sight

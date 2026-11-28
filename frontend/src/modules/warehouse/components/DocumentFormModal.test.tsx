@@ -851,6 +851,64 @@ describe("DocumentFormModal", () => {
     expect(toastSuccess).not.toHaveBeenCalled();
   });
 
+  it("shows a refused line price under that line's price field", async () => {
+    const user = userEvent.setup();
+    const refusal = Object.assign(new Error("422"), {
+      isAxiosError: true,
+      response: {
+        status: 422,
+        data: {
+          detail: [
+            {
+              loc: ["body", "lines", 0, "unit_price"],
+              msg: "Must be less than or equal to 99999999.99",
+              type: "less_than_equal",
+            },
+          ],
+        },
+      },
+    });
+    createMutate.mockImplementationOnce((_data, options) => {
+      options?.onError?.(refusal);
+    });
+    offerWidget();
+    // Price fields are drawn where the organization tracks values.
+    const current = vi.mocked(profileHooks.useDocumentProfile)();
+    vi.mocked(profileHooks.useDocumentProfile).mockReturnValue({
+      ...current,
+      data: { ...current.data, value_tracking_enabled: true },
+    } as unknown as ReturnType<typeof profileHooks.useDocumentProfile>);
+
+    await act(async () => {
+      render(<DocumentFormModal initialType="IN" onClose={vi.fn()} />);
+    });
+    const [partnerSelect, targetSelect] = screen.getAllByRole("combobox");
+    const lineNameInput = screen.getAllByPlaceholderText("Item")[0];
+    await placesLoaded();
+    await act(async () => {
+      await pickWidget(user, lineNameInput);
+      await user.selectOptions(partnerSelect, "partner-1");
+      await user.selectOptions(targetSelect, "loc-2");
+    });
+
+    await act(async () => {
+      await user.click(screen.getByRole("button", { name: "Create receipt" }));
+    });
+
+    // The desktop and the phone field of the one line both say it.
+    const prices = screen.getAllByLabelText("Unit price");
+    expect(prices).toHaveLength(2);
+    for (const price of prices) {
+      expect(price).toHaveAccessibleDescription(
+        "Must be less than or equal to 99999999.99",
+      );
+      expect(price).toBeInvalid();
+    }
+    expect(toastError).toHaveBeenCalledWith(
+      "Unit price: Must be less than or equal to 99999999.99",
+    );
+  });
+
   it("does not submit OUT document without required partner and source location", async () => {
     const user = userEvent.setup();
 

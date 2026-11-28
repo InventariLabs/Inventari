@@ -407,3 +407,144 @@ class TestTheCardFollowsTheRecordItWasAdoptedFor:
             elsewhere_record.template_id,
             weighing_elsewhere.id,
         ) == Decimal('2000')
+
+
+def _confirmed_receipt(
+    client: TestClient,
+    headers: dict[str, str],
+    *,
+    partner_id: UUID,
+    location_id: UUID,
+    line: dict[str, object],
+    freight: str | None = None,
+) -> str:
+    created = client.post(
+        '/api/v1/warehouse/documents',
+        headers=headers,
+        json={
+            'type': 'IN',
+            'partner_id': str(partner_id),
+            'target_location_id': str(location_id),
+            'lines': [line],
+        },
+    )
+    assert created.status_code == status.HTTP_201_CREATED, created.text
+    doc_url = f'/api/v1/warehouse/documents/{created.json()["id"]}'
+    if freight is not None:
+        added = client.post(
+            f'{doc_url}/extra-costs',
+            headers=headers,
+            json={'kind': 'freight', 'amount': freight},
+        )
+        assert added.status_code == status.HTTP_201_CREATED, added.text
+    confirmed = client.patch(f'{doc_url}/confirm', headers=headers)
+    assert confirmed.status_code == status.HTTP_200_OK, confirmed.text
+    return doc_url
+
+
+@pytest.mark.integration
+class TestAPriceFollowsTheQuantityIntoTheStockUnit:
+    def test_a_record_opened_in_another_unit_keeps_the_price_per_its_own(
+        self,
+        h: ModuleTestHelper,
+        client: TestClient,
+        weighing_headers: dict[str, str],
+        weighing_shelf: StorageLocation,
+        weighing_partner: Partner,
+        db_session: Session,
+        weighing_org: Organization,
+    ) -> None:
+        """500 g at 0.02 a gram is half a kilogram at 20.00 a kilogram."""
+        flour = h.create_template(
+            weighing_org,
+            name=f'Weighed Flour {uuid4().hex[:6]}',
+            uom_id=str(h.get_uom('kg').id),
+        )
+        doc_url = _confirmed_receipt(
+            client,
+            weighing_headers,
+            partner_id=weighing_partner.id,
+            location_id=weighing_shelf.id,
+            line={
+                'product_template_id': str(flour.id),
+                'expected_quantity': 500,
+                'uom_id': str(h.get_uom('g').id),
+                'unit_price': '0.02',
+            },
+        )
+
+        done = client.patch(
+            f'{doc_url}/complete',
+            headers=weighing_headers,
+            json={'complete_as_planned': True},
+        )
+
+        assert done.status_code == status.HTTP_200_OK, done.text
+        db_session.expire_all()
+        record = db_session.scalars(
+            select(Item).where(Item.template_id == flour.id)
+        ).one()
+        assert record.quantity == Decimal('0.5')
+        assert record.purchase_price == Decimal('20.00')
+        layer = db_session.scalars(
+            select(StockValuationLayer).where(
+                StockValuationLayer.product_template_id == flour.id
+            )
+        ).one()
+        assert layer.unit_cost == record.purchase_price
+        assert layer.total_value == Decimal('10.00')
+
+    @pytest.mark.parametrize(
+        ('grams', 'price', 'freight'),
+        [
+            pytest.param(500, '99999999.99', None, id='the-restated-price'),
+            pytest.param(1, '1.00', '200000.00', id='the-freight-share'),
+        ],
+    )
+    def test_a_cost_the_books_cannot_keep_per_stock_unit_is_refused_by_name(
+        self,
+        grams: int,
+        price: str,
+        freight: str | None,
+        h: ModuleTestHelper,
+        client: TestClient,
+        weighing_headers: dict[str, str],
+        weighing_shelf: StorageLocation,
+        weighing_partner: Partner,
+        db_session: Session,
+        weighing_org: Organization,
+    ) -> None:
+        flour = h.create_template(
+            weighing_org,
+            name=f'Dear Flour {uuid4().hex[:6]}',
+            uom_id=str(h.get_uom('kg').id),
+        )
+        doc_url = _confirmed_receipt(
+            client,
+            weighing_headers,
+            partner_id=weighing_partner.id,
+            location_id=weighing_shelf.id,
+            line={
+                'product_template_id': str(flour.id),
+                'expected_quantity': grams,
+                'uom_id': str(h.get_uom('g').id),
+                'unit_price': price,
+            },
+            freight=freight,
+        )
+
+        refused = client.patch(
+            f'{doc_url}/complete',
+            headers=weighing_headers,
+            json={'complete_as_planned': True},
+        )
+
+        assert refused.status_code == status.HTTP_400_BAD_REQUEST, refused.text
+        assert refused.json()['detail']['code'] == 'ITEM_PRICE_ABOVE_CEILING', (
+            refused.text
+        )
+        db_session.expire_all()
+        assert not db_session.scalars(
+            select(Item).where(Item.template_id == flour.id)
+        ).all()
+        assert _layer_quantity(db_session, weighing_org.id, flour.id) == Decimal('0')
