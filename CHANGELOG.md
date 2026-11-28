@@ -113,8 +113,9 @@ says what the release does rather than what changed since them.
   which tells a category's fields apart from the flags stored beside them.
 - Module authors: the backend module SDK exports `SheetColumns`, which reads
   a cell's number or date by what its whole column says — the decimal mark,
-  the thousands grouping, a day-first order, a currency code — so a module's
-  own import door reads a sheet the way every other door does.
+  the thousands grouping, a day-first order, and for a price (`money=True`) a
+  currency code — so a module's own import door reads a sheet the way every
+  other door does.
 
 ### Fixed
 
@@ -350,11 +351,14 @@ says what the release does rather than what changed since them.
 - Spreadsheet imports read numbers and dates the way the sheet's country
   writes them — products, opening stock, document lines, order lines and
   equipment alike. A decimal comma ("12,5"), thousands separated by a space
-  or a dot, a currency symbol or code ("1 289,00 zł", "$1,289.00",
-  "€ 4,50") are numbers, and a currency code is the one ISO 4217 spells in
-  capitals, so "2 cup" is refused with its cell named rather than read as 2.
-  A day-first date such as "05.11.2026" is 5 November, not 11 May, and a
-  time after it, AM or PM included, belongs to that day. A column of dates
+  or a dot and a currency symbol ("$1,289.00", "€ 4,50") are numbers. A price
+  may also name its currency, by code or till word and in either case
+  ("1 289,00 zł", "pln 12,5"); in a quantity or any other number such a word
+  is a unit, so "3 ft" or "2 cup" is refused with its cell named rather than
+  read as a bare number. A day-first date such as "05.11.2026" is 5 November,
+  not 11 May, and a time after it ("10:30", "10 AM", "10h30") belongs to that
+  day; a numeric date with the year last that is written any other way is
+  refused rather than guessed. A column of dates
   is read from the whole file (a day above 12 settles the order), and a
   column that is ambiguous throughout follows the language of the person
   importing: month-first for English, day-first for the others. The mapping
