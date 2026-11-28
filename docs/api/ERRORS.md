@@ -641,7 +641,6 @@ apart.
 | `RENTAL_KIT_NAME_TAKEN` | A kit with this name already exists. |
 | `RENTAL_KIT_NEEDS_NAME` | Give the kit a name. |
 | `RENTAL_KIT_NOT_FOUND` | Kit not found |
-| `RENTAL_KIT_NOT_IN_BOOKING` | This kit is not part of the booking. |
 | `RENTAL_LINE_NAMES_ONE_KIND` | A line names one asset or one model, not both |
 | `RENTAL_MODEL_LINE_NEEDS_MODEL` | A model line names a model |
 | `RENTAL_MODEL_NOT_IN_FLEET` | No unit of this model is in the register. |

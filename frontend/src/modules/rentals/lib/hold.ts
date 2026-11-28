@@ -15,8 +15,8 @@ export function holdText(
   until: string | null | undefined,
 ): string {
   const start = from ? formatDateInZone(from, timezone) : "";
-  if (until === null) return t("form.heldOpen", { name, from: start });
-  return t("form.busy", {
+  if (until === null) return t("rentals:form.heldOpen", { name, from: start });
+  return t("rentals:form.busy", {
     name,
     from: start,
     to: until ? formatDateInZone(until, timezone) : "",
