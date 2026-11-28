@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { useConfirm } from "@/hooks/useConfirm";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { EmptyState, EmptyStateAction } from "@/components/ui/EmptyState";
 import { ListControlBar } from "@/components/ui/ListControlBar";
 import { QueryResult } from "@/components/ui/QueryResult";
 import Pagination from "@/components/ui/Pagination";
@@ -151,13 +151,12 @@ export default function PartnersPage() {
                 description={t("noPartnersDesc")}
                 primaryAction={
                   canWrite ? (
-                    <Button
-                      variant="primary"
-                      leftIcon={<Plus size={16} />}
+                    <EmptyStateAction
+                      variant="outline"
+                      leftIcon={Plus}
+                      label={t("newPartner")}
                       onClick={() => setShowCreateModal(true)}
-                    >
-                      {t("newPartner")}
-                    </Button>
+                    />
                   ) : undefined
                 }
               />

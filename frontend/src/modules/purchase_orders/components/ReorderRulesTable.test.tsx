@@ -93,7 +93,11 @@ describe("ReorderRulesTable with no rules yet", () => {
     renderEmpty(false);
 
     expect(screen.queryByText(/Add products in Inventory first/)).toBeNull();
-    expect(screen.getByRole("button", { name: /Add rule/ })).toBeEnabled();
+    const add = screen.getByRole("button", { name: /Add rule/ });
+    expect(add).toBeEnabled();
+    // An outline: the page header already holds the filled "Add rule".
+    expect(add).toHaveClass("border");
+    expect(add).not.toHaveClass("bg-primary-700");
   });
 
   it("sends an organization with no products to Inventory", () => {
@@ -102,6 +106,7 @@ describe("ReorderRulesTable with no rules yet", () => {
     expect(
       screen.getByText(/Add products in Inventory first/),
     ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Add rule/ })).toBeNull();
   });
 });
 

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { EmptyState, EmptyStateAction } from "@/components/ui/EmptyState";
 import type { ReorderRule, ReplenishmentAlert } from "../api/reorder-rules";
 import { formatQuantityValue } from "@/utils/formatters";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -84,15 +84,14 @@ export function ReorderRulesTable({
             : "reorderRules.emptyDescriptionWithProducts",
         )}
         primaryAction={
-          readOnly ? undefined : (
-            <Button
-              variant="primary"
-              leftIcon={<Plus size={16} />}
+          // With no products the header's disabled button says it already.
+          readOnly || catalogEmpty ? undefined : (
+            <EmptyStateAction
+              variant="outline"
+              leftIcon={Plus}
+              label={t("reorderRules.addRule")}
               onClick={onCreate}
-              disabled={catalogEmpty}
-            >
-              {t("reorderRules.addRule")}
-            </Button>
+            />
           )
         }
       />

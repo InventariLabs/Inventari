@@ -109,6 +109,21 @@ vi.mock("@/modules/partners/components/PartnerFormModal", () => ({
     React.createElement("button", { type: "button", onClick: onClose }, "Save"),
 }));
 
+describe("PartnersPage with no partners", () => {
+  beforeEach(() => {
+    mockPartners = [];
+    mockTotal = 0;
+  });
+
+  it("offers the empty state's create as an outline, under the header's filled one", () => {
+    render(<PartnersPage />);
+    // The header is not drawn here, so the one button is the empty state's.
+    const create = screen.getByRole("button", { name: "New partner" });
+    expect(create).toHaveClass("border");
+    expect(create).not.toHaveClass("bg-primary-700");
+  });
+});
+
 describe("PartnersPage pagination", () => {
   beforeEach(() => {
     vi.clearAllMocks();

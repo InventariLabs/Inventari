@@ -5,7 +5,7 @@ import { FileText, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { EmptyState, EmptyStateAction } from "@/components/ui/EmptyState";
 import { ListControlBar } from "@/components/ui/ListControlBar";
 import { Pagination } from "@/module-sdk";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -313,13 +313,12 @@ function PurchaseOrdersEmptyState({
       }
       primaryAction={
         !hasFilters && canWrite ? (
-          <Button
-            variant="primary"
-            leftIcon={<Plus size={16} />}
+          <EmptyStateAction
+            variant="outline"
+            leftIcon={Plus}
+            label={t("createOrder")}
             onClick={onCreate}
-          >
-            {t("createOrder")}
-          </Button>
+          />
         ) : undefined
       }
     />

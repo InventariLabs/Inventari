@@ -119,18 +119,17 @@ describe("PurchaseOrdersPage", () => {
     });
   });
 
-  it("shows create button in the empty state", async () => {
+  it("offers the empty state's create as an outline, under the header's filled one", async () => {
     server.use(
       http.get("/api/v1/purchase-orders", () =>
         HttpResponse.json({ items: [], total: 0 }),
       ),
     );
     render(<PurchaseOrdersPage />, { wrapper: createWrapper() });
-    await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /create order/i }),
-      ).toBeInTheDocument();
-    });
+    // The header is not drawn here, so the one button is the empty state's.
+    const create = await screen.findByRole("button", { name: /create order/i });
+    expect(create).toHaveClass("border");
+    expect(create).not.toHaveClass("bg-primary-700");
   });
 
   it("opens create modal from the empty state", async () => {
