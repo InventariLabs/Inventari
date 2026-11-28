@@ -75,17 +75,26 @@ async def analyze_pasted_text(text: str) -> dict[str, Any]:
     """Analyse pasted text and return the same shape as :func:`analyze_import_file`.
 
     The frontend reuses the same preview UI for file uploads and pasted text,
-    so the response contract (``headers`` / ``preview_rows`` / ``total_rows``)
-    must match exactly.
+    so the response contract (``headers`` / ``preview_rows`` /
+    ``preview_rows_as_written`` / ``total_rows``) must match exactly. The
+    preview rides in two readings as it does for a file: the day a date
+    column will be stored, and the cells as they were pasted.
     """
     df = parse_pasted_text(text)
     if df.empty:
-        return {'headers': [], 'preview_rows': [], 'total_rows': 0}
+        return {
+            'headers': [],
+            'preview_rows': [],
+            'preview_rows_as_written': [],
+            'total_rows': 0,
+        }
 
-    preview_df = dates_as_stored(df, df.head(PREVIEW_ROWS))
+    head = df.head(PREVIEW_ROWS)
+    preview_df = dates_as_stored(df, head)
     return {
         'headers': [str(c) for c in df.columns],
         'preview_rows': preview_df.fillna('').to_dict(orient='records'),
+        'preview_rows_as_written': head.fillna('').to_dict(orient='records'),
         'total_rows': len(df),
     }
 

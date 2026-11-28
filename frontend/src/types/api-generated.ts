@@ -15776,6 +15776,8 @@ export interface components {
             headers: string[];
             /** Preview Rows */
             preview_rows: components["schemas"]["ImportPreviewRow"][];
+            /** Preview Rows As Written */
+            preview_rows_as_written: components["schemas"]["ImportPreviewRow"][];
             /** Total Rows */
             total_rows: number;
         };
@@ -17489,6 +17491,10 @@ export interface components {
             headers: string[];
             /** Preview Rows */
             preview_rows: {
+                [key: string]: unknown;
+            }[];
+            /** Preview Rows As Written */
+            preview_rows_as_written: {
                 [key: string]: unknown;
             }[];
             /** Total Rows */
@@ -27384,6 +27390,10 @@ export interface components {
             headers: string[];
             /** Preview Rows */
             preview_rows: {
+                [key: string]: string | number | null;
+            }[];
+            /** Preview Rows As Written */
+            preview_rows_as_written: {
                 [key: string]: string | number | null;
             }[];
             /** Total Rows */

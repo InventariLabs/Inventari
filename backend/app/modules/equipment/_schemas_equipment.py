@@ -97,7 +97,12 @@ class BulkEquipmentResponse(BaseModel):
 
 class ImportAnalyzeResult(BaseModel):
     headers: list[str]
+    #: The first rows with a date-shaped column written as the day the
+    #: import will store it, in words: shown for a date field.
     preview_rows: list[dict[str, object]]
+    #: The same rows with every cell as the file writes it: shown for a
+    #: field that stores text, a serial or an asset tag among them.
+    preview_rows_as_written: list[dict[str, object]]
     total_rows: int
     # canonical field name → matched header (aliases across the
     # module's maintained languages). Empty dict when nothing matched.

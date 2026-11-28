@@ -405,17 +405,32 @@ class UnreadableCellError(ValueError):
 
 
 #: What may stand beside a price without being part of the number: ISO codes
-#: ("PLN", "eur") and the short words a till writes ("zł", "Kč", "kr").
-_CURRENCY_WORDS = frozenset(code.lower() for code in list_currencies()) | {
-    'zł',
-    'zl',
-    'kč',
-    'kc',
-    'kr',
-    'ft',
-    'lei',
-    'fr',
-}
+#: ("PLN", "EUR") and the short words a till writes ("zł", "Kč", "kr").
+#:
+#: A code is written the way ISO 4217 writes it, in capitals. A lowercase
+#: word after a quantity is the language's word for the thing measured —
+#: "2 cup", "3 top" — and CUP, TOP, ALL and BOB are also currency codes:
+#: matched case-insensitively, each would make the cell a bare number and
+#: drop the unit without a word.
+_CURRENCY_CODES = frozenset(list_currencies())
+_CURRENCY_WORDS = frozenset(
+    {
+        'zł',
+        'zl',
+        'kč',
+        'kc',
+        'kr',
+        'ft',
+        'lei',
+        'fr',
+    }
+)
+
+
+def _is_currency_word(word: str) -> bool:
+    """Whether *word* is an ISO code as written in capitals or a till's word."""
+    return word in _CURRENCY_CODES or word.lower() in _CURRENCY_WORDS
+
 
 _LEADING_WORD = re.compile(r'^([^\W\d_]+)\.?\s*(.*)$', re.DOTALL)
 _TRAILING_WORD = re.compile(r'^(.*?)\s*([^\W\d_]+)\.?$', re.DOTALL)
@@ -438,10 +453,10 @@ def _strip_currency(text: str) -> str:
     text = _REAL_SYMBOL.sub('', text)
     text = ''.join(ch for ch in text if category(ch) != 'Sc').strip()
     lead = _LEADING_WORD.match(text)
-    if lead and lead.group(1).lower() in _CURRENCY_WORDS:
+    if lead and _is_currency_word(lead.group(1)):
         text = lead.group(2).strip()
     tail = _TRAILING_WORD.match(text)
-    if tail and tail.group(2).lower() in _CURRENCY_WORDS:
+    if tail and _is_currency_word(tail.group(2)):
         text = tail.group(1).strip()
     return text
 
@@ -589,7 +604,10 @@ def _dot_evidence(raw: Any) -> bool | None:
     return None if _lone_group(text, '.') else False
 
 
-_TIME_TAIL = r'(?:[T ]\d{1,2}:\d{2}(?::\d{2}(?:[.,]\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?'
+_TIME_TAIL = (
+    r'(?:[T ]\d{1,2}:\d{2}(?::\d{2}(?:[.,]\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?'
+    r'(?:\s*[AaPp]\.?[Mm]\.?)?)?'
+)
 _YEAR_FIRST = re.compile(rf'^(\d{{4}})[-./ ](\d{{1,2}})[-./ ](\d{{1,2}}){_TIME_TAIL}$')
 _YEAR_LAST = re.compile(
     rf'^(\d{{1,2}})[-./ ](\d{{1,2}})[-./ ](\d{{4}}|\d{{2}}){_TIME_TAIL}$'
@@ -704,8 +722,10 @@ def parse_sheet_date(raw: Any, day_first: bool) -> date:
     is taken as it is. A year-first text ("2026-11-05") is read as written.
     A text of three numeric parts with the year last is read day-first or
     month-first by *day_first* unless one of its own parts settles it (a
-    day above 12). Anything else ("5 Nov 2026") goes to pandas, which reads
-    English month names; "end of March" is refused.
+    day above 12); the time after it, twelve-hour ("10:30 AM") or not,
+    belongs to the day and does not hand the value to another reader.
+    Anything else ("5 Nov 2026") goes to pandas, which reads English month
+    names; "end of March" is refused.
     """
     if isinstance(raw, pd.Timestamp):
         if pd.isna(raw):

@@ -54,8 +54,12 @@ const EQUIPMENT_FIELDS = [
   },
   { key: "category", labelKey: "import.fields.category" },
   { key: "purchase_price", labelKey: "import.fields.purchase_price" },
-  { key: "purchase_date", labelKey: "import.fields.purchase_date" },
-  { key: "warranty_until", labelKey: "import.fields.warranty_until" },
+  { key: "purchase_date", labelKey: "import.fields.purchase_date", date: true },
+  {
+    key: "warranty_until",
+    labelKey: "import.fields.warranty_until",
+    date: true,
+  },
   { key: "notes", labelKey: "import.fields.notes" },
   { key: "equipment_status", labelKey: "import.fields.equipment_status" },
 ];
@@ -451,10 +455,12 @@ export default function ImportEquipmentModal({
                   shifted header row does not look correctly mapped. */}
               <ImportPreviewTable
                 rows={analyzeResult.preview_rows}
+                rowsAsWritten={analyzeResult.preview_rows_as_written}
                 fields={EQUIPMENT_FIELDS.map((field) => ({
                   key: field.key,
                   label: t(field.labelKey),
                   required: field.required,
+                  date: field.date,
                 }))}
                 mapping={mapping}
               />

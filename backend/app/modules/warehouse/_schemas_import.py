@@ -80,9 +80,12 @@ class ProductSearchResult(BaseModel):
 class DocumentImportAnalyzeResponse(BaseModel):
     headers: list[str]
     preview_rows: list[ImportPreviewRow]
+    #: The same rows with every cell as the file writes it, for a column
+    #: mapped to a text field: only a date field should show the stored day.
+    preview_rows_as_written: list[ImportPreviewRow]
     total_rows: int
 
-    @field_validator('preview_rows', mode='before')
+    @field_validator('preview_rows', 'preview_rows_as_written', mode='before')
     @classmethod
     def _coerce_preview_rows(cls, value: Any) -> Any:
         """Accept the raw ``list[dict]`` shape from

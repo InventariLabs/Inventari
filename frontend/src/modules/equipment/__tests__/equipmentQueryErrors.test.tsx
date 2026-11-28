@@ -96,6 +96,7 @@ describe("ImportEquipmentModal — the default pickers", () => {
       headers: ["name"],
       total_rows: 1,
       preview_rows: [],
+      preview_rows_as_written: [],
       suggested_mapping: { name: "name" },
     });
     renderWith(<ImportEquipmentModal onClose={vi.fn()} />);

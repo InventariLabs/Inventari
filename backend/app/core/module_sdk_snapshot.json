@@ -2289,6 +2289,75 @@
         }
       }
     },
+    "SheetColumns": {
+      "bases": [
+        "object"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "df",
+          "required": true
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "date": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "raw",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "column",
+              "required": true
+            }
+          ]
+        },
+        "day_first": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "column",
+              "required": true
+            }
+          ]
+        },
+        "dot_thousands": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "column",
+              "required": true
+            }
+          ]
+        },
+        "number": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "raw",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "column",
+              "required": true
+            }
+          ]
+        }
+      }
+    },
     "StockUnavailableError": {
       "bases": [
         "ValueError"

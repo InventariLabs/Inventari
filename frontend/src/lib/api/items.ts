@@ -358,6 +358,7 @@ export const itemsApi = {
       return {
         headers: [],
         preview_rows: [],
+        preview_rows_as_written: [],
         total_rows: 0,
         filled_counts: {},
       };

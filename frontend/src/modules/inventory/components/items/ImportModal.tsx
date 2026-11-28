@@ -33,28 +33,40 @@ interface Props {
 }
 
 /** Column keys the importer understands, in the order they are offered. */
-const MAPPING_FIELDS: { key: string; labelKey: string; required?: boolean }[] =
-  [
-    { key: "name", labelKey: "items:import.fields.name", required: true },
-    { key: "sku", labelKey: "items:import.fields.sku" },
-    { key: "quantity", labelKey: "items:import.fields.quantity" },
-    { key: "unit", labelKey: "items:import.fields.unit" },
-    { key: "expiry_date", labelKey: "items:import.fields.expiryDate" },
-    { key: "freeze_date", labelKey: "items:import.fields.freezeDate" },
-    {
-      key: "location",
-      labelKey: "items:import.fields.storageLocation",
-    },
-    { key: "sublocation", labelKey: "items:import.fields.sublocation" },
-    { key: "category", labelKey: "items:import.fields.category" },
-    { key: "brand", labelKey: "items:import.fields.brand" },
-    { key: "barcode", labelKey: "items:import.fields.barcode" },
-    { key: "serial_number", labelKey: "items:import.fields.serialNumber" },
-    { key: "purchase_price", labelKey: "items:import.fields.purchasePrice" },
-    { key: "min_quantity", labelKey: "items:import.fields.stockAlert" },
-    { key: "description", labelKey: "items:import.fields.description" },
-    { key: "label_code", labelKey: "items:import.fields.labelCode" },
-  ];
+const MAPPING_FIELDS: {
+  key: string;
+  labelKey: string;
+  required?: boolean;
+  date?: boolean;
+}[] = [
+  { key: "name", labelKey: "items:import.fields.name", required: true },
+  { key: "sku", labelKey: "items:import.fields.sku" },
+  { key: "quantity", labelKey: "items:import.fields.quantity" },
+  { key: "unit", labelKey: "items:import.fields.unit" },
+  {
+    key: "expiry_date",
+    labelKey: "items:import.fields.expiryDate",
+    date: true,
+  },
+  {
+    key: "freeze_date",
+    labelKey: "items:import.fields.freezeDate",
+    date: true,
+  },
+  {
+    key: "location",
+    labelKey: "items:import.fields.storageLocation",
+  },
+  { key: "sublocation", labelKey: "items:import.fields.sublocation" },
+  { key: "category", labelKey: "items:import.fields.category" },
+  { key: "brand", labelKey: "items:import.fields.brand" },
+  { key: "barcode", labelKey: "items:import.fields.barcode" },
+  { key: "serial_number", labelKey: "items:import.fields.serialNumber" },
+  { key: "purchase_price", labelKey: "items:import.fields.purchasePrice" },
+  { key: "min_quantity", labelKey: "items:import.fields.stockAlert" },
+  { key: "description", labelKey: "items:import.fields.description" },
+  { key: "label_code", labelKey: "items:import.fields.labelCode" },
+];
 
 /**
  * The product fields any location or category sets, once per key. A field set
@@ -165,11 +177,14 @@ export default function ImportModal({ onClose }: Props) {
       key: f.key,
       label: t(f.labelKey),
       required: f.required,
+      date: f.date,
     })),
-    // A user's field keeps the words its label was given.
+    // A user's field keeps the words its label was given, and a date field
+    // reads its column the way the import stores it.
     ...ownFields.map((f) => ({
       key: locationFieldKey(f.key),
       label: f.label ?? f.key,
+      date: f.type === "date",
     })),
   ];
 
