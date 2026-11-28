@@ -83,6 +83,8 @@ const getSeverityColor = (severity: string) => {
     case "medium":
     case "warning":
       return "bg-amber-50 border-amber-200 text-on-warning dark:bg-amber-500/10 dark:border-amber-500/20";
+    case "info":
+      return "bg-blue-50 border-blue-200 text-on-info";
     case "low":
       return "bg-primary-50 border-primary-200 text-primary-700 dark:text-primary-500 dark:bg-primary-500/10 dark:border-primary-500/20";
     default:

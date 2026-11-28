@@ -1162,6 +1162,13 @@ describe("SmartAlertsPanel", () => {
     expect(card?.className).toContain("bg-amber-50");
   });
 
+  it("paints an info alert in the info colour, not the neutral grey", () => {
+    render(wrap(<SmartAlertsPanel alerts={smartAlerts} t={t} />));
+    const card = screen.getByText("Coffee").closest("div.p-4");
+    expect(card?.className).toContain("bg-blue-50");
+    expect(card?.className).toContain("text-on-info");
+  });
+
   it("leads from an item's alert to that item", () => {
     render(wrap(<SmartAlertsPanel alerts={smartAlerts} t={t} />));
     expect(screen.getByRole("link", { name: "Cheddar" })).toHaveAttribute(
