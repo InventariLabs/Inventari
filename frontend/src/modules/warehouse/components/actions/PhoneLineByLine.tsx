@@ -71,6 +71,16 @@ function candidateFrom(
   };
 }
 
+/** What the card holds once `line` was scanned. */
+function withPieceRead(
+  current: Candidate | null,
+  line: ReceiptDraftLine,
+): Candidate {
+  if (!current || current.line.item_id !== line.item_id) return { line };
+  const quantity = Number(current.line.quantity) + Number(line.quantity);
+  return { ...current, line: { ...current.line, quantity } };
+}
+
 /** The card of the product in hand: how many, with buttons a thumb can hit. */
 function CandidateCard({
   candidate,
@@ -176,7 +186,9 @@ export function PhoneLineByLine({
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [query, setQuery] = useState("");
   const scanner = useDocumentScanner({
-    onAddOrIncrementLine: (line) => setCandidate({ line }),
+    // The product on the card, read again, is one more piece of it.
+    onAddOrIncrementLine: (line) =>
+      setCandidate((current) => withPieceRead(current, line)),
     onOpenQuickAdd: () => toast.warning(t("action.phone.notInStock")),
     stock: { locationId: stockLocationId },
     announceAdded: false,

@@ -1762,6 +1762,7 @@
       "chooseLocation": "Elige una ubicación",
       "done": "Ubicado — {{number}} registrado",
       "awaitingApproval": "{{number}} espera aprobación; la mercancía se moverá cuando se apruebe",
+      "checking": "Comprobando la etiqueta…",
       "putOn": "Colocar en",
       "elsewhere": "Lo pongo en otro sitio",
       "step": "Ubicación {{current}} de {{total}}",

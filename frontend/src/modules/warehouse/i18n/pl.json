@@ -1892,6 +1892,7 @@
       "chooseLocation": "Wybierz miejsce",
       "done": "Odłożone — zaksięgowano {{number}}",
       "awaitingApproval": "{{number}} czeka na akceptację; towar przejdzie po jej udzieleniu",
+      "checking": "Sprawdzanie etykiety…",
       "putOn": "Połóż na",
       "elsewhere": "Kładę gdzie indziej",
       "step": "Odkładanie {{current}} z {{total}}",

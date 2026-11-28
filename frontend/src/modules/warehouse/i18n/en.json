@@ -1762,6 +1762,7 @@
       "chooseLocation": "Choose a location",
       "done": "Put away — {{number}} posted",
       "awaitingApproval": "{{number}} is waiting for approval; the goods move once it is approved",
+      "checking": "Checking the label…",
       "putOn": "Put on",
       "elsewhere": "I'm putting it elsewhere",
       "step": "Put away {{current}} of {{total}}",

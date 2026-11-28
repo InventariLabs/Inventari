@@ -348,6 +348,24 @@ describe("PutawaySheet", () => {
       ).toBeInTheDocument();
     });
 
+    it("says a label is being checked while the posting waits for it", async () => {
+      const release = heldShelfLookups();
+      render(<PutawaySheet item={rice} queue={[rice]} onClose={vi.fn()} />);
+      const dialog = screen.getByRole("dialog", { name: "Put away" });
+      await within(dialog).findByText("A-01-01");
+      expect(within(dialog).queryByText("Checking the label…")).toBeNull();
+
+      act(() => cameraMock.onCodeScanned("A-01-01"));
+      expect(within(dialog).getByRole("status")).toHaveTextContent(
+        "Checking the label…",
+      );
+
+      await answer(release, "A-01-01");
+      await waitFor(() =>
+        expect(within(dialog).queryByText("Checking the label…")).toBeNull(),
+      );
+    });
+
     it("holds the posting until the label read last is answered", async () => {
       const release = heldShelfLookups();
       render(<PutawaySheet item={rice} queue={[rice]} onClose={vi.fn()} />);

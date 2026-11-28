@@ -38,6 +38,12 @@ interface UseScanResolverOptions {
    * message instead.
    */
   acceptUnrecognized?: (code: string) => boolean;
+  /**
+   * Set where each read is one piece: the code still waiting, read again, is
+   * then answered too. The camera reports a code it holds in view once, so its
+   * second report is a second showing.
+   */
+  everyReadCounts?: boolean;
 }
 
 /**
@@ -54,6 +60,7 @@ interface UseScanResolverOptions {
 export function useScanResolver({
   handle,
   acceptUnrecognized,
+  everyReadCounts = false,
 }: UseScanResolverOptions) {
   const { t } = useTranslation("scan");
   const navigate = useNavigate();
@@ -146,9 +153,11 @@ export function useScanResolver({
     (rawCode: string): Promise<void> => {
       // A camera or a field may hand over a QR's whole address.
       const code = scannedCode(rawCode);
-      // The camera and a nervous thumb repeat a symbol: the code just read,
-      // still unanswered, is the same reading.
-      if (!code || pending.current.at(-1) === code) return Promise.resolve();
+      // Where a scan looks something up, the code just read, still
+      // unanswered, is the same reading: a nervous thumb or a symbol shown
+      // again asks nothing new.
+      const repeated = !everyReadCounts && pending.current.at(-1) === code;
+      if (!code || repeated) return Promise.resolve();
       // A screen that is gone asks nothing more of what was still waiting:
       // the first answer may be what took the reader elsewhere.
       const waited = pending.current.length > 0;
@@ -167,7 +176,7 @@ export function useScanResolver({
       lastTurn.current = waited ? lastTurn.current.then(run, run) : run();
       return lastTurn.current;
     },
-    [lookup],
+    [everyReadCounts, lookup],
   );
 
   useEffect(() => {

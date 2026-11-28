@@ -410,6 +410,14 @@ export function PutawaySheet({
         )}
       </SheetBody>
       <SheetFooter>
+        {/* Says why Put away is greyed while a scan is looked up. Always on
+            the page, so a screen reader hears the sentence arrive. */}
+        <p
+          role="status"
+          className="text-sm text-on-secondary [&:not(:empty)]:mb-2"
+        >
+          {isResolving ? t("todo.putawaySheet.checking") : null}
+        </p>
         <SheetActions>
           <Button variant="outline" onClick={onClose}>
             {t("common:actions.cancel")}

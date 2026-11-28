@@ -290,6 +290,7 @@ export function useDocumentScanner({
   };
 
   const { resolve } = useScanResolver({
+    everyReadCounts: true,
     handle: async (result, code) => {
       const kind = scanSubjectKind(result);
       if (kind === "storage") return takeLocation(result);
