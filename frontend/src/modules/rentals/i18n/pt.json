@@ -9,7 +9,8 @@
     "today": "Hoje",
     "calendar": "Calendário",
     "bookings": "Reservas",
-    "blocks": "Bloqueios de serviço"
+    "blocks": "Bloqueios de serviço",
+    "kits": "Conjuntos"
   },
   "status": {
     "reserved": "Reservado",
@@ -43,13 +44,18 @@
     "guide": "Como funciona",
     "extendNamed": "Prolongar o empréstimo de {{name}}",
     "takeBackNamed": "Receber {{name}}",
-    "handOutNamed": "Entregar {{name}}"
+    "handOutNamed": "Entregar {{name}}",
+    "expiredTitle": "Reservas cujo período terminou",
+    "expiredHint": "Já não podem ser entregues. Prolongue uma para um novo período se o equipamento estiver livre."
   },
   "bookings": {
     "search": "Pesquisar",
     "status": "Estado",
     "all": "Todas",
-    "empty": "Nenhuma reserva corresponde."
+    "empty": "Nenhuma reserva corresponde.",
+    "partnerFilter": "Reservas deste parceiro",
+    "itemFilter": "Reservas deste equipamento",
+    "clearFilter": "Mostrar todas as reservas"
   },
   "calendar": {
     "previous": "Duas semanas anteriores",
@@ -132,7 +138,12 @@
     "timeOf": "{{label}}: hora",
     "heldBy_one": "Retido por uma reserva de modelo: {{name}} ({{count}} unidade)",
     "heldBy_other": "Retido por uma reserva de modelo: {{name}} ({{count}} unidades)",
-    "modelWithCount": "{{model}} × {{quantity}}"
+    "modelWithCount": "{{model}} × {{quantity}}",
+    "kitLine": "Conjunto",
+    "chooseKit": "Escolher um conjunto",
+    "kitHint": "Um conjunto reserva-se como uma linha; a sua disponibilidade vem dos membros e uma leitura na entrega leva o conjunto todo.",
+    "duplicateUnit": "Este equipamento já está noutra linha. Remova uma das duas.",
+    "bookAgainHint": "Copiado da reserva de {{name}}. Escolha novas datas e confirme as linhas antes de guardar."
   },
   "detail": {
     "title": "Reserva",
@@ -168,7 +179,18 @@
     "handedOut": "Entregue",
     "returned": "Devolvido",
     "notHandedOut": "Ainda não foi entregue nada.",
-    "notFound": "Reserva não encontrada"
+    "notFound": "Reserva não encontrada",
+    "printPickList": "Imprimir lista de preparação",
+    "printHandover": "Imprimir folha de entrega",
+    "printFailed": "Não foi possível criar o documento. Tente novamente.",
+    "bookAgain": "Reservar novamente",
+    "alreadyReturned": "Já devolvido",
+    "selectAll": "Selecionar tudo",
+    "returnSelected_one": "Devolver {{count}} unidade",
+    "returnSelected_other": "Devolver {{count}} unidades",
+    "staysOut": "Fica fora — não é devolvido agora",
+    "partlyReturned": "Devolvido até agora",
+    "returnedOf": "{{returned}} de {{total}} unidades"
   },
   "pickup": {
     "title": "Entrega",
@@ -193,7 +215,11 @@
     "notOnThisBooking": "{{name}} não faz parte desta reserva.",
     "busyUnit": "{{name}} não está livre até ao fim desta reserva: {{reason}}.",
     "assetTaken": "{{name}} está ocupado: {{reason}}. Escolha outra unidade.",
-    "anyUnit": "qualquer unidade"
+    "anyUnit": "qualquer unidade",
+    "kitScanHint": "Ler o código de um conjunto leva todas as suas unidades de uma vez.",
+    "kitScanned": "O conjunto {{name}} está pronto para entrega.",
+    "kitUnitsMissing": "Não há unidades livres suficientes para entregar o conjunto {{name}}.",
+    "kitPart": "conjunto {{name}}"
   },
   "blocks": {
     "title": "Bloqueios de serviço",
@@ -245,6 +271,14 @@
       "late": {
         "title": "Vigiar os atrasos",
         "body": "Hoje lista as entregas e devoluções do dia e todo o empréstimo fora do prazo. O atraso lê-se do período; não há estado que possa divergir."
+      },
+      "kits": {
+        "title": "Conjuntos",
+        "body": "Um conjunto é um grupo nomeado de equipamentos e modelos. Reserva-se como uma linha; a sua disponibilidade vem dos membros, por isso fica indisponível quando algum está ocupado. Leia o código do conjunto na entrega e todo o grupo sai de uma vez."
+      },
+      "borrower": {
+        "title": "Requerentes sem conta",
+        "body": "Uma reserva pode indicar um parceiro, um membro ou alguém de fora com nome e e-mail. A página do parceiro mostra os alugueres passados e futuros, e a cronologia de um equipamento as reservas em que participou."
       }
     },
     "rulesTitle": "Regras que o módulo mantém",
@@ -252,7 +286,10 @@
       "buffer": "As horas de margem em volta de uma reserva pertencem ao modelo ou à sua categoria e tornam a unidade não reservável dentro delas.",
       "block": "Um bloqueio manual ou de serviço não pode cobrir uma reserva existente, e não se reserva dentro de um bloqueio.",
       "overdue": "O atraso lê-se do período e do estado, nunca é guardado; prolongar também move a devolução esperada da entrega.",
-      "noPartial": "Sem entrega nem devolução parciais: cada linha é lida ou escolhida, cada unidade volta."
+      "partial": "Uma reserva pode voltar por partes: as unidades que continuam fora mantêm-na entregue e atrasada, e as devolvidas ficam livres de imediato.",
+      "kits": "Um conjunto não pode ser reservado enquanto algum membro estiver ocupado; é entregue e recebido como um todo.",
+      "reminders": "O requerente recebe um lembrete por e-mail antes do fim do período e uma vez por dia enquanto a reserva estiver atrasada, segundo o relógio da organização.",
+      "bookAgain": "«Reservar novamente» copia o requerente e as linhas de uma reserva terminada para um novo rascunho com novas datas; nada é guardado até premir Reservar."
     },
     "back": "Voltar a hoje"
   },
@@ -266,5 +303,47 @@
     "readDesc": "Pode abrir o módulo e ler reservas e bloqueios",
     "write": "Gerir alugueres",
     "writeDesc": "Pode reservar equipamento, entregá-lo, recebê-lo, prolongar reservas e bloquear unidades"
+  },
+  "history": {
+    "title": "Alugueres",
+    "partnerTitle": "Histórico de alugueres",
+    "assetTitle": "Reservas deste equipamento",
+    "emptyPartner": "Este parceiro ainda não tem alugueres.",
+    "emptyAsset": "Este equipamento ainda não tem reservas.",
+    "viewAll": "Ver todas as reservas",
+    "upcoming": "Próximos",
+    "past": "Passados"
+  },
+  "kits": {
+    "title": "Conjuntos",
+    "new": "Novo conjunto",
+    "edit": "Editar conjunto",
+    "empty": "Ainda não há conjuntos. Um conjunto é um grupo nomeado de equipamento entregue em conjunto.",
+    "name": "Nome",
+    "note": "Nota (opcional)",
+    "members": "Membros",
+    "addMember": "Adicionar membro",
+    "memberKind": {
+      "asset": "Equipamento",
+      "model": "Modelo"
+    },
+    "chooseAsset": "Escolher um equipamento",
+    "chooseModel": "Escolher um modelo",
+    "quantity": "Quantidade",
+    "save": "Guardar o conjunto",
+    "cancel": "Cancelar",
+    "delete": "Eliminar conjunto",
+    "deleteConfirmTitle": "Eliminar o conjunto",
+    "deleteConfirmMessage": "As reservas já feitas mantêm o seu equipamento; o conjunto deixa de ser oferecido.",
+    "code": "Código",
+    "codeHint": "Leia este código na entrega para levar o conjunto todo de uma vez.",
+    "memberCount_one": "{{count}} membro",
+    "memberCount_other": "{{count}} membros",
+    "needName": "Dê um nome ao conjunto",
+    "needMembers": "Um conjunto precisa de pelo menos um membro",
+    "saveFailed": "Não foi possível guardar o conjunto",
+    "removeMember": "Remover membro",
+    "editNamed": "Editar o conjunto {{name}}",
+    "deleteNamed": "Eliminar o conjunto {{name}}"
   }
 }

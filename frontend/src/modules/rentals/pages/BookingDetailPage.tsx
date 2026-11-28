@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Printer, RotateCcw } from "lucide-react";
 
 import {
   Button,
@@ -20,6 +20,7 @@ import {
   SheetFooter,
   SheetHeader,
   buttonVariants,
+  downloadBlob,
   formatDateInZone,
   formatQuantityLocale,
   isNotFoundError,
@@ -44,7 +45,6 @@ import { queryKeys } from "../queryKeys";
 export default function BookingDetailPage() {
   const { t } = useTranslation("rentals");
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const qc = useQueryClient();
   const { setHeader } = useModulePageHeader();
   const canWrite = useCanWrite("rentals");
@@ -93,7 +93,6 @@ export default function BookingDetailPage() {
               canWrite={canWrite}
               onDone={() => {
                 void qc.invalidateQueries({ queryKey: queryKeys.rentals.all });
-                navigate("/rentals");
               }}
             />
           ) : null}
@@ -159,6 +158,7 @@ function BookingHeader({
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-2">
+        <PrintButtons booking={booking} />
         {booking.can_extend ? (
           <Button
             type="button"
@@ -167,6 +167,17 @@ function BookingHeader({
             onClick={() => setExtendOpen(true)}
           >
             {t("detail.extend")}
+          </Button>
+        ) : null}
+        {booking.status === "RETURNED" || booking.status === "CANCELLED" ? (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!canWrite}
+            onClick={() => navigate(`/rentals/bookings/new?from=${booking.id}`)}
+          >
+            <RotateCcw className="mr-1.5 h-4 w-4" />
+            {t("detail.bookAgain")}
           </Button>
         ) : null}
         {booking.can_cancel ? (
@@ -201,6 +212,65 @@ function BookingHeader({
         onCancel={() => setConfirmCancel(false)}
       />
     </header>
+  );
+}
+
+function PrintButtons({ booking }: { booking: Booking }) {
+  const { t } = useTranslation("rentals");
+  const { i18n } = useTranslation();
+  const [error, setError] = useState(false);
+  const [printing, setPrinting] = useState<"pick" | "handover" | null>(null);
+  const lang = i18n.language;
+
+  async function print(kind: "pick" | "handover") {
+    setError(false);
+    setPrinting(kind);
+    try {
+      const blob =
+        kind === "pick"
+          ? await rentalsApi.pickList(booking.id, lang)
+          : await rentalsApi.handoverSheet(booking.id, lang);
+      downloadBlob(
+        blob,
+        `${kind === "pick" ? "pick-list" : "handover"}-${booking.id.slice(0, 8)}.pdf`,
+      );
+    } catch {
+      setError(true);
+    } finally {
+      setPrinting(null);
+    }
+  }
+
+  return (
+    <>
+      {booking.status === "RESERVED" ? (
+        <Button
+          type="button"
+          variant="outline"
+          isLoading={printing === "pick"}
+          onClick={() => void print("pick")}
+        >
+          <Printer className="mr-1.5 h-4 w-4" />
+          {t("detail.printPickList")}
+        </Button>
+      ) : null}
+      {booking.status === "PICKED_UP" || booking.status === "RETURNED" ? (
+        <Button
+          type="button"
+          variant="outline"
+          isLoading={printing === "handover"}
+          onClick={() => void print("handover")}
+        >
+          <Printer className="mr-1.5 h-4 w-4" />
+          {t("detail.printHandover")}
+        </Button>
+      ) : null}
+      {error ? (
+        <span role="alert" className="text-sm text-red-700">
+          {t("detail.printFailed")}
+        </span>
+      ) : null}
+    </>
   );
 }
 
@@ -327,10 +397,23 @@ function ReturnForm({
 }) {
   const { t } = useTranslation("rentals");
   const timezone = useOrganizationTimezone();
-  const units = useMemo(
+  const allUnits = useMemo(
     () => booking.lines.flatMap((line) => line.units ?? []),
     [booking.lines],
   );
+  const units = useMemo(
+    () => allUnits.filter((unit) => unit.is_out !== false),
+    [allUnits],
+  );
+  const goneUnits = useMemo(
+    () => allUnits.filter((unit) => unit.is_out === false),
+    [allUnits],
+  );
+  const [selected, setSelected] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    for (const unit of units) initial[unit.id] = true;
+    return initial;
+  });
   const [state, setState] = useState<Record<string, UnitReturn>>(() => {
     const initial: Record<string, UnitReturn> = {};
     for (const unit of units) {
@@ -389,22 +472,24 @@ function ReturnForm({
 
   function buildPayload(): ReturnRequest {
     const payload: ReturnRequest = {
-      units: units.map((unit) => {
-        const entry = state[unit.id] as UnitReturn;
-        return {
-          unit_id: unit.id,
-          condition: entry.condition,
-          note: entry.note.trim() || undefined,
-          service_reason:
-            entry.condition === "NEEDS_REPAIR"
-              ? entry.serviceReason.trim()
-              : undefined,
-          service_until:
-            entry.condition === "NEEDS_REPAIR"
-              ? wallTimeToIso(entry.serviceDate, entry.serviceTime, timezone)
-              : undefined,
-        };
-      }),
+      units: units
+        .filter((unit) => selected[unit.id])
+        .map((unit) => {
+          const entry = state[unit.id] as UnitReturn;
+          return {
+            unit_id: unit.id,
+            condition: entry.condition,
+            note: entry.note.trim() || undefined,
+            service_reason:
+              entry.condition === "NEEDS_REPAIR"
+                ? entry.serviceReason.trim()
+                : undefined,
+            service_until:
+              entry.condition === "NEEDS_REPAIR"
+                ? wallTimeToIso(entry.serviceDate, entry.serviceTime, timezone)
+                : undefined,
+          };
+        }),
       moves: conflicts
         .filter(
           (conflict) =>
@@ -419,23 +504,44 @@ function ReturnForm({
     return payload;
   }
 
-  const ready = units.every((unit) => {
-    const entry = state[unit.id] as UnitReturn;
-    if (entry.condition !== "NEEDS_REPAIR") return true;
-    return Boolean(entry.serviceReason.trim() && entry.serviceDate);
-  });
+  const comingBack = units.filter((unit) => selected[unit.id]);
+  const ready =
+    comingBack.length > 0 &&
+    comingBack.every((unit) => {
+      const entry = state[unit.id] as UnitReturn;
+      if (entry.condition !== "NEEDS_REPAIR") return true;
+      return Boolean(entry.serviceReason.trim() && entry.serviceDate);
+    });
+  const partly = comingBack.length < units.length;
 
   return (
     <section className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
       <h2 className="border-b border-zinc-200 px-4 py-3.5 text-base font-semibold">
         {t("detail.returnTitle")}
       </h2>
+      {goneUnits.length ? (
+        <div className="border-b border-zinc-100 px-4 py-3 text-sm text-zinc-500">
+          <span className="block font-semibold">
+            {t("detail.alreadyReturned")}
+          </span>
+          {goneUnits.map((unit) => (
+            <span key={unit.id} className="block">
+              {unit.item_name}
+              {unit.condition ? ` · ${t(CONDITION_KEYS[unit.condition])}` : ""}
+            </span>
+          ))}
+        </div>
+      ) : null}
       <div className="flex flex-col">
         {units.map((unit) => (
           <UnitReturnBlock
             key={unit.id}
             unit={unit}
             value={state[unit.id] as UnitReturn}
+            selected={selected[unit.id] ?? true}
+            onSelected={(value) =>
+              setSelected((current) => ({ ...current, [unit.id]: value }))
+            }
             onChange={(patch) => update(unit.id, patch)}
           />
         ))}
@@ -521,7 +627,18 @@ function ReturnForm({
         </p>
       ) : null}
 
-      <div className="flex justify-end border-t border-zinc-100 p-4">
+      <div className="flex flex-wrap items-center justify-end gap-2 border-t border-zinc-100 p-4">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() =>
+            setSelected(
+              Object.fromEntries(units.map((unit) => [unit.id, true])),
+            )
+          }
+        >
+          {t("detail.selectAll")}
+        </Button>
         <Button
           type="button"
           variant="primary"
@@ -529,7 +646,9 @@ function ReturnForm({
           isLoading={submit.isPending}
           onClick={() => submit.mutate(buildPayload())}
         >
-          {t("detail.confirmReturn")}
+          {partly
+            ? t("detail.returnSelected", { count: comingBack.length })
+            : t("detail.confirmReturn")}
         </Button>
       </div>
     </section>
@@ -539,65 +658,85 @@ function ReturnForm({
 function UnitReturnBlock({
   unit,
   value,
+  selected,
+  onSelected,
   onChange,
 }: {
   unit: UnitSchema;
   value: UnitReturn;
+  selected: boolean;
+  onSelected: (value: boolean) => void;
   onChange: (patch: Partial<UnitReturn>) => void;
 }) {
   const { t } = useTranslation("rentals");
   return (
     <fieldset className="flex flex-col gap-2.5 border-b border-zinc-100 p-4 last:border-b-0">
-      <legend className="text-sm font-semibold">{unit.item_name}</legend>
-      <div className="flex flex-wrap gap-1.5">
-        {(["GOOD", "DAMAGED", "NEEDS_REPAIR"] as const).map((condition) => {
-          const active = value.condition === condition;
-          return (
-            <Button
-              key={condition}
-              type="button"
-              variant={active ? "primary" : "outline"}
-              className={
-                active && condition === "NEEDS_REPAIR"
-                  ? "rounded-full border-amber-700 bg-amber-50 text-amber-900 hover:bg-amber-100"
-                  : "rounded-full"
-              }
-              onClick={() => onChange({ condition })}
-            >
-              {t(CONDITION_KEYS[condition])}
-            </Button>
-          );
-        })}
-      </div>
-      {value.condition === "NEEDS_REPAIR" ? (
-        <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-3">
-          <div className="sm:col-span-1">
+      <legend className="text-sm font-semibold">
+        <label className="flex min-h-10 items-center gap-2.5">
+          <input
+            type="checkbox"
+            className="h-5 w-5 accent-teal-700"
+            checked={selected}
+            onChange={(event) => onSelected(event.target.checked)}
+          />
+          {unit.item_name}
+        </label>
+      </legend>
+      {selected ? (
+        <>
+          <div className="flex flex-wrap gap-1.5">
+            {(["GOOD", "DAMAGED", "NEEDS_REPAIR"] as const).map((condition) => {
+              const active = value.condition === condition;
+              return (
+                <Button
+                  key={condition}
+                  type="button"
+                  variant={active ? "primary" : "outline"}
+                  className={
+                    active && condition === "NEEDS_REPAIR"
+                      ? "rounded-full border-amber-700 bg-amber-50 text-amber-900 hover:bg-amber-100"
+                      : "rounded-full"
+                  }
+                  onClick={() => onChange({ condition })}
+                >
+                  {t(CONDITION_KEYS[condition])}
+                </Button>
+              );
+            })}
+          </div>
+          {value.condition === "NEEDS_REPAIR" ? (
+            <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-3">
+              <div className="sm:col-span-1">
+                <Input
+                  label={t("detail.whatHappened")}
+                  value={value.serviceReason}
+                  onChange={(event) =>
+                    onChange({ serviceReason: event.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <DateTimeField
+                  id={`service-${unit.id}`}
+                  label={t("detail.unavailableUntil")}
+                  date={value.serviceDate}
+                  time={value.serviceTime}
+                  onDateChange={(date) => onChange({ serviceDate: date })}
+                  onTimeChange={(time) => onChange({ serviceTime: time })}
+                />
+              </div>
+            </div>
+          ) : (
             <Input
-              label={t("detail.whatHappened")}
-              value={value.serviceReason}
-              onChange={(event) =>
-                onChange({ serviceReason: event.target.value })
-              }
-              required
+              label={t("detail.note")}
+              value={value.note}
+              onChange={(event) => onChange({ note: event.target.value })}
             />
-          </div>
-          <div className="sm:col-span-2">
-            <DateTimeField
-              id={`service-${unit.id}`}
-              label={t("detail.unavailableUntil")}
-              date={value.serviceDate}
-              time={value.serviceTime}
-              onDateChange={(date) => onChange({ serviceDate: date })}
-              onTimeChange={(time) => onChange({ serviceTime: time })}
-            />
-          </div>
-        </div>
+          )}
+        </>
       ) : (
-        <Input
-          label={t("detail.note")}
-          value={value.note}
-          onChange={(event) => onChange({ note: event.target.value })}
-        />
+        <span className="text-xs text-zinc-500">{t("detail.staysOut")}</span>
       )}
     </fieldset>
   );
@@ -628,6 +767,11 @@ function BookingFacts({ booking }: { booking: Booking }) {
         <Fact label={t("detail.equipment")}>
           {booking.lines.map((line) => (
             <span key={line.id} className="block">
+              {line.kit_name ? (
+                <span className="mr-1.5 rounded bg-zinc-100 px-1.5 py-0.5 text-xs">
+                  {line.kit_name}
+                </span>
+              ) : null}
               {line.item_id
                 ? line.item_name
                 : `${line.model} (${t("detail.anyUnit")})`}
@@ -637,6 +781,14 @@ function BookingFacts({ booking }: { booking: Booking }) {
             </span>
           ))}
         </Fact>
+        {booking.returned_count > 0 && booking.outstanding_count > 0 ? (
+          <Fact label={t("detail.partlyReturned")}>
+            {t("detail.returnedOf", {
+              returned: booking.returned_count,
+              total: booking.returned_count + booking.outstanding_count,
+            })}
+          </Fact>
+        ) : null}
         {booking.note ? (
           <Fact label={t("detail.note")}>{booking.note}</Fact>
         ) : null}

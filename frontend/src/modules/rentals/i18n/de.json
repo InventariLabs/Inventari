@@ -9,7 +9,8 @@
     "today": "Heute",
     "calendar": "Kalender",
     "bookings": "Buchungen",
-    "blocks": "Servicesperren"
+    "blocks": "Servicesperren",
+    "kits": "Sets"
   },
   "status": {
     "reserved": "Reserviert",
@@ -43,13 +44,18 @@
     "guide": "So funktioniert es",
     "extendNamed": "Leihe von {{name}} verlängern",
     "takeBackNamed": "{{name}} zurücknehmen",
-    "handOutNamed": "{{name}} ausgeben"
+    "handOutNamed": "{{name}} ausgeben",
+    "expiredTitle": "Buchungen mit abgelaufenem Zeitraum",
+    "expiredHint": "Sie können nicht mehr ausgegeben werden. Verlängern Sie eine auf einen neuen Zeitraum, wenn das Equipment frei ist."
   },
   "bookings": {
     "search": "Suche",
     "status": "Status",
     "all": "Alle",
-    "empty": "Keine Buchung passt."
+    "empty": "Keine Buchung passt.",
+    "partnerFilter": "Buchungen dieses Partners",
+    "itemFilter": "Buchungen dieses Gegenstands",
+    "clearFilter": "Alle Buchungen anzeigen"
   },
   "calendar": {
     "previous": "Vorherige zwei Wochen",
@@ -132,7 +138,12 @@
     "timeOf": "{{label}}: Uhrzeit",
     "heldBy_one": "Von einer Modellbuchung gehalten: {{name}} ({{count}} Gerät)",
     "heldBy_other": "Von einer Modellbuchung gehalten: {{name}} ({{count}} Geräte)",
-    "modelWithCount": "{{model}} × {{quantity}}"
+    "modelWithCount": "{{model}} × {{quantity}}",
+    "kitLine": "Set",
+    "chooseKit": "Set auswählen",
+    "kitHint": "Ein Set wird als eine Position gebucht; seine Verfügbarkeit folgt seinen Bestandteilen, und ein Scan bei der Ausgabe nimmt das ganze Set mit.",
+    "duplicateUnit": "Dieser Gegenstand steht bereits auf einer anderen Position. Entfernen Sie eine der beiden.",
+    "bookAgainHint": "Aus der Buchung von {{name}} kopiert. Wählen Sie neue Daten und prüfen Sie die Positionen vor dem Speichern."
   },
   "detail": {
     "title": "Buchung",
@@ -168,7 +179,18 @@
     "handedOut": "Ausgegeben",
     "returned": "Zurückgenommen",
     "notHandedOut": "Noch nichts ausgegeben.",
-    "notFound": "Buchung nicht gefunden"
+    "notFound": "Buchung nicht gefunden",
+    "printPickList": "Packliste drucken",
+    "printHandover": "Übergabeprotokoll drucken",
+    "printFailed": "Das Dokument konnte nicht erstellt werden. Bitte erneut versuchen.",
+    "bookAgain": "Erneut buchen",
+    "alreadyReturned": "Bereits zurückgegeben",
+    "selectAll": "Alle auswählen",
+    "returnSelected_one": "{{count}} Stück zurückgeben",
+    "returnSelected_other": "{{count}} Stück zurückgeben",
+    "staysOut": "Bleibt draußen — wird jetzt nicht zurückgegeben",
+    "partlyReturned": "Bisher zurückgegeben",
+    "returnedOf": "{{returned}} von {{total}} Stück"
   },
   "pickup": {
     "title": "Ausgabe",
@@ -193,7 +215,11 @@
     "notOnThisBooking": "{{name}} gehört nicht zu dieser Buchung.",
     "busyUnit": "{{name}} ist nicht bis zum Ende dieser Buchung frei: {{reason}}.",
     "assetTaken": "{{name}} ist belegt: {{reason}}. Wählen Sie ein anderes Gerät.",
-    "anyUnit": "beliebiges Gerät"
+    "anyUnit": "beliebiges Gerät",
+    "kitScanHint": "Der Scan des Set-Codes nimmt alle Bestandteile auf einmal mit.",
+    "kitScanned": "Set {{name}} ist zur Ausgabe bereit.",
+    "kitUnitsMissing": "Zu wenige freie Stücke, um das Set {{name}} auszugeben.",
+    "kitPart": "Set {{name}}"
   },
   "blocks": {
     "title": "Servicesperren",
@@ -245,6 +271,14 @@
       "late": {
         "title": "Überfälliges im Blick",
         "body": "Heute zeigt die Ausgaben und Rückgaben des Tages und jede Buchung über der Frist. Überfällig wird aus dem Zeitraum gelesen; es gibt keinen Status, der auseinanderlaufen kann."
+      },
+      "kits": {
+        "title": "Sets",
+        "body": "Ein Set ist ein benannter Satz von Gegenständen und Modellen. Sie buchen es als eine Position; seine Verfügbarkeit folgt seinen Bestandteilen, ist also nicht verfügbar, wenn einer davon belegt ist. Scannen Sie den Set-Code bei der Ausgabe, und der ganze Satz geht auf einmal mit."
+      },
+      "borrower": {
+        "title": "Ausleihende ohne Konto",
+        "body": "Eine Buchung kann einen Partner, ein Mitglied oder eine Person außerhalb des Systems mit Name und E-Mail nennen. Die Partnerseite zeigt vergangene und kommende Ausleihen, die Zeitleiste eines Gegenstands die Buchungen, an denen er beteiligt war."
       }
     },
     "rulesTitle": "Regeln des Moduls",
@@ -252,7 +286,10 @@
       "buffer": "Pufferstunden um eine Buchung gehören zum Modell oder seiner Kategorie; darin ist das Gerät nicht buchbar.",
       "block": "Eine manuelle oder Service-Sperre darf keine bestehende Buchung treffen, und in eine Sperre darf nicht gebucht werden.",
       "overdue": "Überfällig wird aus Zeitraum und Status gelesen, nie gespeichert; Verlängern verschiebt auch die erwartete Rückgabe der Ausgabe.",
-      "noPartial": "Keine teilweise Ausgabe oder Rückgabe: jede Position wird gescannt oder gewählt, jedes Gerät kommt zurück."
+      "partial": "Eine Buchung kann in Teilen zurückkommen: Die noch draußen befindlichen Stücke halten sie ausgegeben und überfällig, die zurückgegebenen sind sofort frei.",
+      "kits": "Ein Set kann nicht gebucht werden, solange ein Bestandteil belegt ist; es wird als Ganzes ausgegeben und zurückgenommen.",
+      "reminders": "Die ausleihende Person wird vor dem Ende des Zeitraums per E-Mail erinnert und danach einmal täglich, solange die Buchung überfällig ist — nach der Uhr der Organisation.",
+      "bookAgain": "„Erneut buchen“ kopiert Ausleihende und Positionen einer abgeschlossenen Buchung in einen neuen Entwurf mit neuen Daten; gespeichert wird erst mit „Buchen“."
     },
     "back": "Zurück zu Heute"
   },
@@ -266,5 +303,47 @@
     "readDesc": "Kann das Verleihmodul öffnen und Buchungen sowie Sperren lesen",
     "write": "Verleih verwalten",
     "writeDesc": "Kann Geräte buchen, ausgeben, zurücknehmen, Buchungen verlängern und Geräte sperren"
+  },
+  "history": {
+    "title": "Ausleihen",
+    "partnerTitle": "Ausleihhistorie",
+    "assetTitle": "Buchungen dieses Gegenstands",
+    "emptyPartner": "Dieser Partner hat noch keine Ausleihen.",
+    "emptyAsset": "Dieser Gegenstand hat noch keine Buchungen.",
+    "viewAll": "Alle Buchungen anzeigen",
+    "upcoming": "Kommend",
+    "past": "Vergangen"
+  },
+  "kits": {
+    "title": "Sets",
+    "new": "Neues Set",
+    "edit": "Set bearbeiten",
+    "empty": "Noch keine Sets. Ein Set ist ein benannter Satz Equipment, der zusammen ausgegeben wird.",
+    "name": "Name",
+    "note": "Notiz (optional)",
+    "members": "Bestandteile",
+    "addMember": "Bestandteil hinzufügen",
+    "memberKind": {
+      "asset": "Gegenstand",
+      "model": "Modell"
+    },
+    "chooseAsset": "Gegenstand auswählen",
+    "chooseModel": "Modell auswählen",
+    "quantity": "Menge",
+    "save": "Set speichern",
+    "cancel": "Abbrechen",
+    "delete": "Set löschen",
+    "deleteConfirmTitle": "Set löschen",
+    "deleteConfirmMessage": "Bereits erstellte Buchungen behalten ihr Equipment; das Set wird für neue Buchungen nicht mehr angeboten.",
+    "code": "Code",
+    "codeHint": "Scannen Sie diesen Code bei der Ausgabe, um das ganze Set auf einmal mitzunehmen.",
+    "memberCount_one": "{{count}} Bestandteil",
+    "memberCount_other": "{{count}} Bestandteile",
+    "needName": "Geben Sie dem Set einen Namen",
+    "needMembers": "Ein Set braucht mindestens einen Bestandteil",
+    "saveFailed": "Das Set konnte nicht gespeichert werden",
+    "removeMember": "Bestandteil entfernen",
+    "editNamed": "Set {{name}} bearbeiten",
+    "deleteNamed": "Set {{name}} löschen"
   }
 }

@@ -319,6 +319,19 @@ def _add_booking_slots(
             held_asset = world.assets_by_id.get(unit.item_id)
             if held_asset is None:
                 continue
+            if booking.status == 'PICKED_UP' and unit.returned_at is not None:
+                # A partly returned booking keeps its status while the rest
+                # is out; the unit that came back is free from that moment.
+                world.slots_by_item.setdefault(unit.item_id, []).append(
+                    Slot(
+                        kind='returned',
+                        starts_at=booking.held_from,
+                        ends_at=unit.returned_at,
+                        label=booking.borrower_name,
+                        booking_id=booking.id,
+                    )
+                )
+                continue
             if open_ended:
                 # The loan up to its due date is drawn as handed out, and the
                 # late stretch from there to now as a hold of its own.
@@ -392,6 +405,8 @@ def add_extended_booking(
     """
     kind = _booking_kind(booking, world.now)
     for unit in booking.units:
+        if unit.returned_at is not None:
+            continue
         asset = world.assets_by_id.get(unit.item_id)
         if asset is None:
             continue
@@ -564,7 +579,9 @@ def model_pool(
             ):
                 waiting.append((booking, line))
     physically_free = max(0, len(units) - len(busy))
-    held = sum(line.unresolved_count for _booking, line in waiting)
+    held = _peak_promise_demand(
+        waiting, window_start, window_end, model_before, model_after
+    )
     busy_ids = {unit.id for unit, _slots in busy}
     beside = sum(
         1 for unit in units if unit.id in pinned_beside and unit.id not in busy_ids
@@ -581,7 +598,8 @@ def model_pool(
             own_taken = sum(
                 1
                 for unit in excluded.units
-                if unit.item_id not in busy_ids
+                if unit.returned_at is None
+                and unit.item_id not in busy_ids
                 and unit.item_id in world.assets_by_id
                 and world.assets_by_id[unit.item_id].model == model
             )
@@ -592,6 +610,40 @@ def model_pool(
         physically_free=physically_free,
         free=max(0, physically_free - held - own_taken - taken - beside),
     )
+
+
+def _peak_promise_demand(
+    waiting: list[tuple[RentalBooking, RentalBookingLine]],
+    window_start: datetime,
+    window_end: datetime,
+    model_before: int,
+    model_after: int,
+) -> int:
+    """How many units the promises hold at the busiest moment of the window.
+
+    Promises that never overlap each other never compete for the same unit:
+    two bookings on Monday and two on Wednesday leave the fleet free on
+    Tuesday, and a week-long booking fits between them. Summing them as if
+    they all ran at once would answer "nothing is free" for a fleet that is
+    half idle every day.
+    """
+    events: list[tuple[datetime, int]] = []
+    for booking, line in waiting:
+        start = max(booking.starts_at - timedelta(hours=model_before), window_start)
+        end = min(booking.ends_at + timedelta(hours=model_after), window_end)
+        if end <= start:
+            continue
+        count = line.unresolved_count
+        events.append((start, count))
+        events.append((end, -count))
+    # Half-open windows: an end at the instant another promise starts leaves
+    # the two non-overlapping, so ends are applied before starts.
+    events.sort(key=lambda event: (event[0], event[1]))
+    peak = current = 0
+    for _moment, delta in events:
+        current += delta
+        peak = max(peak, current)
+    return peak
 
 
 @dataclass
@@ -754,6 +806,11 @@ def _slot_detail(slot: Slot, asset: EquipmentAssetDTO | None = None) -> Conflict
         ends_at=slot.ends_at,
         booking_id=slot.booking_id,
         reason=slot.reason,
+        # A slot starts when the unit really left: the booked window when
+        # nobody came early, the hand-out when they did. An open-ended late
+        # loan has no end until the return is recorded.
+        held_from=slot.starts_at,
+        held_until=None if slot.open_ended else slot.ends_at,
     )
 
 
@@ -940,6 +997,42 @@ def nearest_window(
     return None
 
 
+def nearest_window_for_lines(
+    world: World,
+    lines: list[BookingLineIn],
+    starts_at: datetime,
+    ends_at: datetime,
+    *,
+    exclude_booking_id: UUID | None = None,
+) -> WindowSuggestion | None:
+    """The nearest window of the same length in which every line fits.
+
+    A kit is handed out as one set, so its way out is a window where all its
+    members are free together, not the first member's own nearest window.
+    """
+    duration = ends_at - starts_at
+    horizon = min(
+        world.ends_at - duration,
+        starts_at + timedelta(days=NEAREST_HORIZON_DAYS),
+    )
+    cursor = starts_at
+    checks = 0
+    while cursor + duration <= horizon and checks < 24 * 30:
+        candidate_end = cursor + duration
+        world_checks = checks_for_lines(
+            world,
+            lines,
+            cursor,
+            candidate_end,
+            exclude_booking_id=exclude_booking_id,
+        )
+        if all(check.ok for check in world_checks):
+            return WindowSuggestion(starts_at=cursor, ends_at=candidate_end)
+        cursor += timedelta(hours=1)
+        checks += 1
+    return None
+
+
 def checks_for_lines(
     world: World,
     lines: list[BookingLineIn],
@@ -961,6 +1054,10 @@ def checks_for_lines(
         asset = world.assets_by_id.get(line.item_id) if line.item_id else None
         if asset is not None and asset.model:
             pinned.setdefault(asset.model, set()).add(asset.id)
+    seen_units: dict[UUID, int] = {}
+    for line in lines:
+        if line.item_id is not None:
+            seen_units[line.item_id] = seen_units.get(line.item_id, 0) + 1
     results: list[LineCheck] = []
     for index, line in enumerate(lines):
         if line.model is not None:
@@ -981,6 +1078,23 @@ def checks_for_lines(
             pinned_beside=beside,
         )
         check.index = index
+        if line.item_id is not None and seen_units.get(line.item_id, 0) > 1:
+            asset = world.assets_by_id.get(line.item_id)
+            check.ok = False
+            check.available = 0
+            check.max_quantity = 0
+            check.nearest_window = None
+            check.conflicts.append(
+                ConflictDetail(
+                    item_id=line.item_id,
+                    item_name=asset.name if asset is not None else None,
+                    item_serial_number=(
+                        asset.serial_number if asset is not None else None
+                    ),
+                    kind='duplicate_unit',
+                    label=asset.name if asset is not None else '',
+                )
+            )
         results.append(
             attach_way_out(
                 world,

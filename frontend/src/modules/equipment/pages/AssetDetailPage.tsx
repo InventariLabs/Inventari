@@ -9,7 +9,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { QueryError } from "@/components/ui/QueryResult";
 import { RecordNotFound } from "@/components/ui/RecordNotFound";
 import { isNotFoundError } from "@/lib/errors";
-import { useCanPurge, useRecordVisit } from "@/module-sdk";
+import { TypedSlot, useCanPurge, useRecordVisit } from "@/module-sdk";
 import { AssetStatusBadge } from "@/modules/equipment/components/AssetStatusBadge";
 import { AssetDetailHeaderActions } from "@/modules/equipment/components/AssetDetailHeaderActions";
 import { CheckoutModal } from "@/modules/equipment/components/CheckoutModal";
@@ -259,7 +259,16 @@ export default function AssetDetailPage() {
           </div>
         </TabsContent>
         <TabsContent value="timeline">
-          <AssetTimeline item={item} />
+          <div className="space-y-6">
+            <AssetTimeline item={item} />
+            {/* What the asset was rented out for, from the rentals module
+                when it is on. The timeline records what happened to the
+                asset; the bookings are not this module's record. */}
+            <TypedSlot
+              name="asset_detail_extra"
+              data={{ itemId: item.id, itemName: item.name }}
+            />
+          </div>
         </TabsContent>
         <TabsContent value="assignments">
           <AssignmentsTab

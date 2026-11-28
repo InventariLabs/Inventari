@@ -24,18 +24,24 @@ BorrowerKind = Literal['partner', 'user', 'external']
 
 
 class BookingLineIn(BaseModel):
-    """One thing a booking asks for: an asset, or a model and a count."""
+    """One thing a booking asks for: an asset, a model and a count, or a kit."""
 
     item_id: UUID | None = None
     model: str | None = Field(default=None, max_length=255)
+    kit_id: UUID | None = None
     quantity: int = Field(default=1, ge=1, le=999)
 
     @model_validator(mode='after')
     def _one_kind(self) -> BookingLineIn:
-        if (self.item_id is None) == (self.model is None):
+        named = sum(
+            value is not None for value in (self.item_id, self.model, self.kit_id)
+        )
+        if named != 1:
             raise ServiceRejectionError('rental_line_names_one_kind')
         if self.item_id is not None and self.quantity != 1:
             raise ServiceRejectionError('rental_asset_line_quantity')
+        if self.kit_id is not None and self.quantity != 1:
+            raise ServiceRejectionError('rental_kit_line_quantity')
         if self.model is not None:
             self.model = self.model.strip()
             if not self.model:
@@ -90,6 +96,11 @@ class ConflictDetail(BaseModel):
     ends_at: datetime | None = None
     booking_id: UUID | None = None
     reason: str | None = None
+    # When the thing really holds the unit: a hand-out made before the
+    # window, or a loan left open past its due date (held_until is empty
+    # then, because the return is what ends the hold).
+    held_from: datetime | None = None
+    held_until: datetime | None = None
 
 
 class WindowSuggestion(BaseModel):
@@ -134,6 +145,7 @@ class UnitSchema(BaseModel):
     condition: Condition | None = None
     note: str | None = None
     returned_at: datetime | None = None
+    is_out: bool = True
 
 
 class LineSchema(BaseModel):
@@ -143,7 +155,13 @@ class LineSchema(BaseModel):
     model: str | None = None
     quantity: int
     resolved_count: int
+    kit_id: UUID | None = None
+    kit_name: str | None = None
     units: list[UnitSchema] = Field(default_factory=list)
+
+    @property
+    def out_count(self) -> int:
+        return sum(1 for unit in self.units if unit.is_out)
 
 
 class BookingSchema(BaseModel):
@@ -167,6 +185,10 @@ class BookingSchema(BaseModel):
     can_return: bool
     can_cancel: bool
     can_extend: bool
+    # A partly returned booking keeps its status and its late flag while any
+    # unit is still out; these counts make the state legible.
+    returned_count: int = 0
+    outstanding_count: int = 0
     # History for the detail screen: reserved, handed out, returned.
     handed_out_at: datetime | None = None
     returned_at: datetime | None = None
@@ -179,6 +201,7 @@ class BookingListRow(BaseModel):
     late_days: int
     borrower_name: str
     borrower_kind: BorrowerKind
+    borrower_partner_id: UUID | None = None
     starts_at: datetime
     ends_at: datetime
     units_count: int
@@ -187,8 +210,11 @@ class BookingListRow(BaseModel):
 
 class PickupRequest(BaseModel):
     # Each scanned or chosen asset, in scan order. A model line takes the
-    # units that match its model until its count is met.
+    # units that match its model until its count is met. A scanned kit is
+    # one entry here; the service resolves every member the booking holds
+    # from it, so one scan hands the whole set out.
     item_ids: list[UUID] = Field(default_factory=list)
+    kit_ids: list[UUID] = Field(default_factory=list)
 
 
 class ReturnUnitIn(BaseModel):
@@ -357,6 +383,8 @@ class TodayItem(BaseModel):
     at: datetime
     until: datetime | None = None
     late_days: int = 0
+    # A reservation whose window has passed is extended, never handed out.
+    can_pickup: bool = True
 
 
 class TodayResponse(BaseModel):
@@ -364,9 +392,11 @@ class TodayResponse(BaseModel):
     pickups_count: int
     returns_count: int
     late_count: int
+    expired_count: int = 0
     late: list[TodayItem]
     pickups: list[TodayItem]
     returns: list[TodayItem]
+    expired: list[TodayItem] = Field(default_factory=list)
     in_service: list[BlockSchema]
 
 
@@ -408,3 +438,58 @@ class CalendarResponse(BaseModel):
     starts_at: datetime
     ends_at: datetime
     groups: list[CalendarGroup]
+
+
+class KitMemberIn(BaseModel):
+    """One member of a kit: a specific asset, or a model and a count."""
+
+    item_id: UUID | None = None
+    model: str | None = Field(default=None, max_length=255)
+    quantity: int = Field(default=1, ge=1, le=999)
+
+    @model_validator(mode='after')
+    def _one_kind(self) -> KitMemberIn:
+        if (self.item_id is None) == (self.model is None):
+            raise ServiceRejectionError('rental_kit_member_names_one_kind')
+        if self.item_id is not None and self.quantity != 1:
+            raise ServiceRejectionError('rental_asset_line_quantity')
+        if self.model is not None:
+            self.model = self.model.strip()
+            if not self.model:
+                raise ServiceRejectionError('rental_model_line_needs_model')
+        return self
+
+
+class KitCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=255)
+    note: str | None = Field(default=None, max_length=2000)
+    members: list[KitMemberIn] = Field(..., min_length=1)
+
+
+class KitUpdate(KitCreate):
+    pass
+
+
+class KitMemberSchema(BaseModel):
+    id: UUID
+    item_id: UUID | None = None
+    item_name: str | None = None
+    model: str | None = None
+    quantity: int
+
+
+class KitSchema(BaseModel):
+    id: UUID
+    name: str
+    code: str
+    note: str | None = None
+    members: list[KitMemberSchema] = Field(default_factory=list)
+    created_at: datetime
+
+
+class KitListRow(BaseModel):
+    id: UUID
+    name: str
+    code: str
+    member_count: int
+    summary: str

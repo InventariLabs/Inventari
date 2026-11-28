@@ -26,10 +26,16 @@ export type BookingStatus = Booking["status"];
 export type LineCheck = components["schemas"]["LineCheck"];
 export type UnitSchema = components["schemas"]["UnitSchema"];
 export type ConflictDetail = components["schemas"]["ConflictDetail"];
+export type Kit = components["schemas"]["KitSchema"];
+export type KitListRow = components["schemas"]["KitListRow"];
+export type KitCreate = components["schemas"]["KitCreate"];
+export type KitMemberIn = components["schemas"]["KitMemberIn"];
 
 export interface BookingListParams {
   status?: string;
   search?: string;
+  partner_id?: string;
+  item_id?: string;
   limit?: number;
   offset?: number;
 }
@@ -69,6 +75,46 @@ export const rentalsApi = {
       params,
     });
     return response.data;
+  },
+
+  pickList: async (id: string, lang: string): Promise<Blob> => {
+    const response = await api.get<Blob>(`/rentals/bookings/${id}/pick-list`, {
+      params: { lang },
+      responseType: "blob",
+    });
+    return response.data;
+  },
+
+  handoverSheet: async (id: string, lang: string): Promise<Blob> => {
+    const response = await api.get<Blob>(
+      `/rentals/bookings/${id}/handover-sheet`,
+      { params: { lang }, responseType: "blob" },
+    );
+    return response.data;
+  },
+
+  kits: async (): Promise<KitListRow[]> => {
+    const response = await api.get<KitListRow[]>("/rentals/kits");
+    return response.data;
+  },
+
+  kit: async (id: string): Promise<Kit> => {
+    const response = await api.get<Kit>(`/rentals/kits/${id}`);
+    return response.data;
+  },
+
+  createKit: async (data: KitCreate): Promise<Kit> => {
+    const response = await api.post<Kit>("/rentals/kits", data);
+    return response.data;
+  },
+
+  updateKit: async (id: string, data: KitCreate): Promise<Kit> => {
+    const response = await api.put<Kit>(`/rentals/kits/${id}`, data);
+    return response.data;
+  },
+
+  deleteKit: async (id: string): Promise<void> => {
+    await api.delete(`/rentals/kits/${id}`);
   },
 
   booking: async (id: string): Promise<Booking> => {

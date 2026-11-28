@@ -41,9 +41,11 @@ from ._availability import (
     item_promise_conflicts,
     load_world,
     model_pool,
+    nearest_window_for_lines,
     organization_today,
 )
 from ._blocks import block_schema
+from ._kits import kits_by_ids
 from .exceptions import RentalConflictError
 from .models import (
     RentalBlock,
@@ -52,12 +54,15 @@ from .models import (
     RentalBookingUnit,
 )
 from .schemas import (
+    BookingCheckRequest,
     BookingCheckResponse,
     BookingCreate,
+    BookingLineIn,
     BookingListRow,
     BookingSchema,
     CalendarResponse,
     ExtendRequest,
+    LineCheck,
     LineSchema,
     MoveIn,
     PickupRequest,
@@ -137,7 +142,14 @@ def _booking_summary(
     booking: RentalBooking, assets: dict[UUID, EquipmentAssetDTO]
 ) -> str:
     parts: list[str] = []
+    seen_kits: set[UUID] = set()
     for line in booking.lines:
+        if line.kit_id is not None:
+            if line.kit_id in seen_kits:
+                continue
+            seen_kits.add(line.kit_id)
+            parts.append(line.kit_name or '—')
+            continue
         if line.item_id is not None:
             name = _asset_name(assets, line.item_id)
             parts.append(name or '—')
@@ -162,6 +174,7 @@ def _unit_schema(
         condition=unit.condition,  # type: ignore[arg-type]
         note=unit.return_note,
         returned_at=unit.returned_at,
+        is_out=unit.returned_at is None,
     )
 
 
@@ -179,6 +192,8 @@ def _line_schema(
         model=line.model,
         quantity=line.quantity,
         resolved_count=len(line.units),
+        kit_id=line.kit_id,
+        kit_name=line.kit_name,
         units=[_unit_schema(unit, assets) for unit in line.units],
     )
 
@@ -200,6 +215,8 @@ async def booking_schema(
         if user is not None:
             created_by_name = user.full_name or user.email
     is_late = booking.status == 'PICKED_UP' and booking.ends_at < now
+    outstanding = [unit for unit in booking.units if unit.returned_at is None]
+    returned_count = len(booking.units) - len(outstanding)
     return BookingSchema(
         id=booking.id,
         status=booking.status,  # type: ignore[arg-type]
@@ -216,10 +233,15 @@ async def booking_schema(
         lines=[_line_schema(line, assets) for line in booking.lines],
         created_at=booking.created_at,
         created_by_name=created_by_name,
-        can_pickup=booking.status == 'RESERVED',
-        can_return=booking.status == 'PICKED_UP',
+        # A window that has passed cannot be handed out: the loan would be
+        # late from its first minute. Extend it first, which asks whether the
+        # units are free for the time it will really be out.
+        can_pickup=booking.status == 'RESERVED' and booking.ends_at > now,
+        can_return=booking.status == 'PICKED_UP' and bool(outstanding),
         can_cancel=booking.status == 'RESERVED',
         can_extend=booking.status in ACTIVE_STATUSES,
+        returned_count=returned_count,
+        outstanding_count=len(outstanding),
         handed_out_at=booking.picked_up_at,
         returned_at=booking.returned_at,
     )
@@ -330,6 +352,92 @@ def _conflict_payload(checks: list) -> dict:
     }
 
 
+@dataclass
+class ResolvedLine:
+    """A line as it will be stored: a kit line becomes one per member."""
+
+    line: BookingLineIn
+    kit_id: UUID | None = None
+    kit_name: str | None = None
+
+
+async def _expand_lines(
+    db: AsyncSession, org_id: UUID, lines: list[BookingLineIn]
+) -> tuple[list[ResolvedLine], list[tuple[int, int]]]:
+    """Turn kit lines into member lines, and say which checks belong to which.
+
+    The sheet submits a kit as one line; availability and the write work on
+    units, so the line becomes one ordinary line per member. ``spans`` gives
+    each submitted line the slice of expanded lines it owns, so a refusal
+    still answers the line the user can see.
+    """
+    kit_ids = {line.kit_id for line in lines if line.kit_id is not None}
+    kits = await kits_by_ids(db, org_id, kit_ids)
+    for kit_id in kit_ids:
+        if kit_id not in kits:
+            raise ServiceRejectionError('rental_kit_not_found')
+    expanded: list[ResolvedLine] = []
+    spans: list[tuple[int, int]] = []
+    for line in lines:
+        start = len(expanded)
+        if line.kit_id is None:
+            expanded.append(ResolvedLine(line))
+        else:
+            kit = kits[line.kit_id]
+            if not kit.members:
+                raise ServiceRejectionError('rental_kit_empty')
+            for member in kit.members:
+                expanded.append(
+                    ResolvedLine(
+                        BookingLineIn(
+                            item_id=member.item_id,
+                            model=member.model,
+                            quantity=member.quantity,
+                        ),
+                        kit_id=kit.id,
+                        kit_name=kit.name,
+                    )
+                )
+        spans.append((start, len(expanded)))
+    return expanded, spans
+
+
+def _aggregate_checks(
+    checks: list[LineCheck],
+    spans: list[tuple[int, int]],
+    resolved: list[ResolvedLine],
+    lines: list[BookingLineIn],
+) -> list[LineCheck]:
+    """Answer one check per submitted line, a kit's members summed as one."""
+    result: list[LineCheck] = []
+    for index, (start, end) in enumerate(spans):
+        parts = checks[start:end]
+        submitted = lines[index]
+        if submitted.kit_id is None:
+            check = parts[0]
+            check.index = index
+            result.append(check)
+            continue
+        ok = all(part.ok for part in parts)
+        kit_name = resolved[start].kit_name or ''
+        result.append(
+            LineCheck(
+                index=index,
+                ok=ok,
+                label=kit_name,
+                requested=1,
+                available=1 if ok else 0,
+                conflicts=[conflict for part in parts for conflict in part.conflicts]
+                if not ok
+                else [],
+                max_quantity=1 if ok else 0,
+                # The caller that holds the world fills a kit's way out.
+                nearest_window=None,
+            )
+        )
+    return result
+
+
 async def create_booking(
     db: AsyncSession,
     org_id: UUID,
@@ -339,6 +447,8 @@ async def create_booking(
     starts_at = data.starts_at
     ends_at = data.ends_at
     name, email = await _resolve_borrower(db, org_id, data)
+    resolved, spans = await _expand_lines(db, org_id, data.lines)
+    expanded_lines = [item.line for item in resolved]
 
     assets = await equipment_api.list_bookable_assets_async(db, org_id)
     by_id = {asset.id: asset for asset in assets}
@@ -346,7 +456,7 @@ async def create_booking(
     for asset in assets:
         by_model.setdefault(asset.model, []).append(asset)
 
-    for line in data.lines:
+    for line in expanded_lines:
         if line.item_id is not None and line.item_id not in by_id:
             raise ServiceRejectionError('rental_asset_not_bookable')
 
@@ -355,13 +465,14 @@ async def create_booking(
     await _lock(
         db,
         org_id,
-        [LockLine(item_id=line.item_id, model=line.model) for line in data.lines],
+        [LockLine(item_id=line.item_id, model=line.model) for line in expanded_lines],
         by_id,
         by_model,
     )
 
     world = await load_world(db, org_id, starts_at, ends_at, cover_bookings=True)
-    checks = checks_for_lines(world, data.lines, starts_at, ends_at)
+    checks = checks_for_lines(world, expanded_lines, starts_at, ends_at)
+    checks = _aggregate_checks(checks, spans, resolved, data.lines)
     if any(not check.ok for check in checks):
         raise RentalConflictError(
             'rental_booking_conflict',
@@ -384,13 +495,16 @@ async def create_booking(
     db.add(booking)
     await db.flush()
 
-    for line_in in data.lines:
+    for item in resolved:
+        line_in = item.line
         booking_line = RentalBookingLine(
             organization_id=org_id,
             booking_id=booking.id,
             item_id=line_in.item_id,
             model=line_in.model,
             quantity=line_in.quantity,
+            kit_id=item.kit_id,
+            kit_name=item.kit_name,
         )
         db.add(booking_line)
         await db.flush()
@@ -412,11 +526,13 @@ async def create_booking(
 async def check_booking(
     db: AsyncSession,
     org_id: UUID,
-    data,
+    data: BookingCheckRequest,
 ) -> BookingCheckResponse:
     assets = await equipment_api.list_bookable_assets_async(db, org_id)
     by_id = {asset.id: asset for asset in assets}
-    for line in data.lines:
+    resolved, spans = await _expand_lines(db, org_id, data.lines)
+    expanded_lines = [item.line for item in resolved]
+    for line in expanded_lines:
         if line.item_id is not None and line.item_id not in by_id:
             raise ServiceRejectionError('rental_asset_not_bookable')
     # The way-out search looks further than the window it was asked about,
@@ -429,13 +545,24 @@ async def check_booking(
         data.ends_at + timedelta(days=60),
         cover_bookings=True,
     )
-    checks = checks_for_lines(
+    expanded_checks = checks_for_lines(
         world,
-        data.lines,
+        expanded_lines,
         data.starts_at,
         data.ends_at,
         exclude_booking_id=data.booking_id,
     )
+    checks = _aggregate_checks(expanded_checks, spans, resolved, data.lines)
+    for index, (start, end) in enumerate(spans):
+        if checks[index].ok or data.lines[index].kit_id is None:
+            continue
+        checks[index].nearest_window = nearest_window_for_lines(
+            world,
+            expanded_lines[start:end],
+            data.starts_at,
+            data.ends_at,
+            exclude_booking_id=data.booking_id,
+        )
     return BookingCheckResponse(ok=all(check.ok for check in checks), lines=checks)
 
 
@@ -445,6 +572,8 @@ async def list_bookings(
     *,
     status: str | None = None,
     search: str | None = None,
+    partner_id: UUID | None = None,
+    item_id: UUID | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> tuple[list[RentalBooking], int]:
@@ -459,6 +588,18 @@ async def list_bookings(
     )
     if status:
         stmt = stmt.where(RentalBooking.status == status)
+    if partner_id is not None:
+        stmt = stmt.where(RentalBooking.borrower_partner_id == partner_id)
+    if item_id is not None:
+        # The asset's history: lines that name it, and promises already
+        # resolved to it. A model line that never pinned this unit is not its
+        # history, even if the pool once could have promised it.
+        stmt = stmt.where(
+            or_(
+                RentalBooking.lines.any(RentalBookingLine.item_id == item_id),
+                RentalBooking.units.any(RentalBookingUnit.item_id == item_id),
+            )
+        )
     if search:
         pattern = f'%{search.strip()}%'
         stmt = stmt.where(
@@ -489,6 +630,7 @@ async def booking_rows(
                 late_days=_late_days(booking.ends_at, now),
                 borrower_name=booking.borrower_name,
                 borrower_kind=_borrower_kind(booking),  # type: ignore[arg-type]
+                borrower_partner_id=booking.borrower_partner_id,
                 starts_at=booking.starts_at,
                 ends_at=booking.ends_at,
                 units_count=len(booking.units),
@@ -560,6 +702,7 @@ async def pickup_booking(
         cover_bookings=True,
     )
 
+    scanned = _expand_kit_scans(booking, data.kit_ids, scanned, world, by_id)
     remaining = list(scanned)
     new_units, missing_count = _assign_scans(db, booking, remaining, by_id)
     if remaining or missing_count:
@@ -611,6 +754,60 @@ async def pickup_booking(
     await db.flush()
     await _journal(db, booking, AuditAction.UPDATE, user_id, extra={'action': 'PICKUP'})
     return booking
+
+
+def _expand_kit_scans(
+    booking: RentalBooking,
+    kit_ids: list[UUID],
+    scanned: list[UUID],
+    world: World,
+    by_id: dict[UUID, EquipmentAssetDTO],
+) -> list[UUID]:
+    """Turn one kit scan into the member units it needs.
+
+    An asset member is the unit itself. A model member lets the kit promise
+    *some* unit of the model, so the scan picks the first free ones for this
+    booking's hold: the kit is handed out whole or not at all.
+    """
+    if not kit_ids:
+        return scanned
+    booked_kits = {line.kit_id for line in booking.lines if line.kit_id is not None}
+    for kit_id in kit_ids:
+        if kit_id not in booked_kits:
+            raise ServiceRejectionError('rental_kit_not_in_booking')
+    result = list(scanned)
+    for kit_id in dict.fromkeys(kit_ids):
+        for line in booking.lines:
+            if line.kit_id != kit_id:
+                continue
+            if line.item_id is not None:
+                if line.item_id not in result:
+                    result.append(line.item_id)
+                continue
+            need = line.quantity - len(line.units)
+            if need <= 0:
+                continue
+            candidates = sorted(
+                (
+                    asset
+                    for asset in by_id.values()
+                    if asset.model == line.model and asset.id not in result
+                ),
+                key=lambda asset: asset.name,
+            )
+            free = [
+                asset
+                for asset in candidates
+                if not item_busy_conflicts(
+                    world,
+                    asset.id,
+                    booking.held_from,
+                    booking.ends_at,
+                    exclude_booking_id=booking.id,
+                )
+            ]
+            result.extend(asset.id for asset in free[:need])
+    return result
 
 
 def _assign_scans(
@@ -785,9 +982,10 @@ async def return_booking(
     booking = await _require_booking(db, org_id, booking_id)
     if booking.status != 'PICKED_UP':
         raise ServiceRejectionError('rental_return_not_picked_up')
-    units_by_id = {unit.id: unit for unit in booking.units}
-    if {unit.unit_id for unit in data.units} != set(units_by_id):
-        raise ServiceRejectionError('rental_return_needs_every_unit')
+    units_by_id = {unit.id: unit for unit in booking.units if unit.returned_at is None}
+    requested = {unit.unit_id for unit in data.units}
+    if not requested or not requested <= set(units_by_id):
+        raise ServiceRejectionError('rental_return_unknown_unit')
 
     now = _now()
     assets = await equipment_api.list_bookable_assets_async(db, org_id)
@@ -797,7 +995,11 @@ async def return_booking(
         by_model.setdefault(asset.model, []).append(asset)
     # Lock the returned units, the units their models can promise, and every
     # unit a move may touch.
-    lock_lines = [LockLine(item_id=unit.item_id) for unit in booking.units]
+    lock_lines = [
+        LockLine(item_id=unit.item_id)
+        for unit in booking.units
+        if unit.returned_at is None
+    ]
     for planned_move in data.moves:
         lock_lines.append(LockLine(item_id=planned_move.to_item_id))
     await _lock(db, org_id, lock_lines, by_id, by_model)
@@ -843,8 +1045,15 @@ async def return_booking(
 
     await _check_in_units(db, org_id, planning, units_by_id, user_id, now)
 
-    booking.status = 'RETURNED'
-    booking.returned_at = now
+    # A partial return keeps the booking out with the units still in the
+    # borrower's hands, so it stays on the late list and still holds them;
+    # the units that came back are free from this moment.
+    still_out = set(units_by_id) - requested
+    if still_out:
+        booking.status = 'PICKED_UP'
+    else:
+        booking.status = 'RETURNED'
+        booking.returned_at = now
     await db.flush()
     await _journal(
         db,
@@ -853,6 +1062,7 @@ async def return_booking(
         user_id,
         extra={
             'action': 'RETURN',
+            'partial': bool(still_out),
             'conditions': {
                 str(unit_id): plan.condition for unit_id, plan in planning.items()
             },
@@ -1304,13 +1514,15 @@ async def calendar_view(
 def _today_item(
     booking: RentalBooking, assets: dict[UUID, EquipmentAssetDTO]
 ) -> TodayItem:
+    now = _now()
     return TodayItem(
         booking_id=booking.id,
         borrower_name=booking.borrower_name,
         what=_booking_summary(booking, assets),
         at=booking.starts_at,
         until=booking.ends_at,
-        late_days=_late_days(booking.ends_at, _now()),
+        late_days=_late_days(booking.ends_at, now),
+        can_pickup=booking.status == 'RESERVED' and booking.ends_at > now,
     )
 
 
@@ -1358,6 +1570,12 @@ async def today_view(db: AsyncSession, org_id: UUID) -> TodayResponse:
         ],
         key=lambda b: b.ends_at,
     )
+    # A reservation whose window has closed cannot be handed out any more:
+    # the module offers to extend it instead, here and on its page.
+    expired = sorted(
+        [b for b in bookings if b.status == 'RESERVED' and b.ends_at <= now],
+        key=lambda b: b.ends_at,
+    )
     blocks = (
         (
             await db.execute(
@@ -1381,5 +1599,7 @@ async def today_view(db: AsyncSession, org_id: UUID) -> TodayResponse:
         late=[_today_item(booking, assets) for booking in late],
         pickups=[_today_item(booking, assets) for booking in pickups],
         returns=[_today_item(booking, assets) for booking in returns],
+        expired_count=len(expired),
+        expired=[_today_item(booking, assets) for booking in expired],
         in_service=[block_schema(block, assets) for block in blocks],
     )

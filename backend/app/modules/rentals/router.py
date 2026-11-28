@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import UserContextDTO
@@ -29,7 +29,7 @@ from app.core.module_sdk import (
 from app.core.public_api import core_api
 from app.modules.equipment.equipment_api import EquipmentAssetDTO, equipment_api
 
-from . import service
+from . import _documents, _kits, service
 from ._availability import (
     check_line,
     load_world,
@@ -62,6 +62,10 @@ from .schemas import (
     CalendarResponse,
     CategoryOption,
     ExtendRequest,
+    KitCreate,
+    KitListRow,
+    KitSchema,
+    KitUpdate,
     ModelOption,
     NearestWindowResponse,
     PickupRequest,
@@ -114,6 +118,8 @@ async def calendar_endpoint(
 async def list_bookings_endpoint(
     status_filter: str | None = Query(None, alias='status'),
     search: str | None = Query(None, max_length=200),
+    partner_id: UUID | None = Query(None),
+    item_id: UUID | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
@@ -121,7 +127,14 @@ async def list_bookings_endpoint(
     org_id: UUID = Depends(require_org),
 ) -> PaginatedResponse[BookingListRow]:
     bookings, total = await service.list_bookings(
-        db, org_id, status=status_filter, search=search, limit=limit, offset=offset
+        db,
+        org_id,
+        status=status_filter,
+        search=search,
+        partner_id=partner_id,
+        item_id=item_id,
+        limit=limit,
+        offset=offset,
     )
     rows = await service.booking_rows(db, org_id, bookings)
     return PaginatedResponse[BookingListRow].from_slice(rows, offset, limit, total)
@@ -227,6 +240,98 @@ async def extend_booking_endpoint(
         raise _conflict(exc) from exc
     booking = await service._require_booking(db, org_id, booking_id)
     return await service.booking_schema(db, booking)
+
+
+@router.get(
+    '/kits',
+    # list-envelope-exception: a vocabulary of reusable sets, the booking sheet searches it
+    response_model=list[KitListRow],
+)
+async def list_kits_endpoint(
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> list[KitListRow]:
+    return await _kits.list_kits(db, org_id)
+
+
+@router.post('/kits', response_model=KitSchema, status_code=status.HTTP_201_CREATED)
+async def create_kit_endpoint(
+    data: KitCreate,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> KitSchema:
+    return await _kits.create_kit(db, org_id, data, current_user.id)
+
+
+@router.get('/kits/{kit_id}', response_model=KitSchema)
+async def get_kit_endpoint(
+    kit_id: UUID,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> KitSchema:
+    return await _kits.kit_schema_by_id(db, org_id, kit_id)
+
+
+@router.put('/kits/{kit_id}', response_model=KitSchema)
+async def update_kit_endpoint(
+    kit_id: UUID,
+    data: KitUpdate,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> KitSchema:
+    return await _kits.update_kit(db, org_id, kit_id, data, current_user.id)
+
+
+@router.delete('/kits/{kit_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_kit_endpoint(
+    kit_id: UUID,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> None:
+    await _kits.delete_kit(db, org_id, kit_id, current_user.id)
+
+
+def _pdf_response(pdf: bytes, filename: str) -> Response:
+    return Response(
+        content=pdf,
+        media_type='application/pdf',
+        headers={'Content-Disposition': f'attachment; filename="{filename}.pdf"'},
+    )
+
+
+@router.get('/bookings/{booking_id}/pick-list')
+async def pick_list_endpoint(
+    booking_id: UUID,
+    lang: str = Query('en', max_length=8),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> Response:
+    booking = await service._require_booking(db, org_id, booking_id)
+    pdf = await _documents.render_document_pdf(
+        db, org_id, booking, _documents.DOCUMENT_PICK_LIST, lang
+    )
+    return _pdf_response(pdf, f'pick-list-{str(booking.id)[:8]}')
+
+
+@router.get('/bookings/{booking_id}/handover-sheet')
+async def handover_sheet_endpoint(
+    booking_id: UUID,
+    lang: str = Query('en', max_length=8),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> Response:
+    booking = await service._require_booking(db, org_id, booking_id)
+    pdf = await _documents.render_document_pdf(
+        db, org_id, booking, _documents.DOCUMENT_HANDOVER, lang
+    )
+    return _pdf_response(pdf, f'handover-{str(booking.id)[:8]}')
 
 
 @router.get('/blocks', response_model=PaginatedResponse[BlockSchema])

@@ -96,6 +96,16 @@ async def _blocking_bookings(
                 'borrower_name': booking.borrower_name,
                 'starts_at': booking.starts_at.isoformat(),
                 'ends_at': booking.ends_at.isoformat(),
+                # The window is the promise; these are the times the unit is
+                # really held: from an early hand-out, and open past the due
+                # date when the loan is late.
+                'held_from': booking.held_from.isoformat(),
+                'held_until': (
+                    None
+                    if booking.status == 'PICKED_UP'
+                    and booking.ends_at < datetime.now(UTC)
+                    else booking.ends_at.isoformat()
+                ),
                 'item_id': str(item_id),
                 'item_name': asset.name,
                 'suggested_until': free_until.isoformat(),

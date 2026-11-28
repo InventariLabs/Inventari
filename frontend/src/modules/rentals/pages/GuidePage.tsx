@@ -8,6 +8,8 @@ import { RentalsTabs } from "../components/RentalsTabs";
 
 const STEPS = [
   { title: "guide.steps.book.title", body: "guide.steps.book.body" },
+  { title: "guide.steps.kits.title", body: "guide.steps.kits.body" },
+  { title: "guide.steps.borrower.title", body: "guide.steps.borrower.body" },
   { title: "guide.steps.handOut.title", body: "guide.steps.handOut.body" },
   { title: "guide.steps.takeBack.title", body: "guide.steps.takeBack.body" },
   { title: "guide.steps.late.title", body: "guide.steps.late.body" },
@@ -49,7 +51,10 @@ export default function GuidePage() {
           <li>{t("guide.rules.buffer")}</li>
           <li>{t("guide.rules.block")}</li>
           <li>{t("guide.rules.overdue")}</li>
-          <li>{t("guide.rules.noPartial")}</li>
+          <li>{t("guide.rules.partial")}</li>
+          <li>{t("guide.rules.kits")}</li>
+          <li>{t("guide.rules.reminders")}</li>
+          <li>{t("guide.rules.bookAgain")}</li>
         </ul>
       </Card>
       <div>

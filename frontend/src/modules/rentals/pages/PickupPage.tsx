@@ -24,6 +24,7 @@ import { rentalsApi } from "../api/rentals";
 import {
   useBooking,
   useCalendar,
+  useKits,
   usePickupBooking,
   useRentalAssets,
 } from "../hooks/useRentals";
@@ -34,6 +35,8 @@ type Slot = {
   itemId: string | null;
   model: string | null;
   label: string;
+  kitId?: string | null;
+  kitName?: string | null;
 };
 
 type TakenUnit = {
@@ -105,6 +108,69 @@ function useUnitsBusyForHandOut(booking: Booking | undefined) {
   return { busy, isError };
 }
 
+/**
+ * The slots a kit scan fills: its own members, and for a model member the
+ * first free units of that model, so the set leaves as one action.
+ */
+function resolveKit(
+  kitSlots: Slot[],
+  picked: Record<string, string>,
+  assets: AssetOption[],
+  busy: Map<string, CalendarBar>,
+  allSlots: Slot[],
+): Record<string, string> | null {
+  const next = { ...picked };
+  const used = new Set(Object.values(picked));
+  const candidates = (model: string | null) =>
+    assets.filter(
+      (asset) =>
+        asset.model === model &&
+        !used.has(asset.id) &&
+        !busy.has(asset.id) &&
+        !allSlots.some(
+          (entry) => entry.model === null && entry.itemId === asset.id,
+        ),
+    );
+  for (const slot of kitSlots) {
+    if (next[slot.key]) {
+      used.add(next[slot.key]);
+      continue;
+    }
+    let chosen = slot.itemId;
+    if (!chosen) {
+      chosen =
+        candidates(slot.model).find((asset) => !used.has(asset.id))?.id ?? null;
+    }
+    if (!chosen) return null;
+    next[slot.key] = chosen;
+    used.add(chosen);
+  }
+  return next;
+}
+
+function optionsForSlot(
+  slot: Slot,
+  selected: string,
+  assets: AssetOption[],
+  picked: Record<string, string>,
+  busy: Map<string, CalendarBar>,
+  allSlots: Slot[],
+): AssetOption[] {
+  if (slot.itemId) {
+    return assets.filter((asset) => asset.id === slot.itemId);
+  }
+  const taken = new Set(Object.values(picked));
+  return assets.filter(
+    (asset) =>
+      asset.model === slot.model &&
+      (asset.id === selected || !taken.has(asset.id)) &&
+      !busy.has(asset.id) &&
+      !allSlots.some(
+        (entry) => entry.model === null && entry.itemId === asset.id,
+      ),
+  );
+}
+
 export default function PickupPage() {
   const { t } = useTranslation("rentals");
   const { id } = useParams<{ id: string }>();
@@ -114,6 +180,7 @@ export default function PickupPage() {
   const canWrite = useCanWrite("rentals");
   const booking = useBooking(id);
   const assets = useRentalAssets("");
+  const kits = useKits();
   const pickup = usePickupBooking();
   const { busy, isError: calendarFailed } = useUnitsBusyForHandOut(
     booking.data,
@@ -142,6 +209,8 @@ export default function PickupPage() {
           itemId: line.item_id,
           model: null,
           label: line.item_name ?? "",
+          kitId: line.kit_id,
+          kitName: line.kit_name,
         });
         continue;
       }
@@ -152,6 +221,8 @@ export default function PickupPage() {
           itemId: null,
           model: line.model ?? null,
           label: `${line.model} · ${t("pickup.anyUnit")}`,
+          kitId: line.kit_id,
+          kitName: line.kit_name,
         });
       }
     }
@@ -185,10 +256,35 @@ export default function PickupPage() {
     }
   }
 
+  function handOutKit(kitId: string, kitName: string) {
+    const kitSlots = slots.filter((slot) => slot.kitId === kitId);
+    if (kitSlots.length === 0) return false;
+    const next = resolveKit(kitSlots, picked, assets.data ?? [], busy, slots);
+    if (!next) {
+      setMessage({
+        ok: false,
+        text: t("pickup.kitUnitsMissing", { name: kitName }),
+      });
+      return false;
+    }
+    setPicked(next);
+    setMessage({ ok: true, text: t("pickup.kitScanned", { name: kitName }) });
+    return true;
+  }
+
   async function scan(raw: string) {
     const value = raw.trim();
     if (!value) return;
     setCode("");
+    const kit = (kits.data ?? []).find(
+      (entry) =>
+        entry.code.toLowerCase() === value.toLowerCase() ||
+        entry.name.toLowerCase() === value.toLowerCase(),
+    );
+    if (kit) {
+      handOutKit(kit.id, kit.name);
+      return;
+    }
     try {
       const matches = await rentalsApi.assets({ search: value });
       const exact =
@@ -265,22 +361,6 @@ export default function PickupPage() {
   }
   const data = booking.data;
 
-  const optionsFor = (slot: Slot, selected: string): AssetOption[] => {
-    if (slot.itemId) {
-      return (assets.data ?? []).filter((asset) => asset.id === slot.itemId);
-    }
-    const taken = new Set(Object.values(picked));
-    return (assets.data ?? []).filter(
-      (asset) =>
-        asset.model === slot.model &&
-        (asset.id === selected || !taken.has(asset.id)) &&
-        !busy.has(asset.id) &&
-        !slots.some(
-          (entry) => entry.model === null && entry.itemId === asset.id,
-        ),
-    );
-  };
-
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-4">
       <ReadOnlyNotice module="rentals" />
@@ -327,7 +407,9 @@ export default function PickupPage() {
         pickedCount={pickedCount}
         totalSlots={totalSlots}
         assetsById={assetsById}
-        optionsFor={optionsFor}
+        optionsFor={(slot, selected) =>
+          optionsForSlot(slot, selected, assets.data ?? [], picked, busy, slots)
+        }
         onAssign={assignSlot}
       />
       <ScanCard code={code} onCode={setCode} onScan={scan} />
@@ -437,6 +519,9 @@ function PickupSlots({
                 {slot.itemId
                   ? t("pickup.specificUnit")
                   : t("pickup.anyUnitLine")}
+                {slot.kitName
+                  ? ` · ${t("pickup.kitPart", { name: slot.kitName })}`
+                  : ""}
               </span>
             </div>
             {slot.itemId && value ? null : (
@@ -497,6 +582,7 @@ function ScanCard({
         </Button>
       </div>
       <p className="m-0 text-xs text-zinc-500">{t("pickup.scanHint")}</p>
+      <p className="m-0 text-xs text-zinc-500">{t("pickup.kitScanHint")}</p>
     </Card>
   );
 }

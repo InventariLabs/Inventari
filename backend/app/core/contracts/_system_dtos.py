@@ -337,6 +337,7 @@ class AuditTargetType(StrEnum):
     #: A promise of equipment for a window, the block that keeps a unit off
     #: the calendar, and the hours a model or category needs around a booking.
     RENTAL_BOOKING = 'rental_booking'
+    RENTAL_KIT = 'rental_kit'
     RENTAL_BLOCK = 'rental_block'
     RENTAL_BUFFER_RULE = 'rental_buffer_rule'
 

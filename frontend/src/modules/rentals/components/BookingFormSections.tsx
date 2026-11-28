@@ -12,6 +12,7 @@ import {
 import type {
   AssetOption,
   ConflictDetail,
+  KitListRow,
   LineCheck,
   ModelOption,
 } from "../api/rentals";
@@ -27,9 +28,12 @@ const WHO_KEYS: Record<Who, string> = {
 
 export type LineDraft = {
   key: number;
-  kind: "model" | "asset";
+  kind: "model" | "asset" | "kit";
   model: string;
   itemId: string;
+  kitId: string;
+  /** The kit's name as the booking carried it, for a kit deleted since. */
+  kitName?: string;
   quantity: number;
 };
 
@@ -178,6 +182,7 @@ export function LinesSection({
   lines,
   models,
   assets,
+  kits,
   checks,
   onUpdate,
   onAdd,
@@ -187,6 +192,7 @@ export function LinesSection({
   lines: LineDraft[];
   models: ModelOption[];
   assets: AssetOption[];
+  kits: KitListRow[];
   checks: LineCheck[];
   onUpdate: (key: number, patch: Partial<LineDraft>) => void;
   onAdd: () => void;
@@ -204,6 +210,7 @@ export function LinesSection({
           check={checks[index]}
           models={models}
           assets={assets}
+          kits={kits}
           onUpdate={(patch) => onUpdate(line.key, patch)}
           onRemove={lines.length > 1 ? () => onRemove(line.key) : undefined}
           onMoveWindow={onMoveWindow}
@@ -228,6 +235,7 @@ function LineEditor({
   check,
   models,
   assets,
+  kits,
   onUpdate,
   onRemove,
   onMoveWindow,
@@ -237,6 +245,7 @@ function LineEditor({
   check?: LineCheck;
   models: ModelOption[];
   assets: AssetOption[];
+  kits: KitListRow[];
   onUpdate: (patch: Partial<LineDraft>) => void;
   onRemove?: () => void;
   onMoveWindow: (startsAt: string, endsAt: string) => void;
@@ -257,7 +266,7 @@ function LineEditor({
     >
       <div className="flex flex-wrap items-center gap-3 px-3.5 py-3">
         <div className="min-w-0 flex-1 basis-48">
-          <div className="mb-1 flex gap-1.5">
+          <div className="mb-1 flex flex-wrap gap-1.5">
             <Button
               type="button"
               size="sm"
@@ -274,36 +283,22 @@ function LineEditor({
             >
               {t("form.assetLine")}
             </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={line.kind === "kit" ? "primary" : "outline"}
+              onClick={() => onUpdate({ kind: "kit" })}
+            >
+              {t("form.kitLine")}
+            </Button>
           </div>
-          {line.kind === "model" ? (
-            <NativeSelect
-              aria-label={t("form.model")}
-              value={line.model}
-              onChange={(event) => onUpdate({ model: event.target.value })}
-            >
-              <option value="">{t("form.chooseModel")}</option>
-              {models.map((model) => (
-                <option key={model.model} value={model.model}>
-                  {model.model} ·{" "}
-                  {t("form.units", { count: model.total_units })}
-                </option>
-              ))}
-            </NativeSelect>
-          ) : (
-            <NativeSelect
-              aria-label={t("form.asset")}
-              value={line.itemId}
-              onChange={(event) => onUpdate({ itemId: event.target.value })}
-            >
-              <option value="">{t("form.chooseAsset")}</option>
-              {assets.map((asset) => (
-                <option key={asset.id} value={asset.id}>
-                  {asset.name}
-                  {asset.serial_number ? ` · ${asset.serial_number}` : ""}
-                </option>
-              ))}
-            </NativeSelect>
-          )}
+          <LinePicker
+            line={line}
+            models={models}
+            assets={assets}
+            kits={kits}
+            onUpdate={onUpdate}
+          />
           {line.kind === "model" && check?.ok && modelTotal ? (
             <span className="mt-1 block text-xs text-zinc-500">
               {t("form.freeOf", {
@@ -369,6 +364,86 @@ function LineEditor({
   );
 }
 
+/** What an equipment line picks: a model and a count, a specific unit, or a kit. */
+function LinePicker({
+  line,
+  models,
+  assets,
+  kits,
+  onUpdate,
+}: {
+  line: LineDraft;
+  models: ModelOption[];
+  assets: AssetOption[];
+  kits: KitListRow[];
+  onUpdate: (patch: Partial<LineDraft>) => void;
+}) {
+  const { t } = useTranslation("rentals");
+  if (line.kind === "model") {
+    return (
+      <NativeSelect
+        aria-label={t("form.model")}
+        value={line.model}
+        onChange={(event) => onUpdate({ model: event.target.value })}
+      >
+        <option value="">{t("form.chooseModel")}</option>
+        {models.map((model) => (
+          <option key={model.model} value={model.model}>
+            {model.model} · {t("form.units", { count: model.total_units })}
+          </option>
+        ))}
+      </NativeSelect>
+    );
+  }
+  if (line.kind === "asset") {
+    return (
+      <NativeSelect
+        aria-label={t("form.asset")}
+        value={line.itemId}
+        onChange={(event) => onUpdate({ itemId: event.target.value })}
+      >
+        <option value="">{t("form.chooseAsset")}</option>
+        {assets.map((asset) => (
+          <option key={asset.id} value={asset.id}>
+            {asset.name}
+            {asset.serial_number ? ` · ${asset.serial_number}` : ""}
+          </option>
+        ))}
+      </NativeSelect>
+    );
+  }
+  const selectedKit = kits.find((kit) => kit.id === line.kitId);
+  const kitGone = Boolean(line.kitId) && !selectedKit && Boolean(line.kitName);
+  return (
+    <>
+      <NativeSelect
+        aria-label={t("form.chooseKit")}
+        value={line.kitId}
+        onChange={(event) =>
+          onUpdate({ kitId: event.target.value, kitName: undefined })
+        }
+      >
+        <option value="">{t("form.chooseKit")}</option>
+        {kits.map((kit) => (
+          <option key={kit.id} value={kit.id}>
+            {kit.name} · {t("kits.memberCount", { count: kit.member_count })}
+          </option>
+        ))}
+        {kitGone ? <option value={line.kitId}>{line.kitName}</option> : null}
+      </NativeSelect>
+      <span className="mt-1 block text-xs text-zinc-500">
+        {t("form.kitHint")}
+      </span>
+      {selectedKit ? (
+        <span className="mt-0.5 block text-xs text-zinc-500">
+          {selectedKit.summary} ·{" "}
+          {t("kits.memberCount", { count: selectedKit.member_count })}
+        </span>
+      ) : null}
+    </>
+  );
+}
+
 function LineConflict({
   line,
   check,
@@ -388,56 +463,66 @@ function LineConflict({
 }) {
   const { t } = useTranslation("rentals");
   const maxQuantity = check?.max_quantity ?? 1;
+  // The same unit asked for twice is a defect of the form, not a shortage:
+  // the count sentence would read "Only 0 of 1 are free" and explain nothing.
+  const duplicateUnit = conflicts.some(
+    (conflict) => conflict.kind === "duplicate_unit",
+  );
   return (
     <div role="alert" className="flex flex-col gap-2.5 bg-red-50 px-3.5 py-3">
       <span className="text-sm font-semibold text-red-800">
-        {t("form.doesNotFit", {
-          available: check?.available ?? 0,
-          requested: check?.requested ?? line.quantity,
-        })}
+        {duplicateUnit
+          ? t("form.duplicateUnit")
+          : t("form.doesNotFit", {
+              available: check?.available ?? 0,
+              requested: check?.requested ?? line.quantity,
+            })}
       </span>
       <ul className="m-0 flex list-disc flex-col gap-0.5 pl-4 text-xs text-red-800">
-        {conflicts.slice(0, 6).map((conflict, conflictIndex) => {
-          let text: string;
-          if (conflict.kind === "block") {
-            text = t("form.blocked", {
-              reason: conflict.reason ?? conflict.label,
-              date: conflict.ends_at
-                ? formatDateInZone(conflict.ends_at, timezone)
-                : "",
-            });
-          } else if (conflict.kind === "model_booking") {
-            text = t("form.heldBy", {
-              name: conflict.label,
-              // The count picks the plural form: i18next stops pluralising
-              // when the count is a string, and the API sends the number as
-              // one (a conflict's reason is text for the other kinds).
-              count: Number(conflict.reason ?? 0),
-            });
-          } else {
-            text = t("form.busy", {
-              name: conflict.label,
-              from: conflict.starts_at
-                ? formatDateInZone(conflict.starts_at, timezone)
-                : "",
-              to: conflict.ends_at
-                ? formatDateInZone(conflict.ends_at, timezone)
-                : "",
-            });
-          }
-          return (
-            <li key={`${conflict.kind}-${conflictIndex}`}>
-              {conflict.item_name
-                ? `${conflict.item_name}${
-                    conflict.item_serial_number
-                      ? ` · ${conflict.item_serial_number}`
-                      : ""
-                  }: `
-                : ""}
-              {text}
-            </li>
-          );
-        })}
+        {conflicts
+          .filter((conflict) => conflict.kind !== "duplicate_unit")
+          .slice(0, 6)
+          .map((conflict, conflictIndex) => {
+            let text: string;
+            if (conflict.kind === "block") {
+              text = t("form.blocked", {
+                reason: conflict.reason ?? conflict.label,
+                date: conflict.ends_at
+                  ? formatDateInZone(conflict.ends_at, timezone)
+                  : "",
+              });
+            } else if (conflict.kind === "model_booking") {
+              text = t("form.heldBy", {
+                name: conflict.label,
+                // The count picks the plural form: i18next stops pluralising
+                // when the count is a string, and the API sends the number as
+                // one (a conflict's reason is text for the other kinds).
+                count: Number(conflict.reason ?? 0),
+              });
+            } else {
+              text = t("form.busy", {
+                name: conflict.label,
+                from: conflict.starts_at
+                  ? formatDateInZone(conflict.starts_at, timezone)
+                  : "",
+                to: conflict.ends_at
+                  ? formatDateInZone(conflict.ends_at, timezone)
+                  : "",
+              });
+            }
+            return (
+              <li key={`${conflict.kind}-${conflictIndex}`}>
+                {conflict.item_name
+                  ? `${conflict.item_name}${
+                      conflict.item_serial_number
+                        ? ` · ${conflict.item_serial_number}`
+                        : ""
+                    }: `
+                  : ""}
+                {text}
+              </li>
+            );
+          })}
       </ul>
       <div className="flex flex-wrap gap-2">
         {line.kind === "model" && (check?.max_quantity ?? 0) > 0 ? (

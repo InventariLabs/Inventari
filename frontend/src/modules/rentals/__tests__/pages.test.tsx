@@ -230,6 +230,7 @@ function mockBase() {
       HttpResponse.json([{ model: "Projektor 4K", total_units: 3 }]),
     ),
     http.get("/api/v1/rentals/assets", () => HttpResponse.json([asset])),
+    http.get("/api/v1/rentals/kits", () => HttpResponse.json([])),
     http.get("/api/v1/rentals/categories", () => HttpResponse.json([])),
     http.get("/api/v1/rentals/buffer-rules", () => HttpResponse.json([])),
     http.get("/api/v1/rentals/blocks", () => HttpResponse.json(onePage([]))),

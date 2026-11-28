@@ -21,6 +21,7 @@ import { Sheet } from "@/components/ui/Sheet";
 import { useModules } from "@/contexts/ModulesContext";
 import { countryLabel } from "@/lib/countries";
 import { cn } from "@/lib/utils";
+import { TypedSlot } from "@/module-sdk";
 import { formatDate } from "@/utils/formatters";
 import { usePartnerTurnover } from "@/modules/partners/hooks/usePartnerTurnover";
 import { usePartner } from "@/modules/partners/hooks/usePartners";
@@ -236,6 +237,14 @@ export function PartnerDetailSheet({
         </div>
 
         <PartnerRelatedLinks partner={partner} />
+
+        {/* What this partner has rented, from the rentals module when it is
+            on. The sheet knows the partner; the bookings are not its record. */}
+        <TypedSlot
+          name="partner_detail_extra"
+          data={{ partnerId: partner.id, partnerName: partner.name }}
+          className="mt-5"
+        />
       </div>
 
       {canWrite && (

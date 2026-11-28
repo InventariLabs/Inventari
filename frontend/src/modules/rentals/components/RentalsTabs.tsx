@@ -7,6 +7,7 @@ const TABS = [
   { to: "/rentals", key: "tabs.today", end: true },
   { to: "/rentals/calendar", key: "tabs.calendar", end: false },
   { to: "/rentals/bookings", key: "tabs.bookings", end: false },
+  { to: "/rentals/kits", key: "tabs.kits", end: false },
   { to: "/rentals/blocks", key: "tabs.blocks", end: false },
 ] as const;
 

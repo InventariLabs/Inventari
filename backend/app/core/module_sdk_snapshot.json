@@ -2374,6 +2374,22 @@
               "required": true
             }
           ]
+        },
+        "restate": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "raw",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "column",
+              "required": true
+            }
+          ]
         }
       }
     },
@@ -3084,6 +3100,31 @@
       ]
     },
     "format_date_for": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lang",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "value",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "missing",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "country",
+          "required": false
+        }
+      ]
+    },
+    "format_datetime_for": {
       "kind": "function",
       "params": [
         {

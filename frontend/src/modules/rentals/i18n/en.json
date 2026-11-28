@@ -9,7 +9,8 @@
     "today": "Today",
     "calendar": "Calendar",
     "bookings": "Bookings",
-    "blocks": "Service blocks"
+    "blocks": "Service blocks",
+    "kits": "Kits"
   },
   "status": {
     "reserved": "Reserved",
@@ -43,13 +44,18 @@
     "guide": "How it works",
     "extendNamed": "Extend the loan of {{name}}",
     "takeBackNamed": "Take back {{name}}",
-    "handOutNamed": "Hand out {{name}}"
+    "handOutNamed": "Hand out {{name}}",
+    "expiredTitle": "Reservations whose window passed",
+    "expiredHint": "These can no longer be handed out. Extend one to a new window if the equipment is still free."
   },
   "bookings": {
     "search": "Search",
     "status": "Status",
     "all": "All",
-    "empty": "No bookings match."
+    "empty": "No bookings match.",
+    "partnerFilter": "Bookings of this partner",
+    "itemFilter": "Bookings of this unit",
+    "clearFilter": "Show all bookings"
   },
   "calendar": {
     "previous": "Previous two weeks",
@@ -132,7 +138,12 @@
     "timeOf": "{{label}}: time",
     "heldBy_one": "Held by a model booking: {{name}} ({{count}} unit)",
     "heldBy_other": "Held by a model booking: {{name}} ({{count}} units)",
-    "modelWithCount": "{{model}} × {{quantity}}"
+    "modelWithCount": "{{model}} × {{quantity}}",
+    "kitLine": "Kit",
+    "chooseKit": "Choose a kit",
+    "kitHint": "A kit is booked as one; its availability comes from its members, and one scan at the hand-out takes the whole set.",
+    "duplicateUnit": "This unit is already on another line. Remove one of the two.",
+    "bookAgainHint": "Copied from the booking of {{name}}. Pick new dates and check the lines before saving."
   },
   "detail": {
     "title": "Booking",
@@ -168,7 +179,18 @@
     "handedOut": "Handed out",
     "returned": "Returned",
     "notHandedOut": "Nothing has been handed out yet.",
-    "notFound": "Booking not found"
+    "notFound": "Booking not found",
+    "printPickList": "Print pick list",
+    "printHandover": "Print hand-over sheet",
+    "printFailed": "The document could not be created. Try again.",
+    "bookAgain": "Book again",
+    "alreadyReturned": "Already returned",
+    "selectAll": "Select all",
+    "returnSelected_one": "Return {{count}} unit",
+    "returnSelected_other": "Return {{count}} units",
+    "staysOut": "Stays out — not returned now",
+    "partlyReturned": "Returned so far",
+    "returnedOf": "{{returned}} of {{total}} units"
   },
   "pickup": {
     "title": "Hand out",
@@ -193,7 +215,11 @@
     "notOnThisBooking": "{{name}} is not part of this booking.",
     "busyUnit": "{{name}} is not free until this booking ends: {{reason}}.",
     "assetTaken": "{{name}} is taken: {{reason}}. Pick another unit.",
-    "anyUnit": "any unit"
+    "anyUnit": "any unit",
+    "kitScanHint": "Scanning a kit's code takes every unit of the set at once.",
+    "kitScanned": "Kit {{name}} is ready to hand out.",
+    "kitUnitsMissing": "Not enough free units to hand out the kit {{name}}.",
+    "kitPart": "kit {{name}}"
   },
   "blocks": {
     "title": "Service blocks",
@@ -245,6 +271,14 @@
       "late": {
         "title": "Watch what is late",
         "body": "Today lists the day's pickups and returns and every loan past its window. Late is derived from the window; there is no status to keep in step."
+      },
+      "kits": {
+        "title": "Kits",
+        "body": "A kit is a named set of units and models. Book it as one line; its availability comes from its members, so it is unavailable when any member is. Scan the kit's code at the hand-out and the whole set goes out at once."
+      },
+      "borrower": {
+        "title": "Borrowers without an account",
+        "body": "A booking can name a partner, a member, or somebody outside the system with a name and an e-mail. A partner's page shows their past and upcoming rentals, and an asset's timeline shows the bookings it was part of."
       }
     },
     "rulesTitle": "Rules the module keeps",
@@ -252,7 +286,10 @@
       "buffer": "Buffer hours around a booking belong to the model or its category and make the unit unbookable inside them.",
       "block": "A manual or service block cannot cover an existing booking, and a booking cannot be made into a block.",
       "overdue": "Overdue is read from the window and the status, never stored; extending moves the expected return of the hand-out too.",
-      "noPartial": "No partial pickup or partial return: every line is scanned or chosen, every unit comes back."
+      "partial": "A booking can come back in parts: the units still out keep it handed out and late, and the units that came back are free at once.",
+      "kits": "A kit cannot be booked while any of its members is busy, and a kit is handed out or returned as the whole set.",
+      "reminders": "The borrower is reminded by e-mail before the window ends, and once a day while the booking is late, on the organization's own clock.",
+      "bookAgain": "'Book again' copies a finished booking's borrower and lines into a new draft with new dates; nothing is saved until you press Book."
     },
     "back": "Back to today"
   },
@@ -266,5 +303,47 @@
     "readDesc": "Can open the rentals module and read its bookings and blocks",
     "write": "Manage rentals",
     "writeDesc": "Can book equipment, hand it out, take it back, extend a booking and block a unit"
+  },
+  "history": {
+    "title": "Rentals",
+    "partnerTitle": "Rental history",
+    "assetTitle": "Rental bookings",
+    "emptyPartner": "No rentals for this partner yet.",
+    "emptyAsset": "This unit has no rental bookings yet.",
+    "viewAll": "View all bookings",
+    "upcoming": "Upcoming",
+    "past": "Past"
+  },
+  "kits": {
+    "title": "Kits",
+    "new": "New kit",
+    "edit": "Edit kit",
+    "empty": "No kits yet. A kit is a named set of equipment handed out together.",
+    "name": "Name",
+    "note": "Note (optional)",
+    "members": "Members",
+    "addMember": "Add a member",
+    "memberKind": {
+      "asset": "Unit",
+      "model": "Model"
+    },
+    "chooseAsset": "Choose a unit",
+    "chooseModel": "Choose a model",
+    "quantity": "Quantity",
+    "save": "Save the kit",
+    "cancel": "Cancel",
+    "delete": "Delete kit",
+    "deleteConfirmTitle": "Delete the kit",
+    "deleteConfirmMessage": "Bookings already made keep their equipment; the set is no longer offered for new bookings.",
+    "code": "Code",
+    "codeHint": "Scan this code at the hand-out to take the whole set at once.",
+    "memberCount_one": "{{count}} member",
+    "memberCount_other": "{{count}} members",
+    "needName": "Give the kit a name",
+    "needMembers": "A kit needs at least one member",
+    "saveFailed": "The kit could not be saved",
+    "removeMember": "Remove member",
+    "editNamed": "Edit the kit {{name}}",
+    "deleteNamed": "Delete the kit {{name}}"
   }
 }

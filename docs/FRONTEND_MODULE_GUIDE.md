@@ -383,6 +383,8 @@ moduleRegistry.register({
 | `approval_decision_panel` | A queue card of a target module — the request's progress through its stages and the approve / reject panel | `approval`, `onApprove(request, notes?)`, `onReject(request, notes)` | Active |
 | `approval_parked_requests` | Above a target module's approval queue — the open requests parked at a stage nobody can decide | `targetType`, `targetHref(targetId)` | Active |
 | `document_approval_setup_notice` | The warehouse's document approval settings — what the threshold and types do given the workflows that exist | `approvalRequested` | Active |
+| `partner_detail_extra` | Partner detail sheet — below the related links | `partnerId`, `partnerName` | Active |
+| `asset_detail_extra` | Equipment asset page → Timeline tab — below the asset timeline | `itemId`, `itemName` | Active |
 
 > **Status semantics — what does "Active" vs "Extension point" mean for you?**
 >

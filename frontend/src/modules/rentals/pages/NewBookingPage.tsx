@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -15,7 +15,7 @@ import {
   useOrganizationTimezone,
 } from "@/module-sdk";
 
-import type { BookingLineIn } from "../api/rentals";
+import type { Booking, BookingLineIn } from "../api/rentals";
 import {
   BorrowerSection,
   LinesSection,
@@ -24,14 +24,16 @@ import {
   type Who,
 } from "../components/BookingFormSections";
 import {
+  useBooking,
   useBookingCheck,
   useCreateBooking,
+  useKits,
   useMembers,
   useModels,
   usePartners,
   useRentalAssets,
 } from "../hooks/useRentals";
-import { isoToWall, wallTimeToIso } from "../lib/datetime";
+import { addDays, isoDate, isoToWall, wallTimeToIso } from "../lib/datetime";
 
 let nextKey = 1;
 
@@ -61,16 +63,119 @@ function footerMessage(
   return "";
 }
 
+/** The borrower kind of a booking, in the form's own vocabulary. */
+function whoOf(booking: Booking): Who {
+  if (booking.borrower_kind === "partner") return "partner";
+  if (booking.borrower_kind === "user") return "member";
+  return "external";
+}
+
+/**
+ * A booking's lines as drafts: a kit's member lines collapse back into the
+ * one kit line the sheet submitted.
+ */
+function linesOf(booking: Booking): LineDraft[] {
+  const result: LineDraft[] = [];
+  const seenKits = new Set<string>();
+  for (const line of booking.lines) {
+    if (line.kit_id) {
+      if (seenKits.has(line.kit_id)) continue;
+      seenKits.add(line.kit_id);
+      result.push({
+        key: nextKey++,
+        kind: "kit",
+        model: "",
+        itemId: "",
+        kitId: line.kit_id,
+        kitName: line.kit_name ?? undefined,
+        quantity: 1,
+      });
+    } else if (line.item_id) {
+      result.push({
+        key: nextKey++,
+        kind: "asset",
+        model: "",
+        itemId: line.item_id,
+        kitId: "",
+        quantity: 1,
+      });
+    } else if (line.model) {
+      result.push({
+        key: nextKey++,
+        kind: "model",
+        model: line.model,
+        itemId: "",
+        kitId: "",
+        quantity: line.quantity,
+      });
+    }
+  }
+  return result;
+}
+
+/** One week on from the booking, or tomorrow when that week has already passed. */
+function bookAgainWindow(
+  booking: Booking,
+  timezone?: string,
+): {
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
+} {
+  const start = isoToWall(booking.starts_at, timezone);
+  const end = isoToWall(booking.ends_at, timezone);
+  const shiftedStart = addDays(start.date, 7);
+  const shiftedStartAt = wallTimeToIso(shiftedStart, start.time, timezone);
+  if (new Date(shiftedStartAt).getTime() > Date.now()) {
+    return {
+      startDate: shiftedStart,
+      startTime: start.time,
+      endDate: addDays(end.date, 7),
+      endTime: end.time,
+    };
+  }
+  const duration =
+    new Date(booking.ends_at).getTime() - new Date(booking.starts_at).getTime();
+  const tomorrow = addDays(isoDate(new Date().toISOString(), timezone), 1);
+  const nextStart = wallTimeToIso(tomorrow, start.time, timezone);
+  const nextEnd = isoToWall(
+    new Date(new Date(nextStart).getTime() + duration).toISOString(),
+    timezone,
+  );
+  return {
+    startDate: tomorrow,
+    startTime: start.time,
+    endDate: nextEnd.date,
+    endTime: nextEnd.time,
+  };
+}
+
+/** Why the form is already filled: the booking it repeats. */
+function BookAgainHint({ booking }: { booking?: Booking }) {
+  const { t } = useTranslation("rentals");
+  if (!booking) return null;
+  return (
+    <p className="m-0 rounded-lg bg-blue-50 p-3 text-sm text-blue-800">
+      {t("form.bookAgainHint", { name: booking.borrower_name })}
+    </p>
+  );
+}
+
 export default function NewBookingPage() {
   const { t } = useTranslation("rentals");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const fromId = searchParams.get("from") ?? undefined;
   const { setHeader } = useModulePageHeader();
   const timezone = useOrganizationTimezone();
   const canWrite = useCanWrite("rentals");
   const models = useModels();
   const assets = useRentalAssets("");
+  const kits = useKits();
   const partners = usePartners();
   const members = useMembers();
+  const source = useBooking(fromId);
   const check = useBookingCheck();
   const create = useCreateBooking();
 
@@ -85,8 +190,18 @@ export default function NewBookingPage() {
   const [endDate, setEndDate] = useState(todayPlus(3));
   const [endTime, setEndTime] = useState("16:00");
   const [lines, setLines] = useState<LineDraft[]>([
-    { key: nextKey++, kind: "model", model: "", itemId: "", quantity: 1 },
+    {
+      key: nextKey++,
+      kind: "model",
+      model: "",
+      itemId: "",
+      kitId: "",
+      quantity: 1,
+    },
   ]);
+  // "Book again" fills the form once, when the source booking arrives. The
+  // guard keeps a later refetch from overwriting what the reader typed.
+  const prefilledFrom = useRef<string | null>(null);
 
   useEffect(() => {
     setHeader({ title: t("form.newTitle"), backTo: "/rentals" });
@@ -103,19 +218,40 @@ export default function NewBookingPage() {
     );
   }, [models.data]);
 
+  useEffect(() => {
+    const booking = source.data;
+    if (!fromId || !booking || prefilledFrom.current === fromId) return;
+    prefilledFrom.current = fromId;
+    setWho(whoOf(booking));
+    setPartnerId(booking.borrower_partner_id ?? "");
+    setMemberId(booking.borrower_user_id ?? "");
+    setName(booking.borrower_name);
+    setEmail(booking.borrower_email ?? "");
+    setNote(booking.note ?? "");
+    const window = bookAgainWindow(booking, timezone);
+    setStartDate(window.startDate);
+    setStartTime(window.startTime);
+    setEndDate(window.endDate);
+    setEndTime(window.endTime);
+    const prefilled = linesOf(booking);
+    if (prefilled.length) setLines(prefilled);
+  }, [fromId, source.data, timezone]);
+
   const startsAt = wallTimeToIso(startDate, startTime, timezone);
   const endsAt = wallTimeToIso(endDate, endTime, timezone);
   const payloadLines: BookingLineIn[] = useMemo(
     () =>
-      lines
-        .filter((line) =>
-          line.kind === "model" ? Boolean(line.model) : Boolean(line.itemId),
-        )
-        .map((line) =>
-          line.kind === "model"
-            ? { model: line.model, quantity: line.quantity }
-            : { item_id: line.itemId, quantity: 1 },
-        ),
+      lines.flatMap((line): BookingLineIn[] => {
+        if (line.kind === "model") {
+          return line.model
+            ? [{ model: line.model, quantity: line.quantity }]
+            : [];
+        }
+        if (line.kind === "asset") {
+          return line.itemId ? [{ item_id: line.itemId, quantity: 1 }] : [];
+        }
+        return line.kitId ? [{ kit_id: line.kitId }] : [];
+      }),
     [lines],
   );
   const payloadKey = JSON.stringify(payloadLines);
@@ -149,7 +285,11 @@ export default function NewBookingPage() {
   ]);
 
   const optionsFailed =
-    models.isError || assets.isError || partners.isError || members.isError;
+    models.isError ||
+    assets.isError ||
+    kits.isError ||
+    partners.isError ||
+    members.isError;
   const checkFailed = check.isError;
   const checks = check.data?.lines ?? [];
   const failingLine = checks.find((line) => !line.ok);
@@ -216,6 +356,7 @@ export default function NewBookingPage() {
               {t("errors.loadChoices")}
             </p>
           ) : null}
+          <BookAgainHint booking={source.data} />
           <BorrowerSection
             who={who}
             onWho={setWho}
@@ -245,6 +386,7 @@ export default function NewBookingPage() {
             lines={lines}
             models={models.data ?? []}
             assets={assets.data ?? []}
+            kits={kits.data ?? []}
             checks={checks}
             onUpdate={updateLine}
             onMoveWindow={moveWindow}
@@ -256,6 +398,7 @@ export default function NewBookingPage() {
                   kind: models.data?.length ? "model" : "asset",
                   model: models.data?.[0]?.model ?? "",
                   itemId: "",
+                  kitId: "",
                   quantity: 1,
                 },
               ])

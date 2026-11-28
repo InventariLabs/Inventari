@@ -3871,6 +3871,98 @@ def _organization_day(db, org_id):
     return local_at, later_today
 
 
+def _create_rentals_kit_demo(db, org_id, created_by, assets, local_at) -> int:
+    """A kit and a borrower without an account, for the set's screen and guide.
+
+    The kit is one line on the booking sheet and one scan at the hand-out;
+    its borrower has a name and an e-mail and no account.
+    """
+    from app.modules.rentals.models import (
+        RentalBooking,
+        RentalBookingLine,
+        RentalBookingUnit,
+        RentalKit,
+        RentalKitMember,
+    )
+
+    model = _rental_model_of(assets[3])
+    kit_id = uuid.uuid4()
+    kit = RentalKit(
+        id=kit_id,
+        organization_id=org_id,
+        name='Conference kit',
+        code=f'KIT-{kit_id.hex[:8].upper()}',
+        note='A projector and a screen, handed out together.',
+    )
+    db.add(kit)
+    db.add(
+        RentalKitMember(
+            id=uuid.uuid4(),
+            organization_id=org_id,
+            kit_id=kit.id,
+            item_id=assets[3].id,
+        )
+    )
+    kit_model = model or _rental_model_of(assets[0])
+    if kit_model:
+        db.add(
+            RentalKitMember(
+                id=uuid.uuid4(),
+                organization_id=org_id,
+                kit_id=kit.id,
+                model=kit_model,
+                quantity=1,
+            )
+        )
+    db.flush()
+
+    kit_start = local_at(7, 9).astimezone(UTC)
+    kit_end = local_at(9, 16).astimezone(UTC)
+    kit_name, kit_email = DEMO_RENTAL_BORROWERS[2]
+    kit_booking = RentalBooking(
+        id=uuid.uuid4(),
+        organization_id=org_id,
+        status='RESERVED',
+        borrower_name=kit_name,
+        borrower_email=kit_email,
+        starts_at=kit_start,
+        ends_at=kit_end,
+        note='conference kit, borrower without an account',
+        created_by=created_by,
+    )
+    kit_line = RentalBookingLine(
+        id=uuid.uuid4(),
+        organization_id=org_id,
+        booking_id=kit_booking.id,
+        item_id=assets[3].id,
+        quantity=1,
+        kit_id=kit.id,
+        kit_name=kit.name,
+    )
+    kit_unit = RentalBookingUnit(
+        id=uuid.uuid4(),
+        organization_id=org_id,
+        booking_id=kit_booking.id,
+        line_id=kit_line.id,
+        item_id=assets[3].id,
+    )
+    db.add_all([kit_booking, kit_line, kit_unit])
+    if kit_model:
+        db.add(
+            RentalBookingLine(
+                id=uuid.uuid4(),
+                organization_id=org_id,
+                booking_id=kit_booking.id,
+                model=kit_model,
+                quantity=1,
+                kit_id=kit.id,
+                kit_name=kit.name,
+            )
+        )
+    db.flush()
+    return 1
+
+
 def _create_rentals_demo(db, org_id, created_by) -> int:
     """Bookings around today, so the module's first screen has all its states.
 
@@ -4078,6 +4170,8 @@ def _create_rentals_demo(db, org_id, created_by) -> int:
             )
         )
         _set_equipment_status(assets[4], 'MAINTENANCE')
+
+    created += _create_rentals_kit_demo(db, org_id, created_by, assets, local_at)
 
     # A buffer on the first model: the booking sheet explains the gap after a
     # return, and the calendar draws it.
@@ -4888,6 +4982,7 @@ def _clean_module_extras(db, org_id) -> None:
         RentalBlock,
         RentalBooking,
         RentalBufferRule,
+        RentalKit,
     )
 
     # The rentals demo writes nothing outside its own tables and carries no
@@ -4902,6 +4997,9 @@ def _clean_module_extras(db, org_id) -> None:
     db.query(RentalBufferRule).filter(
         RentalBufferRule.organization_id == org_id
     ).delete(synchronize_session=False)
+    db.query(RentalKit).filter(RentalKit.organization_id == org_id).delete(
+        synchronize_session=False
+    )
 
     recipe_ids = [
         row[0]

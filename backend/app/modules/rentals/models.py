@@ -9,10 +9,11 @@ the status.
 """
 
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
 from sqlalchemy import (
     CheckConstraint,
+    Date,
     DateTime,
     ForeignKey,
     Index,
@@ -30,6 +31,74 @@ BOOKING_STATUSES = ('RESERVED', 'PICKED_UP', 'RETURNED', 'CANCELLED')
 LINE_KINDS = ('asset', 'model')
 BLOCK_SOURCES = ('MANUAL', 'SERVICE')
 CONDITIONS = ('GOOD', 'DAMAGED', 'NEEDS_REPAIR')
+
+
+class RentalKit(CoreModelBase):
+    """A named set of assets or models handed out together.
+
+    A kit is a booking convenience, not a second stock register: a booking
+    line that names a kit is stored as one line per member, all carrying the
+    kit's id and name, so availability, pickup and return keep working on
+    units. The code is what a scanner reads to take the whole set at once.
+    """
+
+    __tablename__ = 'rental_kits'
+    __table_args__ = (
+        Index('uq_rental_kits_org_name', 'organization_id', 'name', unique=True),
+        Index('uq_rental_kits_org_code', 'organization_id', 'code', unique=True),
+        {'keep_existing': True},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('organizations.id', ondelete='CASCADE'), index=True
+    )
+    name: Mapped[str] = mapped_column(String(255))
+    code: Mapped[str] = mapped_column(String(32))
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    members: Mapped[list['RentalKitMember']] = relationship(
+        back_populates='kit',
+        cascade='all, delete-orphan',
+        order_by='RentalKitMember.created_at',
+    )
+
+
+class RentalKitMember(CoreModelBase):
+    """One member of a kit: a specific asset, or a model and a count."""
+
+    __tablename__ = 'rental_kit_members'
+    __table_args__ = (
+        CheckConstraint(
+            '(item_id IS NOT NULL AND model IS NULL) '
+            'OR (item_id IS NULL AND model IS NOT NULL)',
+            name='ck_rental_kit_members_one_kind',
+        ),
+        CheckConstraint('quantity > 0', name='ck_rental_kit_members_quantity'),
+        Index('ix_rental_kit_members_org_kit', 'organization_id', 'kit_id'),
+        {'keep_existing': True},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('organizations.id', ondelete='CASCADE'), index=True
+    )
+    kit_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('rental_kits.id', ondelete='CASCADE'), index=True
+    )
+    item_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey('items.id', ondelete='CASCADE'), nullable=True
+    )
+    model: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    quantity: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    kit: Mapped[RentalKit] = relationship(back_populates='members')
 
 
 class RentalBooking(CoreModelBase):
@@ -77,6 +146,14 @@ class RentalBooking(CoreModelBase):
     returned_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+
+    # Reminder markers. The end reminder goes out once per booking; the late
+    # one once per organization-local day, so a long loan is nudged daily
+    # and no run of the worker mails the same morning twice.
+    end_reminder_sent_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    late_reminder_sent_on: Mapped[date | None] = mapped_column(Date, nullable=True)
 
     created_by: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey('users.id', ondelete='SET NULL'), nullable=True
@@ -141,6 +218,12 @@ class RentalBookingLine(CoreModelBase):
     )
     model: Mapped[str | None] = mapped_column(String(255), nullable=True)
     quantity: Mapped[int] = mapped_column(Integer, default=1)
+    # The kit this line came from, kept after the kit is deleted so the
+    # booking still reads as one set.
+    kit_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey('rental_kits.id', ondelete='SET NULL'), nullable=True
+    )
+    kit_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

@@ -9,6 +9,7 @@ import {
   type BookingCheckRequest,
   type BookingListParams,
   type BufferRuleIn,
+  type KitCreate,
   type PickupRequest,
 } from "../api/rentals";
 import { queryKeys } from "../queryKeys";
@@ -51,6 +52,40 @@ export function useBookings(params: BookingListParams) {
     queryKey: queryKeys.rentals.bookings(params as Record<string, unknown>),
     queryFn: () => rentalsApi.bookings(params),
   });
+}
+
+export function useKits() {
+  return useModuleQuery(MODULE, {
+    queryKey: queryKeys.rentals.kits(),
+    queryFn: rentalsApi.kits,
+  });
+}
+
+export function useKit(id: string | undefined) {
+  return useModuleQuery(MODULE, {
+    queryKey: queryKeys.rentals.kit(id ?? ""),
+    queryFn: () => rentalsApi.kit(id as string),
+    extraEnabled: Boolean(id),
+  });
+}
+
+export function useCreateKit() {
+  return useAppMutation(rentalsApi.createKit, invalidateRentals);
+}
+
+export function useUpdateKit() {
+  return useAppMutation(
+    ({ id, data }: { id: string; data: KitCreate }) =>
+      rentalsApi.updateKit(id, data),
+    invalidateRentals,
+  );
+}
+
+export function useDeleteKit() {
+  return useAppMutation(
+    (id: string) => rentalsApi.deleteKit(id),
+    invalidateRentals,
+  );
 }
 
 export function useBooking(id: string | undefined) {

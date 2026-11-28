@@ -3197,4 +3197,77 @@ export class ApiHelper {
       throw new Error(`Failed to set margin: ${await response.text()}`);
     return await response.json();
   }
+
+  async createRentalBooking(
+    token: string,
+    data: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
+    const response = await this.request.post("/api/v1/rentals/bookings", {
+      headers: { Authorization: `Bearer ${token}` },
+      data,
+    });
+    if (!response.ok())
+      throw new Error(`Failed to create rental booking: ${await response.text()}`);
+    return await response.json();
+  }
+
+  async pickupRentalBooking(
+    token: string,
+    bookingId: string,
+    data: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
+    const response = await this.request.post(
+      `/api/v1/rentals/bookings/${bookingId}/pickup`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        data,
+      },
+    );
+    if (!response.ok())
+      throw new Error(`Failed to hand out rental booking: ${await response.text()}`);
+    return await response.json();
+  }
+
+  async returnRentalBooking(
+    token: string,
+    bookingId: string,
+    data: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
+    const response = await this.request.post(
+      `/api/v1/rentals/bookings/${bookingId}/return`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        data,
+      },
+    );
+    if (!response.ok())
+      throw new Error(`Failed to return rental booking: ${await response.text()}`);
+    return await response.json();
+  }
+
+  async getRentalBooking(
+    token: string,
+    bookingId: string,
+  ): Promise<Record<string, unknown>> {
+    const response = await this.request.get(
+      `/api/v1/rentals/bookings/${bookingId}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (!response.ok())
+      throw new Error(`Failed to read rental booking: ${await response.text()}`);
+    return await response.json();
+  }
+
+  async listRentalBookings(
+    token: string,
+    query: string,
+  ): Promise<{ items: Array<Record<string, unknown>>; total: number }> {
+    const response = await this.request.get(
+      `/api/v1/rentals/bookings?${query}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (!response.ok())
+      throw new Error(`Failed to list rental bookings: ${await response.text()}`);
+    return await response.json();
+  }
 }

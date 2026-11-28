@@ -59,6 +59,8 @@ export { ATTACHMENT_FILE_ACCEPT } from "@/utils/fileValidation";
 // picker names it.
 export { storageLeafLabel } from "@/utils/storageLeafOption";
 export { effectiveExpiry } from "@/utils/effectiveExpiry";
+// Handing a generated or downloaded file to the browser as a named download.
+export { downloadBlob } from "@/utils/helpers";
 
 // What the signed-in user may do, and the page header ModuleShell renders.
 export { useCanWrite } from "@/hooks/useCanWrite";

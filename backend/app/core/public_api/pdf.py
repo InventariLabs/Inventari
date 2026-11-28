@@ -8,10 +8,16 @@ All methods are synchronous, stateless utilities — no DB access.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+from uuid import UUID
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.public_api._access import reads
 from app.core.utils import pick_by_lang
+
+if TYPE_CHECKING:
+    from app.core.print_identity import IssuerContext
 
 
 class CorePdfAPI:
@@ -49,6 +55,35 @@ class CorePdfAPI:
         from app.core.pdf_base_service import PdfServiceBase
 
         return PdfServiceBase.render_to_pdf(html)
+
+    @reads
+    async def render_document_pdf_async(
+        self, db: AsyncSession, organization_id: UUID, html: str
+    ) -> bytes:
+        """Render a document on the organization's paper, off the event loop.
+
+        WeasyPrint is CPU-bound, so a module printing a PDF must not call it
+        inline. The page size is the organization's own statement, applied
+        after the body so a saved layout cannot decide the paper.
+        """
+        from app.core.async_utils import run_sync_in_thread
+        from app.core.pdf_base_service import PdfServiceBase
+        from app.core.print_page_size import apply_page_size, resolve_page_size_async
+
+        page_size = await resolve_page_size_async(db, organization_id)
+        sized = apply_page_size(html, page_size)
+        return await run_sync_in_thread(lambda: PdfServiceBase.render_to_pdf(sized))
+
+    @reads
+    async def issuer_async(
+        self, db: AsyncSession, organization_id: UUID, lang: str = 'en'
+    ) -> IssuerContext:
+        """The organization's identity block for a printed document."""
+        from app.core.print_identity import build_issuer_context
+        from app.core.public_api import core_api
+
+        organization = await core_api.organizations.get_async(db, organization_id)
+        return await build_issuer_context(organization, lang)
 
     @reads
     def generate_code128_base64(self, value: str) -> str:

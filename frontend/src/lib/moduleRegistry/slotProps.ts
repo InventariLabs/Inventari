@@ -405,4 +405,22 @@ export interface SlotDataMap {
   document_approval_setup_notice: {
     approvalRequested: boolean;
   };
+  /**
+   * The partner detail sheet's history contribution: the rentals taken out
+   * by this partner. The sheet knows who the partner is; what they borrowed
+   * is the rentals module's record.
+   */
+  partner_detail_extra: {
+    partnerId: string;
+    partnerName: string;
+  };
+  /**
+   * The timeline tab of an equipment asset: the rentals the asset was part
+   * of, beside what the equipment module already records about it. The asset
+   * page knows the item; the bookings are the rentals module's.
+   */
+  asset_detail_extra: {
+    itemId: string;
+    itemName: string;
+  };
 }

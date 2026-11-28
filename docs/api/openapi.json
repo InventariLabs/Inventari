@@ -27825,6 +27825,40 @@
             }
           },
           {
+            "name": "partner_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Partner Id"
+            }
+          },
+          {
+            "name": "item_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Item Id"
+            }
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -28115,6 +28149,126 @@
                 "schema": {
                   "$ref": "#/components/schemas/BookingSchema"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/bookings/{booking_id}/handover-sheet": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Handover Sheet Endpoint",
+        "operationId": "handover_sheet_endpoint_api_v1_rentals_bookings__booking_id__handover_sheet_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Booking Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 8,
+              "default": "en",
+              "title": "Lang"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/bookings/{booking_id}/pick-list": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Pick List Endpoint",
+        "operationId": "pick_list_endpoint_api_v1_rentals_bookings__booking_id__pick_list_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Booking Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 8,
+              "default": "en",
+              "title": "Lang"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -28502,6 +28656,238 @@
             "ApiKey": []
           }
         ]
+      }
+    },
+    "/api/v1/rentals/kits": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "List Kits Endpoint",
+        "operationId": "list_kits_endpoint_api_v1_rentals_kits_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/KitListRow"
+                  },
+                  "type": "array",
+                  "title": "Response List Kits Endpoint Api V1 Rentals Kits Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Create Kit Endpoint",
+        "operationId": "create_kit_endpoint_api_v1_rentals_kits_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KitCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KitSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/rentals/kits/{kit_id}": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Get Kit Endpoint",
+        "operationId": "get_kit_endpoint_api_v1_rentals_kits__kit_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "kit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Kit Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KitSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Update Kit Endpoint",
+        "operationId": "update_kit_endpoint_api_v1_rentals_kits__kit_id__put",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "kit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Kit Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KitUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KitSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Delete Kit Endpoint",
+        "operationId": "delete_kit_endpoint_api_v1_rentals_kits__kit_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "kit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Kit Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/rentals/models": {
@@ -49340,6 +49726,18 @@
             ],
             "title": "Model"
           },
+          "kit_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kit Id"
+          },
           "quantity": {
             "type": "integer",
             "maximum": 999.0,
@@ -49350,7 +49748,7 @@
         },
         "type": "object",
         "title": "BookingLineIn",
-        "description": "One thing a booking asks for: an asset, or a model and a count."
+        "description": "One thing a booking asks for: an asset, a model and a count, or a kit."
       },
       "BookingListRow": {
         "properties": {
@@ -49389,6 +49787,18 @@
               "external"
             ],
             "title": "Borrower Kind"
+          },
+          "borrower_partner_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Borrower Partner Id"
           },
           "starts_at": {
             "type": "string",
@@ -49556,6 +49966,16 @@
           "can_extend": {
             "type": "boolean",
             "title": "Can Extend"
+          },
+          "returned_count": {
+            "type": "integer",
+            "title": "Returned Count",
+            "default": 0
+          },
+          "outstanding_count": {
+            "type": "integer",
+            "title": "Outstanding Count",
+            "default": 0
           },
           "handed_out_at": {
             "anyOf": [
@@ -52446,6 +52866,30 @@
               }
             ],
             "title": "Reason"
+          },
+          "held_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Held From"
+          },
+          "held_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Held Until"
           }
         },
         "type": "object",
@@ -63503,6 +63947,251 @@
         ],
         "title": "KeysetPaginatedResponse[StockMoveRowDTO]"
       },
+      "KitCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/KitMemberIn"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Members"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "members"
+        ],
+        "title": "KitCreate"
+      },
+      "KitListRow": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "member_count": {
+            "type": "integer",
+            "title": "Member Count"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "code",
+          "member_count",
+          "summary"
+        ],
+        "title": "KitListRow"
+      },
+      "KitMemberIn": {
+        "properties": {
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "quantity": {
+            "type": "integer",
+            "maximum": 999.0,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "title": "KitMemberIn",
+        "description": "One member of a kit: a specific asset, or a model and a count."
+      },
+      "KitMemberSchema": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "item_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Name"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "quantity": {
+            "type": "integer",
+            "title": "Quantity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "quantity"
+        ],
+        "title": "KitMemberSchema"
+      },
+      "KitSchema": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/KitMemberSchema"
+            },
+            "type": "array",
+            "title": "Members"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "code",
+          "created_at"
+        ],
+        "title": "KitSchema"
+      },
+      "KitUpdate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/KitMemberIn"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Members"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "members"
+        ],
+        "title": "KitUpdate"
+      },
       "LabelAllergen": {
         "properties": {
           "allergen": {
@@ -64817,6 +65506,29 @@
           "resolved_count": {
             "type": "integer",
             "title": "Resolved Count"
+          },
+          "kit_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kit Id"
+          },
+          "kit_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kit Name"
           },
           "units": {
             "items": {
@@ -74706,6 +75418,14 @@
             },
             "type": "array",
             "title": "Item Ids"
+          },
+          "kit_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Kit Ids"
           }
         },
         "type": "object",
@@ -93270,6 +93990,11 @@
             "type": "integer",
             "title": "Late Days",
             "default": 0
+          },
+          "can_pickup": {
+            "type": "boolean",
+            "title": "Can Pickup",
+            "default": true
           }
         },
         "type": "object",
@@ -93300,6 +94025,11 @@
             "type": "integer",
             "title": "Late Count"
           },
+          "expired_count": {
+            "type": "integer",
+            "title": "Expired Count",
+            "default": 0
+          },
           "late": {
             "items": {
               "$ref": "#/components/schemas/TodayItem"
@@ -93320,6 +94050,13 @@
             },
             "type": "array",
             "title": "Returns"
+          },
+          "expired": {
+            "items": {
+              "$ref": "#/components/schemas/TodayItem"
+            },
+            "type": "array",
+            "title": "Expired"
           },
           "in_service": {
             "items": {
@@ -93752,6 +94489,11 @@
               }
             ],
             "title": "Returned At"
+          },
+          "is_out": {
+            "type": "boolean",
+            "title": "Is Out",
+            "default": true
           }
         },
         "type": "object",

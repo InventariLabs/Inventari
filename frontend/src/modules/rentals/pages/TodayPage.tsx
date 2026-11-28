@@ -119,6 +119,36 @@ export default function TodayPage() {
                   )}
                 </Section>
 
+                {(data.expired ?? []).length ? (
+                  <Section title={t("today.expiredTitle")}>
+                    <p className="px-4 pt-3 text-xs text-zinc-500">
+                      {t("today.expiredHint")}
+                    </p>
+                    {(data.expired ?? []).map((item) => (
+                      <BookingRow
+                        key={item.booking_id}
+                        item={item}
+                        badge="RESERVED"
+                        timeOf="return"
+                        action={
+                          <Link
+                            to={`/rentals/bookings/${item.booking_id}`}
+                            aria-label={t("today.extendNamed", {
+                              name: item.what,
+                            })}
+                            className={buttonVariants({
+                              variant: "outline",
+                              size: "sm",
+                            })}
+                          >
+                            {t("today.extend")}
+                          </Link>
+                        }
+                      />
+                    ))}
+                  </Section>
+                ) : null}
+
                 <Section title={t("today.pickupsTitle")}>
                   {data.pickups.length === 0 ? (
                     <p className="px-4 py-4 text-sm text-zinc-500">
@@ -131,18 +161,33 @@ export default function TodayPage() {
                         item={item}
                         badge="RESERVED"
                         action={
-                          <Link
-                            to={`/rentals/bookings/${item.booking_id}/pickup`}
-                            aria-label={t("today.handOutNamed", {
-                              name: item.what,
-                            })}
-                            className={buttonVariants({
-                              variant: "outline",
-                              size: "sm",
-                            })}
-                          >
-                            {t("today.handOut")}
-                          </Link>
+                          item.can_pickup ? (
+                            <Link
+                              to={`/rentals/bookings/${item.booking_id}/pickup`}
+                              aria-label={t("today.handOutNamed", {
+                                name: item.what,
+                              })}
+                              className={buttonVariants({
+                                variant: "outline",
+                                size: "sm",
+                              })}
+                            >
+                              {t("today.handOut")}
+                            </Link>
+                          ) : (
+                            <Link
+                              to={`/rentals/bookings/${item.booking_id}`}
+                              aria-label={t("today.extendNamed", {
+                                name: item.what,
+                              })}
+                              className={buttonVariants({
+                                variant: "outline",
+                                size: "sm",
+                              })}
+                            >
+                              {t("today.extend")}
+                            </Link>
+                          )
                         }
                       />
                     ))

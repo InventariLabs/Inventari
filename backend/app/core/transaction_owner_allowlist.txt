@@ -74,3 +74,4 @@ purchase_orders/module.py::PurchaseOrdersModule._notify_recalc_failure
 # organization), and the 401 that follows rolls the request's session back.
 # The request's own session is never committed here.
 api_keys/module.py::_resolve_api_key
+rentals/module.py::_run_reminder_pass

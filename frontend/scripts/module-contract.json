@@ -1260,6 +1260,9 @@
                       "literal": "approval_status_badge"
                     },
                     {
+                      "literal": "asset_detail_extra"
+                    },
+                    {
                       "literal": "dashboard_activity_aside"
                     },
                     {
@@ -1297,6 +1300,9 @@
                     },
                     {
                       "literal": "items_page_header_extra"
+                    },
+                    {
+                      "literal": "partner_detail_extra"
                     },
                     {
                       "literal": "quick_action_extra"
@@ -1674,6 +1680,9 @@
               "literal": "approval_status_badge"
             },
             {
+              "literal": "asset_detail_extra"
+            },
+            {
               "literal": "dashboard_activity_aside"
             },
             {
@@ -1711,6 +1720,9 @@
             },
             {
               "literal": "items_page_header_extra"
+            },
+            {
+              "literal": "partner_detail_extra"
             },
             {
               "literal": "quick_action_extra"
@@ -2549,6 +2561,18 @@
           }
         }
       },
+      "asset_detail_extra": {
+        "obj": {
+          "itemId": {
+            "optional": false,
+            "type": "string"
+          },
+          "itemName": {
+            "optional": false,
+            "type": "string"
+          }
+        }
+      },
       "dashboard_activity_aside": {
         "args": [
           "string",
@@ -3295,6 +3319,18 @@
           "never"
         ],
         "ext": "Record"
+      },
+      "partner_detail_extra": {
+        "obj": {
+          "partnerId": {
+            "optional": false,
+            "type": "string"
+          },
+          "partnerName": {
+            "optional": false,
+            "type": "string"
+          }
+        }
       },
       "quick_action_extra": {
         "obj": {

@@ -9,7 +9,8 @@
     "today": "Dziś",
     "calendar": "Kalendarz",
     "bookings": "Rezerwacje",
-    "blocks": "Blokady serwisowe"
+    "blocks": "Blokady serwisowe",
+    "kits": "Zestawy"
   },
   "status": {
     "reserved": "Zarezerwowane",
@@ -45,13 +46,18 @@
     "guide": "Jak to działa",
     "extendNamed": "Przedłuż wypożyczenie: {{name}}",
     "takeBackNamed": "Przyjmij zwrot: {{name}}",
-    "handOutNamed": "Wydaj: {{name}}"
+    "handOutNamed": "Wydaj: {{name}}",
+    "expiredTitle": "Rezerwacje po terminie",
+    "expiredHint": "Nie można ich już wydać. Przedłuż jedną na nowe okno, jeśli sprzęt jest wolny."
   },
   "bookings": {
     "search": "Szukaj",
     "status": "Status",
     "all": "Wszystkie",
-    "empty": "Żadna rezerwacja nie pasuje."
+    "empty": "Żadna rezerwacja nie pasuje.",
+    "partnerFilter": "Rezerwacje tego partnera",
+    "itemFilter": "Rezerwacje tego zasobu",
+    "clearFilter": "Pokaż wszystkie rezerwacje"
   },
   "calendar": {
     "previous": "Poprzednie dwa tygodnie",
@@ -146,7 +152,12 @@
     "heldBy_few": "Zajęte przez rezerwację modelu: {{name}} ({{count}} szt.)",
     "heldBy_many": "Zajęte przez rezerwację modelu: {{name}} ({{count}} szt.)",
     "heldBy_other": "Zajęte przez rezerwację modelu: {{name}} ({{count}} szt.)",
-    "modelWithCount": "{{model}} × {{quantity}}"
+    "modelWithCount": "{{model}} × {{quantity}}",
+    "kitLine": "Zestaw",
+    "chooseKit": "Wybierz zestaw",
+    "kitHint": "Zestaw rezerwuje się jako jedną pozycję; jego dostępność wynika z elementów, a jedno skanowanie przy wydaniu zabiera cały zestaw.",
+    "duplicateUnit": "Ten zasób jest już na innej pozycji. Usuń jedną z dwóch.",
+    "bookAgainHint": "Skopiowano z rezerwacji {{name}}. Wybierz nowe daty i sprawdź pozycje przed zapisaniem."
   },
   "detail": {
     "title": "Rezerwacja",
@@ -182,7 +193,20 @@
     "handedOut": "Wydane",
     "returned": "Zwrócone",
     "notHandedOut": "Nic jeszcze nie wydano.",
-    "notFound": "Nie znaleziono rezerwacji"
+    "notFound": "Nie znaleziono rezerwacji",
+    "printPickList": "Drukuj listę do spakowania",
+    "printHandover": "Drukuj protokół wydania",
+    "printFailed": "Nie udało się utworzyć dokumentu. Spróbuj ponownie.",
+    "bookAgain": "Zarezerwuj ponownie",
+    "alreadyReturned": "Już zwrócone",
+    "selectAll": "Zaznacz wszystko",
+    "returnSelected_one": "Zwróć {{count}} sztukę",
+    "returnSelected_few": "Zwróć {{count}} sztuki",
+    "returnSelected_many": "Zwróć {{count}} sztuk",
+    "returnSelected_other": "Zwróć {{count}} sztuki",
+    "staysOut": "Zostaje na zewnątrz — nie wraca teraz",
+    "partlyReturned": "Dotychczas zwrócone",
+    "returnedOf": "{{returned}} z {{total}} sztuk"
   },
   "pickup": {
     "title": "Wydanie",
@@ -211,7 +235,11 @@
     "notOnThisBooking": "{{name}} nie należy do tej rezerwacji.",
     "busyUnit": "{{name}} nie jest wolny do końca tej rezerwacji: {{reason}}.",
     "assetTaken": "{{name}} jest zajęty: {{reason}}. Wybierz inną sztukę.",
-    "anyUnit": "dowolna sztuka"
+    "anyUnit": "dowolna sztuka",
+    "kitScanHint": "Zeskanowanie kodu zestawu zabiera wszystkie jego elementy naraz.",
+    "kitScanned": "Zestaw {{name}} jest gotowy do wydania.",
+    "kitUnitsMissing": "Za mało wolnych sztuk, aby wydać zestaw {{name}}.",
+    "kitPart": "zestaw {{name}}"
   },
   "blocks": {
     "title": "Blokady serwisowe",
@@ -263,6 +291,14 @@
       "late": {
         "title": "Pilnuj spóźnień",
         "body": "Dziś pokazuje dzisiejsze wydania i zwroty oraz każde wypożyczenie po terminie. Spóźnienie wynika z terminu; nie ma statusu, który mógłby się z nim rozjechać."
+      },
+      "kits": {
+        "title": "Zestawy",
+        "body": "Zestaw to nazwany komplet zasobów i modeli. Rezerwujesz go jako jedną pozycję; jego dostępność wynika z elementów, więc jest niedostępny, gdy któryś z nich jest zajęty. Zeskanuj kod zestawu przy wydaniu, a cały komplet wyjdzie naraz."
+      },
+      "borrower": {
+        "title": "Biorący bez konta",
+        "body": "Rezerwacja może wskazać partnera, członka organizacji albo osobę spoza systemu z imieniem i adresem e-mail. Strona partnera pokazuje jego minione i nadchodzące wypożyczenia, a oś czasu zasobu — rezerwacje, w których brał udział."
       }
     },
     "rulesTitle": "Zasady, których moduł pilnuje",
@@ -270,7 +306,10 @@
       "buffer": "Godziny bufora wokół rezerwacji należą do modelu albo jego kategorii i w tym czasie sztuki nie można zarezerwować.",
       "block": "Blokada ręczna ani serwisowa nie może objąć istniejącej rezerwacji, a rezerwacji nie można zrobić w blokadzie.",
       "overdue": "Spóźnienie czyta się z terminu i statusu, nigdy nie jest zapisywane; przedłużenie przesuwa też oczekiwany zwrot wydania.",
-      "noPartial": "Bez częściowego wydania i zwrotu: każda pozycja jest zeskanowana albo wybrana, każda sztuka wraca."
+      "partial": "Rezerwacja może wracać częściami: zasoby, które zostały na zewnątrz, utrzymują status wydania i spóźnienie, a zwrócone są wolne od razu.",
+      "kits": "Zestawu nie można zarezerwować, gdy któryś z jego elementów jest zajęty; zestaw wydaje się i przyjmuje jako całość.",
+      "reminders": "Biorący dostaje przypomnienie e-mailem przed końcem okna i raz dziennie, gdy rezerwacja jest spóźniona — według zegara organizacji.",
+      "bookAgain": "„Zarezerwuj ponownie” kopiuje biorącego i pozycje zakończonej rezerwacji do nowego szkicu z nowymi datami; nic nie zostaje zapisane, dopóki nie naciśniesz Zarezerwuj."
     },
     "back": "Wróć do dziś"
   },
@@ -284,5 +323,49 @@
     "readDesc": "Może otworzyć moduł wypożyczeń i czytać rezerwacje oraz blokady",
     "write": "Zarządzanie wypożyczeniami",
     "writeDesc": "Może rezerwować sprzęt, wydawać go, przyjmować zwroty, przedłużać rezerwacje i blokować sztuki"
+  },
+  "history": {
+    "title": "Wypożyczenia",
+    "partnerTitle": "Historia wypożyczeń",
+    "assetTitle": "Rezerwacje tego zasobu",
+    "emptyPartner": "Ten partner nie ma jeszcze wypożyczeń.",
+    "emptyAsset": "Ten zasób nie ma jeszcze rezerwacji.",
+    "viewAll": "Pokaż wszystkie rezerwacje",
+    "upcoming": "Nadchodzące",
+    "past": "Minione"
+  },
+  "kits": {
+    "title": "Zestawy",
+    "new": "Nowy zestaw",
+    "edit": "Edytuj zestaw",
+    "empty": "Nie ma jeszcze zestawów. Zestaw to nazwany komplet sprzętu wydawany razem.",
+    "name": "Nazwa",
+    "note": "Uwagi (opcjonalnie)",
+    "members": "Elementy",
+    "addMember": "Dodaj element",
+    "memberKind": {
+      "asset": "Zasób",
+      "model": "Model"
+    },
+    "chooseAsset": "Wybierz zasób",
+    "chooseModel": "Wybierz model",
+    "quantity": "Ilość",
+    "save": "Zapisz zestaw",
+    "cancel": "Anuluj",
+    "delete": "Usuń zestaw",
+    "deleteConfirmTitle": "Usuń zestaw",
+    "deleteConfirmMessage": "Utworzone rezerwacje zachowają swój sprzęt; zestaw nie będzie już proponowany.",
+    "code": "Kod",
+    "codeHint": "Zeskanuj ten kod przy wydaniu, aby zabrać cały zestaw naraz.",
+    "memberCount_one": "{{count}} element",
+    "memberCount_few": "{{count}} elementy",
+    "memberCount_many": "{{count}} elementów",
+    "memberCount_other": "{{count}} elementu",
+    "needName": "Nadaj zestawowi nazwę",
+    "needMembers": "Zestaw potrzebuje co najmniej jednego elementu",
+    "saveFailed": "Nie udało się zapisać zestawu",
+    "removeMember": "Usuń element",
+    "editNamed": "Edytuj zestaw {{name}}",
+    "deleteNamed": "Usuń zestaw {{name}}"
   }
 }

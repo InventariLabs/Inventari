@@ -1,6 +1,9 @@
 import { lazy } from "react";
 import { CalendarClock } from "lucide-react";
-import { moduleRegistry } from "@/module-sdk";
+import { moduleRegistry, slotComponent } from "@/module-sdk";
+
+import { AssetRentalHistory } from "./components/AssetRentalHistory";
+import { PartnerRentalHistory } from "./components/PartnerRentalHistory";
 
 const TodayPage = lazy(() => import("./pages/TodayPage"));
 const CalendarPage = lazy(() => import("./pages/CalendarPage"));
@@ -9,6 +12,7 @@ const NewBookingPage = lazy(() => import("./pages/NewBookingPage"));
 const BookingDetailPage = lazy(() => import("./pages/BookingDetailPage"));
 const PickupPage = lazy(() => import("./pages/PickupPage"));
 const BlocksPage = lazy(() => import("./pages/BlocksPage"));
+const KitsPage = lazy(() => import("./pages/KitsPage"));
 const GuidePage = lazy(() => import("./pages/GuidePage"));
 
 moduleRegistry.register({
@@ -40,7 +44,18 @@ moduleRegistry.register({
     { path: "/rentals/bookings/new", component: NewBookingPage },
     { path: "/rentals/bookings/:id", component: BookingDetailPage },
     { path: "/rentals/bookings/:id/pickup", component: PickupPage },
+    { path: "/rentals/kits", component: KitsPage },
     { path: "/rentals/blocks", component: BlocksPage },
     { path: "/rentals/guide", component: GuidePage },
+  ],
+  slots: [
+    {
+      slot: "partner_detail_extra",
+      component: slotComponent(PartnerRentalHistory),
+    },
+    {
+      slot: "asset_detail_extra",
+      component: slotComponent(AssetRentalHistory),
+    },
   ],
 });

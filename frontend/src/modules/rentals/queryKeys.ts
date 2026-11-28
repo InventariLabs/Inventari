@@ -25,6 +25,8 @@ export const queryKeys = {
     bookings: (params: Record<string, unknown>) =>
       ["rentals", "bookings", params] as const,
     booking: (id: string) => ["rentals", "booking", id] as const,
+    kits: () => ["rentals", "kits"] as const,
+    kit: (id: string) => ["rentals", "kit", id] as const,
     blocks: (params: Record<string, unknown>) =>
       ["rentals", "blocks", params] as const,
     bufferRules: () => ["rentals", "buffer-rules"] as const,

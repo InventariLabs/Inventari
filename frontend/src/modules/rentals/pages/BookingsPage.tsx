@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 
@@ -28,9 +28,14 @@ export default function BookingsPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [offset, setOffset] = useState(0);
+  const [params] = useSearchParams();
+  const partnerId = params.get("partner_id") ?? undefined;
+  const itemId = params.get("item_id") ?? undefined;
   const bookings = useBookings({
     search: search.trim() || undefined,
     status: status || undefined,
+    partner_id: partnerId,
+    item_id: itemId,
     limit: PAGE_SIZE,
     offset,
   });
@@ -53,6 +58,16 @@ export default function BookingsPage() {
   return (
     <div className="flex flex-col gap-5">
       <RentalsTabs />
+      {partnerId || itemId ? (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg bg-zinc-100 px-3 py-2 text-sm">
+          <span>
+            {itemId ? t("bookings.itemFilter") : t("bookings.partnerFilter")}
+          </span>
+          <Link to="/rentals/bookings" className="text-teal-700 underline">
+            {t("bookings.clearFilter")}
+          </Link>
+        </div>
+      ) : null}
       <div className="flex flex-wrap items-end gap-3">
         <div className="min-w-0 flex-1 basis-64">
           <Input
