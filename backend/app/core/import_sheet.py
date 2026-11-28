@@ -409,14 +409,10 @@ class UnreadableCellError(ValueError):
     """
 
 
-#: What may stand beside a price without being part of the number: ISO codes
-#: ("PLN", "EUR") and the short words a till writes ("zł", "Kč", "kr").
-#:
-#: A code is written the way ISO 4217 writes it, in capitals. A lowercase
-#: word after a quantity is the language's word for the thing measured —
-#: "2 cup", "3 top" — and CUP, TOP, ALL and BOB are also currency codes:
-#: matched case-insensitively, each would make the cell a bare number and
-#: drop the unit without a word.
+#: What may stand beside a price without being part of the number, in any
+#: case: ISO codes ("PLN", "eur") and the short words a till writes ("zł",
+#: "Kč", "Ft"). Only beside a price: "3 ft" is also three feet and "2 cup"
+#: two cups, so in any other cell the word stays and the cell is not a number.
 _CURRENCY_CODES = frozenset(list_currencies())
 _CURRENCY_WORDS = frozenset(
     {
@@ -433,8 +429,8 @@ _CURRENCY_WORDS = frozenset(
 
 
 def _is_currency_word(word: str) -> bool:
-    """Whether *word* is an ISO code as written in capitals or a till's word."""
-    return word in _CURRENCY_CODES or word.lower() in _CURRENCY_WORDS
+    """Whether *word* is an ISO code or a till's word."""
+    return word.upper() in _CURRENCY_CODES or word.lower() in _CURRENCY_WORDS
 
 
 _LEADING_WORD = re.compile(r'^([^\W\d_]+)\.?\s*(.*)$', re.DOTALL)
@@ -453,10 +449,12 @@ _FLOAT_TEXT = re.compile(r'^[+-]?\d+(?:\.\d+)?[eE][+-]?\d+$')
 _REAL_SYMBOL = re.compile(r'(?<![^\W\d_])R\$')
 
 
-def _strip_currency(text: str) -> str:
-    """The text without a currency symbol, code or word at either end."""
+def _strip_currency(text: str, money: bool) -> str:
+    """The text without a currency symbol and, in a price, a code or word at either end."""
     text = _REAL_SYMBOL.sub('', text)
     text = ''.join(ch for ch in text if category(ch) != 'Sc').strip()
+    if not money:
+        return text
     lead = _LEADING_WORD.match(text)
     if lead and _is_currency_word(lead.group(1)):
         text = lead.group(2).strip()
@@ -466,12 +464,16 @@ def _strip_currency(text: str) -> str:
     return text
 
 
-def parse_sheet_number(raw: Any, dot_thousands: bool | None = None) -> Decimal:
+def parse_sheet_number(
+    raw: Any, dot_thousands: bool | None = None, *, money: bool = False
+) -> Decimal:
     """A number cell as a ``Decimal``, read the way the sheet's country writes it.
 
-    Raises ``UnreadableCellError`` (a ``ValueError``) when the cell is not a number. Currency symbols
-    and codes, spaces (no-break and narrow no-break included) and an
-    apostrophe between digit groups are not part of the number. A value
+    Raises ``UnreadableCellError`` (a ``ValueError``) when the cell is not a number. Currency
+    symbols, spaces (no-break and narrow no-break included) and an
+    apostrophe between digit groups are not part of the number. Neither is a
+    currency code or a till's word ("PLN", "zł") when the cell is a price
+    (*money*); elsewhere a word beside the digits refuses the cell. A value
     carrying both separators says which is the decimal mark — the last one
     ("1.234,50", "1,234.50"); the same separator repeated is a thousands
     separator ("1.234.567"); a lone comma is a decimal mark ("12,5"), except
@@ -492,13 +494,13 @@ def parse_sheet_number(raw: Any, dot_thousands: bool | None = None) -> Decimal:
         raise UnreadableCellError(raw)
     if _FLOAT_TEXT.match(text):
         return Decimal(text)
-    sign, text = _signed_digits(text, raw)
+    sign, text = _signed_digits(text, raw, money)
     return Decimal(sign + _normalize_separators(text, dot_thousands))
 
 
-def _signed_digits(text: str, raw: Any) -> tuple[str, str]:
-    """A number cell's sign and its digits with separators, no symbol or space groups."""
-    text = _strip_currency(text)
+def _signed_digits(text: str, raw: Any, money: bool) -> tuple[str, str]:
+    """A number cell's sign and its digits with separators, no currency or space groups."""
+    text = _strip_currency(text, money)
     sign = ''
     if text.startswith(('+', '-', '\u2212')):
         sign = '-' if text[0] in '-\u2212' else ''
@@ -592,7 +594,9 @@ def _dot_evidence(raw: Any) -> bool | None:
     if _FLOAT_TEXT.match(text):
         return False
     try:
-        _, text = _signed_digits(text, raw)
+        # Read as a price whatever the column holds: a word beside the digits
+        # does not change what the cell says about its separators.
+        _, text = _signed_digits(text, raw, money=True)
     except UnreadableCellError:
         return None
     has_dot, has_comma = '.' in text, ',' in text
@@ -609,14 +613,22 @@ def _dot_evidence(raw: Any) -> bool | None:
     return None if _lone_group(text, '.') else False
 
 
+_AM_PM = r'[AaPp]\.?[Mm]\.?'
+#: The time a date may carry: "10:30", "10:30:15.5", "10h30", "10h" or "10 AM",
+#: after a space, a comma or a "T", with an optional AM/PM and UTC offset.
 _TIME_TAIL = (
-    r'(?:[T ]\d{1,2}:\d{2}(?::\d{2}(?:[.,]\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?'
-    r'(?:\s*[AaPp]\.?[Mm]\.?)?)?'
+    r'(?:(?:T|,\s*|\s+)'
+    r'(?:\d{1,2}(?::\d{2}(?::\d{2}(?:[.,]\d+)?)?|[Hh](?:\d{2})?)'
+    rf'(?:\s*{_AM_PM})?|\d{{1,2}}\s*{_AM_PM})'
+    r'(?:\s*(?:Z|UTC|GMT|[+-]\d{2}:?\d{2}))?)?'
 )
 _YEAR_FIRST = re.compile(rf'^(\d{{4}})[-./ ](\d{{1,2}})[-./ ](\d{{1,2}}){_TIME_TAIL}$')
-_YEAR_LAST = re.compile(
-    rf'^(\d{{1,2}})[-./ ](\d{{1,2}})[-./ ](\d{{4}}|\d{{2}}){_TIME_TAIL}$'
-)
+#: Between the parts of a year-last date, spaced or not ("5. 11. 2026").
+_DATE_MARK = r'(?:\s*[-./]\s*|\s+)'
+_YEAR_LAST_PARTS = rf'(\d{{1,2}}){_DATE_MARK}(\d{{1,2}}){_DATE_MARK}(\d{{4}}|\d{{2}})'
+_YEAR_LAST = re.compile(rf'^{_YEAR_LAST_PARTS}{_TIME_TAIL}$')
+#: The same date standing anywhere in a text.
+_YEAR_LAST_WITHIN = re.compile(rf'(?<!\d){_YEAR_LAST_PARTS}(?!\d)')
 
 
 def looks_like_numeric_date(text: str) -> bool:
@@ -671,6 +683,7 @@ class SheetColumns:
         self._df = df
         self._day_first: dict[str, bool] = {}
         self._dot_thousands: dict[str, bool | None] = {}
+        self._money: set[str] = set()
 
     def _known(self, column: str | None) -> bool:
         return bool(column) and column in self._df.columns
@@ -714,9 +727,14 @@ class SheetColumns:
             return True
         return None
 
-    def number(self, raw: Any, column: str | None) -> Decimal:
-        """The cell as a number, or ``UnreadableCellError`` (a ``ValueError``) when it is not one."""
-        return parse_sheet_number(raw, self.dot_thousands(column))
+    def number(self, raw: Any, column: str | None, *, money: bool = False) -> Decimal:
+        """The cell as a number, or ``UnreadableCellError`` (a ``ValueError``) when it is not one.
+
+        *money* says the cell is a price, which may name its currency.
+        """
+        if money and column is not None:
+            self._money.add(column)
+        return parse_sheet_number(raw, self.dot_thousands(column), money=money)
 
     def restate(self, raw: Any, column: str) -> str | None:
         """A cell of *column* rewritten to read, in any other sheet, as the
@@ -738,8 +756,10 @@ class SheetColumns:
                 alone = parse_sheet_date(raw, column_day_first((raw,)))
                 return None if alone == day else day.isoformat()
             if column in self._dot_thousands:
-                number = self.number(raw, column)
-                if parse_sheet_number(raw, self._decide_dot((raw,))) != number:
+                money = column in self._money
+                number = self.number(raw, column, money=money)
+                dot_alone = self._decide_dot((raw,))
+                if parse_sheet_number(raw, dot_alone, money=money) != number:
                     return _unambiguous(number)
         except ValueError:
             return None
@@ -759,10 +779,10 @@ def parse_sheet_date(raw: Any, day_first: bool) -> date:
     is taken as it is. A year-first text ("2026-11-05") is read as written.
     A text of three numeric parts with the year last is read day-first or
     month-first by *day_first* unless one of its own parts settles it (a
-    day above 12); the time after it, twelve-hour ("10:30 AM") or not,
-    belongs to the day and does not hand the value to another reader.
-    Anything else ("5 Nov 2026") goes to pandas, which reads English month
-    names; "end of March" is refused.
+    day above 12); the time after it (:data:`_TIME_TAIL`) belongs to the day.
+    A year-last date with anything else around it is refused: only the column
+    says which of its parts is the month. Any other text ("5 Nov 2026") goes
+    to pandas, which reads English month names; "end of March" is refused.
     """
     if isinstance(raw, pd.Timestamp):
         if pd.isna(raw):
@@ -790,6 +810,8 @@ def parse_sheet_date(raw: Any, day_first: bool) -> date:
         else:
             day, month = (first, second) if day_first else (second, first)
         return date(year, month, day)
+    if _YEAR_LAST_WITHIN.search(text):
+        raise UnreadableCellError(text)
     parsed = pd.to_datetime(text)
     if pd.isna(parsed):
         raise UnreadableCellError(text)

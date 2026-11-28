@@ -82,6 +82,56 @@ test.describe("Scan — fake camera", () => {
       .toContain(labelShortCode);
   });
 
+  test("reads a QR the bundled decoder's locator rejects", async ({
+    page,
+    camera,
+    browserName,
+  }) => {
+    // html5-qrcode's zxing port reports NotFoundException for this printed
+    // label's matrix however clean the picture: nine of four hundred labels
+    // came out like this one at six pixels a module. The app's second reader
+    // must read what the library says it cannot.
+    test.skip(browserName === "webkit", NO_READS_IN_WEBKIT);
+    const PAYLOAD = "https://inventari.example.com/s/LBL-L67T8G";
+    const MATRIX = [
+      "11111110111110110100001111111",
+      "10000010001000101000101000001",
+      "10111010111111110111001011101",
+      "10111010010111010111001011101",
+      "10111010001011001010001011101",
+      "10000010100011100010101000001",
+      "11111110101010101010101111111",
+      "00000000011010001000000000000",
+      "10100011011010101001100100101",
+      "10110101101100101001101100011",
+      "10100010101010011101100011101",
+      "10101001111000110010001101000",
+      "00101010000011011010001100001",
+      "01100001110110101101111100011",
+      "10000010110101011001001100001",
+      "10100101011000001000100100000",
+      "10001010010100101001101000001",
+      "01001101110011101001101100111",
+      "11001110111111110011111101001",
+      "00101101001000011011110110000",
+      "11110110001101001000111111010",
+      "00000000101000010100100011101",
+      "11111110110000010000101010001",
+      "10000010000100110010100010001",
+      "10111010010001110001111111010",
+      "10111010010011011101010011101",
+      "10111010111010110101000010011",
+      "10000010000111011010100101000",
+      "11111110101110001010110101001",
+    ].map((row) => [...row].map((module) => module === "1"));
+
+    await openCamera(page);
+    await camera.showQrRows(MATRIX);
+    await expect
+      .poll(() => camera.scanRequests(), { timeout: 20000 })
+      .toContain(PAYLOAD);
+  });
+
   test("an upright phone's scan page does not scroll", async ({ page }) => {
     // The shell padded the bottom bar's room into the page and still sized
     // its content to the whole screen below the app bar: every short page on

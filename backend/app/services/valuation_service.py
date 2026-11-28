@@ -23,12 +23,19 @@ from uuid import UUID
 from sqlalchemy import Date, Select, distinct, func, literal, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.exceptions import ServiceRejectionError
 from app.core.logging import get_logger
 from app.core.money import quantise
 from app.core.posting_batch import current_batch
+from app.i18n.service import stated_quantity
 from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
-from app.models.stock_valuation_layer import CostBasis, StockValuationLayer
+from app.models.stock_valuation_layer import (
+    TOTAL_VALUE_MAX,
+    UNIT_COST_MAX,
+    CostBasis,
+    StockValuationLayer,
+)
 
 logger = get_logger(__name__)
 
@@ -38,6 +45,36 @@ logger = get_logger(__name__)
 #: anything under half a grosz per unit came back as zero — the one answer
 #: :class:`CostBasis` exists to keep apart from "nobody said a price".
 COST_PLACES = 4
+
+
+def _refuse_a_cost_past_its_column(
+    *,
+    product: str,
+    unit_cost: Decimal,
+    total_value: Decimal,
+) -> None:
+    """Refuse a cost or a value the layer's columns cannot hold, by name.
+
+    ``unit_cost`` is ``numeric(12, 4)`` and ``total_value`` ``numeric(14, 2)``.
+    A receipt of a thousand million units at a price inside the line's own
+    range multiplies out past what the row keeps, and a cost known only after
+    the goods arrived can outgrow the per-unit column over a tiny remainder;
+    the driver answered both with a server error after the stock had moved.
+    """
+    if abs(unit_cost) > UNIT_COST_MAX:
+        raise ServiceRejectionError(
+            'stock_layer_unit_cost_above_ceiling',
+            product=product,
+            cost=stated_quantity(unit_cost),
+            ceiling=stated_quantity(UNIT_COST_MAX),
+        )
+    if abs(total_value) > TOTAL_VALUE_MAX:
+        raise ServiceRejectionError(
+            'stock_layer_value_above_ceiling',
+            product=product,
+            value=stated_quantity(total_value),
+            ceiling=stated_quantity(TOTAL_VALUE_MAX),
+        )
 
 
 @dataclass(frozen=True)
@@ -403,6 +440,9 @@ class ValuationService:
         # truth and the unit cost is the per-unit view of it.
         total_value = quantise(quantity * unit_cost)
         unit_cost = quantise(unit_cost, COST_PLACES)
+        _refuse_a_cost_past_its_column(
+            product=template.name, unit_cost=unit_cost, total_value=total_value
+        )
         svl = StockValuationLayer(
             organization_id=organization_id,
             product_template_id=template.id,
@@ -471,13 +511,28 @@ class ValuationService:
         placed = quantise(amount * layer.remaining_qty / layer.quantity)
         if placed <= 0:
             return Decimal('0'), None
+        new_unit_cost = quantise(
+            layer.unit_cost + placed / layer.remaining_qty, COST_PLACES
+        )
+        new_total_value = layer.total_value + placed
+        if abs(new_unit_cost) > UNIT_COST_MAX or abs(new_total_value) > TOTAL_VALUE_MAX:
+            template = await _template_for_organization(
+                db, organization_id, layer.product_template_id
+            )
+            _refuse_a_cost_past_its_column(
+                product=(
+                    template.name
+                    if template is not None
+                    else str(layer.product_template_id)
+                ),
+                unit_cost=new_unit_cost,
+                total_value=new_total_value,
+            )
         layer.revalued_at = datetime.now(UTC)
         layer.unit_cost_before = layer.unit_cost
         layer.cost_basis_before = layer.cost_basis
-        layer.unit_cost = quantise(
-            layer.unit_cost + placed / layer.remaining_qty, COST_PLACES
-        )
-        layer.total_value = layer.total_value + placed
+        layer.unit_cost = new_unit_cost
+        layer.total_value = new_total_value
         if layer.cost_basis == CostBasis.UNKNOWN:
             layer.cost_basis = CostBasis.STATED
         await db.flush()
@@ -911,14 +966,21 @@ class ValuationService:
         if not priced_in_house:
             consumed_value = Decimal('0')
         covered = remaining_to_deliver <= 0 and consumed_only_costs and priced_in_house
+        outgoing_unit_cost = quantise(consumed_value / quantity, COST_PLACES)
+        outgoing_total_value = quantise(consumed_value)
+        _refuse_a_cost_past_its_column(
+            product=template.name,
+            unit_cost=outgoing_unit_cost,
+            total_value=outgoing_total_value,
+        )
         outgoing = StockValuationLayer(
             organization_id=organization_id,
             product_template_id=template.id,
             document_line_id=document_line_id,
             quantity=quantity,
             remaining_qty=Decimal('0'),
-            unit_cost=quantise(consumed_value / quantity, COST_PLACES),
-            total_value=quantise(consumed_value),
+            unit_cost=outgoing_unit_cost,
+            total_value=outgoing_total_value,
             direction='OUT',
             reason=reason,
             item_id=item_id,

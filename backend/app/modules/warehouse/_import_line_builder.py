@@ -52,6 +52,7 @@ def _extract_decimal(
     sheet: SheetColumns,
     *,
     default: Decimal | None = None,
+    money: bool = False,
 ) -> Decimal | None:
     """Read a decimal column value, or ``default`` when the cell is blank.
 
@@ -71,7 +72,7 @@ def _extract_decimal(
     if text is None:
         return default
     try:
-        return sheet.number(text, col_name)
+        return sheet.number(text, col_name, money=money)
     except ValueError as exc:
         raise ServiceRejectionError(
             'import_column_not_a_number', column=col_name, value=text
@@ -252,7 +253,9 @@ async def _build_document_line(
     uom_id = await uom_resolver.resolve(
         _extract_string(row, column_mapping.get('uom_symbol'))
     )
-    unit_price = _extract_decimal(row, column_mapping.get('unit_price'), sheet)
+    unit_price = _extract_decimal(
+        row, column_mapping.get('unit_price'), sheet, money=True
+    )
     if unit_price is not None and not 0 <= unit_price <= PRICE_MAX:
         column = column_mapping.get('unit_price')
         raise ServiceRejectionError(

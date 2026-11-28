@@ -295,6 +295,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'stock_record_not_found': 'The record {item} was not found.',
         'stock_product_not_found': 'The product {product} was not found.',
         'stock_insufficient_record': 'Insufficient stock for "{item}": available {available}, requested {requested}.',
+        'stock_layer_unit_cost_above_ceiling': 'The cost of {product} comes to {cost} per stock unit, and a cost layer keeps at most {ceiling}.',
+        'stock_layer_value_above_ceiling': 'The value of {product} comes to {value}, and a cost layer keeps at most {ceiling}.',
         'receipt_needs_target_location': 'The receipt document has no target location.',
         'receipt_needs_quarantine_location': 'The receipt includes damaged goods or goods on a quality hold, but the document profile names no quarantine location. Set one in the document settings.',
         'transfer_needs_target_location': 'The transfer document has no target location.',
@@ -471,6 +473,11 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'production_overproduction_disabled': (
             'Overproduction is disabled in settings — this order cannot produce '
             'more than planned.'
+        ),
+        'production_unit_cost_above_ceiling': (
+            'The run costs {cost} per unit of {product}, and a stock record keeps '
+            'at most {ceiling}. Record more output or correct what the run cost '
+            'before finishing.'
         ),
         'production_ingredient_unmeasurable': (
             "An ingredient's unit cannot be compared with its stock, so what to "
@@ -1448,6 +1455,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'stock_record_not_found': 'Nie znaleziono rekordu {item}.',
         'stock_product_not_found': 'Nie znaleziono produktu {product}.',
         'stock_insufficient_record': 'Za mało stanu dla „{item}”: dostępne {available}, żądane {requested}.',
+        'stock_layer_unit_cost_above_ceiling': 'Koszt produktu {product} wynosi {cost} za jednostkę zapasową, a warstwa kosztów mieści najwyżej {ceiling}.',
+        'stock_layer_value_above_ceiling': 'Wartość produktu {product} wynosi {value}, a warstwa kosztów mieści najwyżej {ceiling}.',
         'receipt_needs_target_location': 'Dokument przyjęcia nie ma miejsca docelowego.',
         'receipt_needs_quarantine_location': 'Przyjęcie zawiera towar uszkodzony lub wstrzymany jakościowo, a profil dokumentów nie wskazuje miejsca kwarantanny. Wskaż je w ustawieniach dokumentów.',
         'transfer_needs_target_location': 'Dokument przesunięcia nie ma miejsca docelowego.',
@@ -1633,6 +1642,11 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'production_overproduction_disabled': (
             'Nadprodukcja jest wyłączona w ustawieniach — to zlecenie nie może '
             'wyprodukować więcej niż zaplanowano.'
+        ),
+        'production_unit_cost_above_ceiling': (
+            'Zlecenie kosztuje {cost} na jednostkę produktu {product}, a kartoteka '
+            'zapasu mieści najwyżej {ceiling}. Zapisz większą produkcję albo '
+            'popraw to, ile zlecenie kosztowało, przed zakończeniem.'
         ),
         'production_ingredient_unmeasurable': (
             'Jednostki składnika nie da się porównać z jego stanem, więc nie wiadomo, '

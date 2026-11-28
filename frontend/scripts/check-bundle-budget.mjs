@@ -708,6 +708,21 @@ const dist = join(root, "dist");
  * one both branches asked for; the other screens stand under theirs (app
  * first paint 415.2 of 420, receive 492.5 of 495, issue 601.5 of 605, history
  * 626.6 of 630, products 634.7 of 640, initial 194.5 of 245).
+ *
+ * Re-measured 2026-11-28 on the branch that reads a label's QR with a second
+ * decoder: the scanner's chunk carries jsQR beside html5-qrcode, 45.1 KiB gz,
+ * and every screen with the scan panel pays it once — start 700.3 against
+ * 660, issue 646.7 against 605, history 671.7 against 630 and products 679.9
+ * against 640. What the branch adds is that decoder: html5-qrcode's zxing
+ * port cannot locate a label's QR in a clean still for about one label in a
+ * hundred, and on Safari and Firefox it is the only decoder the scanner has,
+ * so jsQR reads the frames it reports it cannot. The chunk loads with the
+ * scanner, not with the first paint: app first paint (415.2 of 420), login
+ * (420.1 of 425), launcher (435.0 of 440) and receive (492.5 of 495) stand
+ * as they were, and initial is 194.6 of 245. The four budgets move by the
+ * reading plus a step of five, to 705, 650, 675 and 685. Merged with the
+ * development line at 7907aca735, the same screens measure 701.2, 647.4,
+ * 672.7 and 680.6, still inside those.
  */
 const BUDGETS = {
   initial: 245,

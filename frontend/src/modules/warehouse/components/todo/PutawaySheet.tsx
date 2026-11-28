@@ -263,7 +263,7 @@ export function PutawaySheet({
   const confirmation: ShelfConfirmationState | null =
     scanRequired && place ? (confirmedShelfId ? "confirmed" : "toScan") : null;
 
-  const { resolve } = useScanResolver({
+  const { resolve, isResolving } = useScanResolver({
     handle: (result, code) => {
       // Anything else scanned here is answered here: the offer to open it on
       // another screen would walk away from the carry.
@@ -414,10 +414,13 @@ export function PutawaySheet({
           <Button variant="outline" onClick={onClose}>
             {t("common:actions.cancel")}
           </Button>
+          {/* Posting moves to the next task, so it waits for a code still
+              being answered about this one. */}
           <Button
             onClick={submit}
             disabled={
               !chosenId ||
+              isResolving ||
               putAway.isPending ||
               (scanRequired && !confirmedShelfId)
             }

@@ -267,6 +267,8 @@ def _number_from_cell(
     key: str,
     default: Decimal | None,
     sheet: SheetColumns,
+    *,
+    money: bool = False,
 ) -> Decimal | None:
     """Parse a mapped numeric cell, or fall back to ``default`` when empty.
 
@@ -281,7 +283,7 @@ def _number_from_cell(
     if text is None:
         return default
     try:
-        return sheet.number(text, mapping[key])
+        return sheet.number(text, mapping[key], money=money)
     except ValueError:
         raise ServiceRejectionError(
             'import_column_not_a_number', column=mapping[key], value=text
@@ -647,7 +649,7 @@ async def _build_item(
         barcode=barcode,
         serial_number=_cell_text(_row_get(row, mapping, 'serial_number')),
         purchase_price=_number_from_cell(
-            row, mapping, 'purchase_price', None, ctx.sheet
+            row, mapping, 'purchase_price', None, ctx.sheet, money=True
         ),
         uom_id=uom_id,
         expiry_date=_parse_date_cell(row, mapping, 'expiry_date', ctx.sheet),
@@ -791,7 +793,7 @@ async def _overwrite_existing(
             changes[key] = value
     if _cell_text(_row_get(row, ctx.mapping, 'purchase_price')) is not None:
         changes['purchase_price'] = _number_from_cell(
-            row, ctx.mapping, 'purchase_price', None, ctx.sheet
+            row, ctx.mapping, 'purchase_price', None, ctx.sheet, money=True
         )
     if sku is not None:
         changes['sku'] = sku

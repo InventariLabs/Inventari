@@ -67,7 +67,8 @@ class CorePartnersAPI:
         partners, _ = await partner_service.list_partners_async(
             db, org_id, search=email, is_active=True, limit=100
         )
-        exact = [p for p in partners if p.email == email]
+        # Addresses are stored as typed and name one mailbox in any casing.
+        exact = [p for p in partners if (p.email or '').lower() == email.lower()]
         return [PartnerDTO.model_validate(p) for p in exact]
 
     @writes
