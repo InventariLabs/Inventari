@@ -52,6 +52,14 @@ describe("parseApiValidationErrors (422 → fields)", () => {
     expect(errs).toEqual({ "line.line-1-key.quantity": "bad" });
   });
 
+  it("maps line unit_price to line.<key>.unit_price", () => {
+    const errs = parseApiValidationErrors(
+      [{ loc: ["body", "lines", 1, "unit_price"], msg: "too big", type: "x" }],
+      keyOf,
+    );
+    expect(errs).toEqual({ "line.line-1-key.unit_price": "too big" });
+  });
+
   it("maps line name to line.<key>.name", () => {
     const errs = parseApiValidationErrors(
       [{ loc: ["body", "lines", 0, "name"], msg: "Provide name", type: "x" }],

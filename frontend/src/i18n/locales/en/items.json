@@ -179,20 +179,22 @@
     "foundedCategories_one": "{{count}} category created",
     "foundedCategories_other": "{{count}} categories created",
     "labelMatch": {
-      "label": "Rows with a label code",
-      "hint": "The Label Code column of an exported sheet says which product a row is about.",
+      "label": "Rows about stock already here",
+      "hint": "A row names stock already here by its label code, its SKU or its barcode.",
       "modes": {
         "add": "Add anyway",
         "skip": "Leave alone",
         "overwrite": "Overwrite"
       },
       "notes": {
-        "add": "Every row becomes a new product; the label code is ignored.",
-        "skip": "A row whose label code names a product here is left alone. A row with no code, or an unknown one, is added.",
-        "overwrite": "A row whose label code names a product here writes its columns onto it. Quantity is never overwritten — stock moves through a receipt or a count."
+        "add": "Every row is added, so stock already here grows.",
+        "skip": "A row naming stock already here is left alone. Any other row is added.",
+        "overwrite": "A row naming stock already here writes its columns onto that record. Quantity is never overwritten — stock moves through a receipt or a count."
       },
-      "needsColumn": "Map the Label Code column first, otherwise there is nothing to match on and every row is added.",
-      "noCodesInFile": "The Label Code column is mapped, but not a single row carries a code — codes appear once a label has been printed. In this mode every row will be added as a new record, exactly as in the add mode."
+      "needsColumn": "Map the label code, SKU or barcode column first, otherwise there is nothing to match on and every row is added.",
+      "noCodesInFile": "Not a single row carries a label code, SKU or barcode, so every row will be added, exactly as in the add mode.",
+      "allInStock_one": "The {{count}} row of this file names a product already in stock. Importing it in this mode adds the quantity again.",
+      "allInStock_other": "All {{count}} rows of this file name products already in stock. Importing them in this mode adds the quantities again."
     },
     "matchedUpdated_one": "{{count}} product updated",
     "matchedUpdated_other": "{{count}} products updated",

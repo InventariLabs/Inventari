@@ -81,6 +81,7 @@ describe("ImportWizardSheet mapping step", () => {
           Promise.resolve({
             headers: ["name"],
             preview_rows: [],
+            preview_rows_as_written: [],
             total_rows: 0,
             filled_counts: {},
           })

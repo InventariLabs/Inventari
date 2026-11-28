@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from app.core.module_sdk import UnitPrice
+from app.core.module_sdk import RefusedRowsFile, UnitPrice
 from app.schemas.item import Item
 from app.schemas.pagination import PaginatedResponse
 
@@ -97,7 +97,12 @@ class BulkEquipmentResponse(BaseModel):
 
 class ImportAnalyzeResult(BaseModel):
     headers: list[str]
+    #: The first rows with a date-shaped column written as the day the
+    #: import will store it, in words: shown for a date field.
     preview_rows: list[dict[str, object]]
+    #: The same rows with every cell as the file writes it: shown for a
+    #: field that stores text, a serial or an asset tag among them.
+    preview_rows_as_written: list[dict[str, object]]
     total_rows: int
     # canonical field name → matched header (aliases across the
     # module's maintained languages). Empty dict when nothing matched.
@@ -108,6 +113,8 @@ class ImportExecuteResult(BaseModel):
     imported: int
     failed: int
     errors: list[dict[str, object]] = []
+    # Every refused row, to correct and upload alone.
+    refused_file: RefusedRowsFile | None = None
     # duplicate handling outcome — skipped (create_only) and
     # updated (update mode) rows.
     skipped: int = 0

@@ -1,4 +1,5 @@
 import { CheckCircle, AlertCircle } from "lucide-react";
+import { RefusedRows } from "@/module-sdk";
 import { formatQuantityValue } from "@/utils/formatters";
 import type { components } from "@/types/api-generated";
 
@@ -28,7 +29,11 @@ interface PreviewViewProps {
   totalRows: number;
   headers: string[];
   mapping: ColumnMapping;
+  /** The first rows with a date-shaped column written as the day it will be
+   *  stored: the expiry column shows this reading. */
   previewRows: PreviewRow[];
+  /** The same rows as the file writes them, for every other column. */
+  previewRowsAsWritten?: PreviewRow[];
   onChangeMapping: (field: keyof ColumnMapping, value: string) => void;
   columnMappingForm: React.ReactNode;
   createStubsForUnmatched: boolean;
@@ -44,6 +49,7 @@ export function ImportPreviewView({
   totalRows,
   mapping,
   previewRows,
+  previewRowsAsWritten,
   onChangeMapping: _onChangeMapping,
   columnMappingForm,
   createStubsForUnmatched,
@@ -112,23 +118,38 @@ export function ImportPreviewView({
                   <th scope="col" className="px-2 py-1 text-left">
                     {t("warehouse:import.quantity")}
                   </th>
+                  {mapping.expiry_date && (
+                    <th scope="col" className="px-2 py-1 text-left">
+                      {t("warehouse:import.expiryDate")}
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
-                {previewRows.slice(0, 5).map((row, idx) => (
-                  <tr key={idx} className="border-t border-border">
-                    <td className="px-2 py-1">{idx + 1}</td>
-                    <td className="px-2 py-1">
-                      {String(row[mapping.name] || "")}
-                    </td>
-                    <td className="px-2 py-1 font-mono">
-                      {String(row[mapping.barcode] || "")}
-                    </td>
-                    <td className="px-2 py-1">
-                      {String(row[mapping.quantity] || "1")}
-                    </td>
-                  </tr>
-                ))}
+                {previewRows.slice(0, 5).map((row, idx) => {
+                  // A date-shaped column is a batch or a serial as often as
+                  // an expiry: only the expiry column shows the stored day.
+                  const written = previewRowsAsWritten?.[idx] ?? row;
+                  return (
+                    <tr key={idx} className="border-t border-border">
+                      <td className="px-2 py-1">{idx + 1}</td>
+                      <td className="px-2 py-1">
+                        {String(written[mapping.name] || "")}
+                      </td>
+                      <td className="px-2 py-1 font-mono">
+                        {String(written[mapping.barcode] || "")}
+                      </td>
+                      <td className="px-2 py-1">
+                        {String(written[mapping.quantity] || "1")}
+                      </td>
+                      {mapping.expiry_date && (
+                        <td className="px-2 py-1">
+                          {String(row[mapping.expiry_date] || "")}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -143,7 +164,11 @@ interface ResultViewProps {
   t: TFunc;
 }
 
+/** How many refusals the dialog lists; the file holds them all. */
+const LISTED_ERRORS = 5;
+
 export function ImportResultView({ result, t }: ResultViewProps) {
+  const listed = result.errors.slice(0, LISTED_ERRORS);
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4 p-4 bg-surface-raised rounded-lg">
@@ -167,23 +192,30 @@ export function ImportResultView({ result, t }: ResultViewProps) {
         </div>
       </div>
 
-      {result.errors.length > 0 && (
+      {listed.length > 0 && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle size={16} className="text-red-600" />
             <span className="text-sm font-medium text-red-700">
               {t("warehouse:import.errorCount", {
-                count: result.errors.length,
+                count: result.failed,
               })}
             </span>
           </div>
           <ul className="text-xs text-red-600 space-y-1">
-            {result.errors.slice(0, 5).map((err, idx) => (
+            {listed.map((err, idx) => (
               <li key={idx}>
                 {t("warehouse:import.row")} {err.row}: {err.error}
               </li>
             ))}
           </ul>
+          <div className="mt-3">
+            <RefusedRows
+              failed={result.failed}
+              shown={listed.length}
+              file={result.refused_file}
+            />
+          </div>
         </div>
       )}
 

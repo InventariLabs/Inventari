@@ -44,6 +44,44 @@ function renderPreview(totalRows: number, canCreateStubs = true) {
   );
 }
 
+describe("the import screen's preview", () => {
+  it("shows the mapped expiry column as it will be stored", async () => {
+    await withLanguage("pl", async () => {
+      render(
+        <ImportPreviewView
+          sourceLabel="plik.csv"
+          totalRows={1}
+          headers={["Nazwa", "Ważne do"]}
+          mapping={{
+            name: "Nazwa",
+            brand: "",
+            barcode: "",
+            sku: "",
+            quantity: "",
+            uom_symbol: "",
+            unit_price: "",
+            tax_rate: "",
+            batch_number: "",
+            expiry_date: "Ważne do",
+          }}
+          previewRows={[{ Nazwa: "Mleko", "Ważne do": "5 lis 2026" }]}
+          previewRowsAsWritten={[{ Nazwa: "Mleko", "Ważne do": "05.11.2026" }]}
+          onChangeMapping={() => {}}
+          columnMappingForm={null}
+          createStubsForUnmatched={false}
+          canCreateStubs={true}
+          onToggleCreateStubs={() => {}}
+          t={t}
+        />,
+      );
+
+      expect(screen.getByText("Data ważności")).toBeInTheDocument();
+      expect(screen.getByText("5 lis 2026")).toBeInTheDocument();
+      expect(screen.queryByText("05.11.2026")).toBeNull();
+    });
+  });
+});
+
 describe("the import screen's counters", () => {
   it("says one row, not one rows", async () => {
     await withLanguage("pl", async () => {
@@ -127,5 +165,31 @@ describe("the import screen's counters", () => {
       renderPreview(1, false);
       expect(screen.queryByRole("checkbox")).toBeNull();
     });
+  });
+
+  it("counts every refusal, not the few listed", () => {
+    render(
+      <ImportResultView
+        result={{
+          imported: 0,
+          matched: 0,
+          unmatched: 0,
+          stubs_created: 0,
+          failed: 12,
+          errors: Array.from({ length: 10 }, (_, i) => ({
+            row: i + 1,
+            error: "no name",
+          })),
+          no_stock: [],
+          lines: [],
+        }}
+        t={tFor("warehouse")}
+      />,
+    );
+
+    expect(screen.getByText(/^12 /)).toBeInTheDocument();
+    expect(
+      screen.getByText("Showing 5 of 12 refused rows."),
+    ).toBeInTheDocument();
   });
 });

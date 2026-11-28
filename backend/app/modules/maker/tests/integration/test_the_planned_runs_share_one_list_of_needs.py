@@ -708,6 +708,35 @@ class TestOrderingWhatIsMissing:
         ).scalar_one()
         assert order.lines[0].unit_price == Decimal('3.00')
 
+    def test_a_supplier_price_is_ordered_to_the_two_decimals_a_line_keeps(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        headers: dict[str, str],
+        org: Organization,
+        user: User,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        kg, _bag = _kg_and_bag(db_session, org)
+        oats = _template(db_session, org, 'Oats', uom=kg)
+        porridge = _template(db_session, org, 'Porridge')
+        _recipe(db_session, org, porridge, oats)
+        mill = h.create_partner(org, user, name='Mill')
+        self._offer(db_session, org, mill, oats, '3.1415')
+        _run(client, headers, porridge, shelf, '5', _monday())
+
+        response = client.post(
+            f'{_API}/needs/order', headers=headers, json=self._scope()
+        )
+
+        assert response.status_code == 200, response.text
+        (placed,) = response.json()['purchase_orders']
+        order = db_session.execute(
+            select(PurchaseOrder).where(PurchaseOrder.id == placed['purchase_order_id'])
+        ).scalar_one()
+        assert order.lines[0].unit_price == Decimal('3.14')
+
     def test_a_price_with_no_unit_of_its_own_orders_in_the_stock_unit(
         self,
         client: TestClient,

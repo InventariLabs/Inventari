@@ -497,6 +497,8 @@ ERRORS_PT: ErrorMessages = {
     'partner_name_exists': 'Já existe um parceiro com o nome "{name}" e o tipo "{partner_type}".',
     'partner_code_exists': 'Já existe um parceiro com o código "{code}".',
     'partner_delete_open_purchase_orders': 'Não é possível excluir o parceiro: {count} pedido(s) de compra em aberto referenciam este parceiro',
+    'import_reason_column': 'Motivo da recusa',
+    'import_overwrite_several_records': 'O produto "{name}" tem vários registros de estoque ({count}): informe o local ou o código da etiqueta para saber qual sobrescrever',
     'partner_import_name_missing': 'Nome do parceiro ausente',
     'partner_import_duplicate': 'Parceiro duplicado: "{twin}" já tem este nome ou esta identificação fiscal',
     'partner_import_company_missing': 'Pessoa de contato de "{company}": este arquivo não adiciona nenhum parceiro com esse nome',

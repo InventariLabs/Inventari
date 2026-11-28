@@ -1,10 +1,12 @@
-"""A receipt restated into a smaller stock unit refuses a cost past its column.
+"""A receipt restated into a smaller stock unit refuses a price past its column.
 
 A line priced per gram on a product kept in kilograms restates the price per
-kilogram when its layer is posted. A price inside the line's own range can
-outgrow the cost layer's ``numeric(12, 4)`` on that restatement, and the driver
-answered with a server error after the record had taken the goods. The layer
-now refuses it with the product and the bound named.
+kilogram before the line is written. A price inside the line's own range can
+outgrow what a record keeps on that restatement, and the driver answered with a
+server error after the record had taken the goods. The receipt refuses it with
+the restated price and the bound named; the cost layer keeps the same bound of
+its own behind it, for a cost the receipt never sees — the organization's rate
+under a delivery cost.
 """
 
 from __future__ import annotations
@@ -28,7 +30,7 @@ pytestmark = pytest.mark.integration
 DOCUMENTS_URL = '/api/v1/warehouse/documents'
 
 
-def test_a_restated_receipt_price_past_the_layer_column_is_refused(
+def test_a_restated_receipt_price_past_the_record_column_is_refused(
     client: TestClient,
     doc_auth_headers: dict[str, str],
     doc_org: Organization,
@@ -73,9 +75,9 @@ def test_a_restated_receipt_price_past_the_layer_column_is_refused(
 
     assert completed.status_code == status.HTTP_400_BAD_REQUEST, completed.text
     detail = completed.json()['detail']
-    assert detail['code'] == 'STOCK_LAYER_UNIT_COST_ABOVE_CEILING'
-    assert '99999999.9999' in detail['message'], detail['message']
-    assert card.name in detail['message'], detail['message']
+    assert detail['code'] == 'ITEM_PRICE_ABOVE_CEILING'
+    assert '99999999990' in detail['message'], detail['message']
+    assert '99999999.99' in detail['message'], detail['message']
     db_session.expire_all()
     layers: list[Any] = list(
         db_session.scalars(

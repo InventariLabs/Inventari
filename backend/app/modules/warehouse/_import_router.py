@@ -177,6 +177,7 @@ async def read_lines_from_file(
         source_location_id=source_location_id,
         create_stubs_for_unmatched=create_stubs_for_unmatched,
         user_id=current_user.id,
+        filename=file.filename or '',
     )
 
 

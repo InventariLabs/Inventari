@@ -54,6 +54,27 @@ describe("ImportMappingStep", () => {
     expect(rows[1]).toHaveTextContent("1");
   });
 
+  it("shows a date field the stored day and a text field the same column as written", () => {
+    // A date-shaped column is a batch number as often as an expiry: only the
+    // date field may read it as a day, and the text field keeps the
+    // characters the file writes.
+    render(
+      <ImportMappingStep
+        {...mockProps}
+        headers={["when"]}
+        fields={[
+          { key: "expiry_date", label: "Expiry", date: true },
+          { key: "batch_number", label: "Batch" },
+        ]}
+        mapping={{ expiry_date: "when", batch_number: "when" }}
+        previewRows={[{ when: "5 lis 2026" }]}
+        previewRowsAsWritten={[{ when: "05.11.2026" }]}
+      />,
+    );
+    expect(screen.getByText("5 lis 2026")).toBeInTheDocument();
+    expect(screen.getByText("05.11.2026")).toBeInTheDocument();
+  });
+
   it("shows no preview table when the server sent no rows", () => {
     render(<ImportMappingStep {...mockProps} />);
     expect(screen.queryByRole("table")).not.toBeInTheDocument();

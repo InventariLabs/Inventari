@@ -14,7 +14,7 @@ from app.core.exceptions import (
 from app.core.file_import import analyze_import_file
 from app.core.import_sheet import SheetColumns, cell_text, read_rows
 from app.core.logging import get_logger
-from app.core.module_sdk import PRICE_MAX
+from app.core.module_sdk import PRICE_MAX, refused_rows_file
 from app.core.public_api import core_api
 from app.core.uom_resolver import UomResolverAsync
 
@@ -208,4 +208,5 @@ async def import_lines_into_po(
         'skipped': skipped,
         'errors': errors[:20],
         'total_errors': len(errors),
+        'refused_file': refused_rows_file(df, errors, filename, sheet),
     }

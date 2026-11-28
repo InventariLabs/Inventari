@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/Input";
 import type {
   LineItem,
+  LineItemErrors,
   LineItemsEditorFeatures,
   LineItemsEditorLabels,
 } from "./types";
@@ -12,6 +13,8 @@ interface LineItemValueFieldsProps {
   unitPriceFieldId: string;
   taxRateFieldId: string;
   lineValue: string;
+  /** The line's refusals; the price field shows its own. */
+  error?: LineItemErrors;
   onUpdate: (updates: Partial<LineItem>) => void;
 }
 
@@ -22,6 +25,7 @@ export function LineItemValueFieldsDesktop({
   unitPriceFieldId,
   taxRateFieldId,
   lineValue,
+  error,
   onUpdate,
 }: LineItemValueFieldsProps) {
   return (
@@ -34,6 +38,7 @@ export function LineItemValueFieldsDesktop({
         label={labels.unitPrice}
         value={line.unit_price ?? ""}
         onChange={(e) => onUpdate({ unit_price: e.target.value })}
+        error={error?.unit_price}
         className="h-10 px-2 text-right"
         wrapperClassName="hidden xl:block xl:space-y-0"
         labelClassName="xl:sr-only"
@@ -68,10 +73,13 @@ export function LineItemValueFieldsMobile({
   unitPriceFieldId,
   taxRateFieldId,
   lineValue,
+  error,
   onUpdate,
 }: LineItemValueFieldsProps) {
+  // Bottoms line the controls up under labels of any height; a message under
+  // one of them would push its neighbours down to it.
   return (
-    <div className="mt-3 grid grid-cols-2 items-end gap-3 sm:grid-cols-3 xl:hidden">
+    <div className="mt-3 grid grid-cols-2 items-end gap-3 has-[[role=alert]]:items-start sm:grid-cols-3 xl:hidden">
       <Input
         id={`${unitPriceFieldId}-mobile`}
         type="number"
@@ -80,6 +88,7 @@ export function LineItemValueFieldsMobile({
         label={labels.unitPrice}
         value={line.unit_price ?? ""}
         onChange={(e) => onUpdate({ unit_price: e.target.value })}
+        error={error?.unit_price}
         className="h-10 px-2"
       />
       {features.taxField && (

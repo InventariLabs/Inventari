@@ -553,10 +553,10 @@ export default function DocumentFormModal({
       if (Object.keys(apiErrors).length > 0) {
         setHasAttemptedSubmit(true);
         setServerErrors(apiErrors);
-        toast.error(extractApiError(err, fallback));
-        return;
       }
-      toast.error(extractApiError(err, fallback));
+      toast.error(
+        extractApiError(err, fallback, { unit_price: t("lines.unitPrice") }),
+      );
     },
     [indexToKey, t, isEdit, document],
   );

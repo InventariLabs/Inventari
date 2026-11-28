@@ -10,8 +10,12 @@ interface ImportMappingStepProps {
   headers: string[];
   fields: MappingField[];
   mapping: ImportMapping;
-  /** The first rows of the source, shown under the grid. */
+  /** The first rows of the source, a date-shaped column written as the day
+   *  it will be stored: shown for a field that stores a date. */
   previewRows?: ImportPreviewRow[];
+  /** The same rows as the file writes them, shown for a field that stores
+   *  text: only a date field shows the stored day. */
+  previewRowsAsWritten?: ImportPreviewRow[];
   onMappingChange: (mapping: ImportMapping) => void;
   /** Sits beside the file name: a preset button, say. */
   headerExtras?: ReactNode;
@@ -25,6 +29,7 @@ export function ImportMappingStep({
   fields,
   mapping,
   previewRows = [],
+  previewRowsAsWritten,
   onMappingChange,
   headerExtras,
   children,
@@ -67,6 +72,7 @@ export function ImportMappingStep({
 
       <ImportPreviewTable
         rows={previewRows}
+        rowsAsWritten={previewRowsAsWritten}
         fields={fields}
         mapping={mapping}
       />

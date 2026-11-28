@@ -82,6 +82,7 @@ async def import_opening_stock(
         create_stubs_for_unmatched=create_stubs_for_unmatched,
         stubs_need_barcode=False,
         user_id=user_id,
+        filename=filename,
     )
     result['total'] = len(df)
     result.pop('lines', None)

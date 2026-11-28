@@ -68,6 +68,45 @@ def test_a_receipt_value_past_the_layer_column_is_refused(
     assert db_session.scalars(select(Item)).first() is None
 
 
+def test_a_freight_share_over_the_rate_past_the_layer_column_is_refused(
+    db_session: Session,
+    async_engine_fixture: Any,
+    test_household: Organization,
+) -> None:
+    """The receipt's own price check cannot see the organization's rate.
+
+    An unpriced delivery adds the organization's rate to its share of the
+    freight. A rate just inside the record's bound takes a share on top and
+    outgrows the layer's per-unit column; the writer refuses the combined
+    figure by name instead of the driver's overflow.
+    """
+    card = ModuleTestHelper(db_session).create_template(
+        test_household, name='A Rate at the Ceiling'
+    )
+    db_session.commit()
+    org_id = test_household.id
+
+    async def _work(session: Any) -> str:
+        await core_api.valuation.record_receipt_async(
+            session, org_id, card.id, Decimal('1'), Decimal('99999999.99')
+        )
+        with pytest.raises(ServiceRejectionError) as refused:
+            await core_api.valuation.record_receipt_async(
+                session,
+                org_id,
+                card.id,
+                Decimal('1'),
+                None,
+                extra_unit_cost=Decimal('0.01'),
+            )
+        return refused.value.key
+
+    assert (
+        run_in_async_session(async_engine_fixture, _work)
+        == 'stock_layer_unit_cost_above_ceiling'
+    )
+
+
 def test_a_cost_added_after_posting_past_the_layer_column_is_refused(
     db_session: Session,
     async_engine_fixture: Any,
