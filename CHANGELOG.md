@@ -37,16 +37,21 @@ says what the release does rather than what changed since them.
 - Moving in from another tool: the product import suggests the columns of the
   exports of Odoo (products and stock), Sortly, inFlow, Zoho, Katana, BoxHero
   and Homebox, and maps the SKU, the description, the stock alert and a
-  sublocation. It finds a product by its SKU, reads Odoo's `[REF] Name`, puts
-  the stock of BoxHero's `Qty(<location>)` columns at each location, reads a
-  location written with slashes as nested locations (or as one name, by the
-  reader's choice), takes the last step of a category path, and knows units
-  such as `Units`, `ea` and `each` and their names in all six languages. A
-  row whose file names no location goes to the oldest real location, never to
-  one of the virtual places. The partner import reads a country by its name
-  and files a contact person's row with the company it belongs to. The
-  export's Read me sheet now says SKU, stock alert and description are read
-  back.
+  sublocation. It finds a product by its SKU, reads Odoo's `[REF] Name` where
+  the catalogue already carries that reference (a bracket naming no product
+  stays the name the sheet gives it, so `[2 pcs] Batteries` arrives as
+  written), puts the stock of BoxHero's `Qty(<location>)` columns at each
+  location, reads a location written with slashes as nested locations (or as
+  one name, by the reader's choice), takes the last step of a category path,
+  and knows units such as `Units`, `ea` and `each` and their names in all six
+  languages. A row whose file names no location goes to the oldest real
+  location, never to one of the virtual places. A repeated sheet in Leave
+  alone mode still adds a shelf the product has no record on, and a name too
+  long for the product's column is refused with that column and its limit
+  rather than as an internal error. The partner import reads a country by its
+  name and files a contact person's row with the company it belongs to,
+  including a company already in the database. The export's Read me sheet now
+  says SKU, stock alert and description are read back.
 - Inventari installs with one command, on a server with a domain or on a
   Linux computer at home:
   `curl -fsSL https://github.com/InventariLabs/Inventari/releases/latest/download/install.sh | sh -s -- vps`
@@ -113,8 +118,9 @@ says what the release does rather than what changed since them.
   which tells a category's fields apart from the flags stored beside them.
 - Module authors: the backend module SDK exports `SheetColumns`, which reads
   a cell's number or date by what its whole column says — the decimal mark,
-  the thousands grouping, a day-first order, a currency code — so a module's
-  own import door reads a sheet the way every other door does.
+  the thousands grouping, a day-first order, and for a price (`money=True`) a
+  currency code — so a module's own import door reads a sheet the way every
+  other door does.
 
 ### Fixed
 
@@ -141,6 +147,30 @@ says what the release does rather than what changed since them.
   a demo before showing the account form.
 - The frontend module SDK hands a module `useQueuedSearchParams`, which edits
   the address without undoing a write the screen has not rendered yet.
+- A code scanned while the one before it is still being looked up is no longer
+  dropped without a word: on the put-away sheet, phone receiving and every
+  other screen that looks codes up this way, codes are answered one at a time
+  in the order they were read. A symbol the camera keeps reading is still one
+  lookup, and the put-away button waits until the scan is answered.
+- A printed label's QR code is read by the phone camera in every browser. The
+  bundled scanner's zxing port fails to locate some valid matrices however
+  clean the picture — about one label in a hundred — so a second reader now
+  reads the frames it reports it cannot, a few times a second. Labels printed
+  before this change scan too.
+- A stock correction or an adjustment written in a smaller unit than the
+  product keeps values its cost layer in the product's own unit: half a
+  kilogram entered in grams carries half a kilogram's value, not a
+  thousandth of it, so the shelf and its value stop drifting apart. A dispatch
+  corrected downwards brings the goods back at what they cost when they left,
+  and where the books never recorded that cost the layer falls back to the
+  organization's rate, or to unknown when it has none, instead of taking the
+  price the goods sold for. A receipt,
+  a cost put on a batch after it was posted, or a production run whose figure
+  outgrows what a cost layer or a stock record can store is refused with the
+  product, the amount and the limit named, instead of ending in a server error.
+- An asset held through a partner is listed in **My assets** of the user whose
+  e-mail address the partner carries, however either address is capitalised,
+  and the asset page words its return as the holder's.
 - A receipt written in another unit than the product is kept in records the
   price per the product's unit: 500 g at 0.02 opens a record at 20.00 a
   kilogram, not 0.02. A price, or a share of the delivery's costs, that comes
@@ -352,11 +382,14 @@ says what the release does rather than what changed since them.
 - Spreadsheet imports read numbers and dates the way the sheet's country
   writes them — products, opening stock, document lines, order lines and
   equipment alike. A decimal comma ("12,5"), thousands separated by a space
-  or a dot, a currency symbol or code ("1 289,00 zł", "$1,289.00",
-  "€ 4,50") are numbers, and a currency code is the one ISO 4217 spells in
-  capitals, so "2 cup" is refused with its cell named rather than read as 2.
-  A day-first date such as "05.11.2026" is 5 November, not 11 May, and a
-  time after it, AM or PM included, belongs to that day. A column of dates
+  or a dot and a currency symbol ("$1,289.00", "€ 4,50") are numbers. A price
+  may also name its currency, by code or till word and in either case
+  ("1 289,00 zł", "pln 12,5"); in a quantity or any other number such a word
+  is a unit, so "3 ft" or "2 cup" is refused with its cell named rather than
+  read as a bare number. A day-first date such as "05.11.2026" is 5 November,
+  not 11 May, and a time after it ("10:30", "10 AM", "10h30") belongs to that
+  day; a numeric date with the year last that is written any other way is
+  refused rather than guessed. A column of dates
   is read from the whole file (a day above 12 settles the order), and a
   column that is ambiguous throughout follows the language of the person
   importing: month-first for English, day-first for the others. The mapping

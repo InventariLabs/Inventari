@@ -580,6 +580,7 @@ apart.
 | `PRODUCTION_RUN_NOT_IN_PROGRESS` | This production run has status {status} — only a run in progress can be filled in portions, ticked off or finished. |
 | `PRODUCTION_START_NOT_DRAFT` | This production order already has status {status} — only a draft can be started. |
 | `PRODUCTION_STEP_NOT_FOUND` | This run has no such step. |
+| `PRODUCTION_UNIT_COST_ABOVE_CEILING` | The run costs {cost} per unit of {product}, and a stock record keeps at most {ceiling}. Record more output or correct what the run cost before finishing. |
 | `PRODUCTION_UPDATE_NOT_DRAFT` | This production order already has status {status} — only a draft can be edited. |
 | `PRODUCT_LABEL_COMPOSITION_DOES_NOT_FIT` | The ingredient list does not fit a label {width} × {height} mm at the smallest letter the law allows on a package. Choose a larger label size |
 | `PRODUCT_LABEL_NO_CODE` | Nothing to print: none of the chosen products has a code. Generate one on the product form |
@@ -694,6 +695,8 @@ apart.
 | `STOCK_AS_OF_PDF_TOO_MANY` | This report has {total} products — more than the {limit} rows a printout carries. Export it as a spreadsheet instead, or pick one location to narrow it. |
 | `STOCK_INSUFFICIENT_FOR_TEMPLATE` | Insufficient stock for template {template_id}: requested {requested}, available {available} |
 | `STOCK_INSUFFICIENT_RECORD` | Insufficient stock for "{item}": available {available}, requested {requested}. |
+| `STOCK_LAYER_UNIT_COST_ABOVE_CEILING` | The cost of {product} comes to {cost} per stock unit, and a cost layer keeps at most {ceiling}. |
+| `STOCK_LAYER_VALUE_ABOVE_CEILING` | The value of {product} comes to {value}, and a cost layer keeps at most {ceiling}. |
 | `STOCK_LOT_NOT_CONSUMABLE` | Batch {lot} is {status} and cannot be consumed or reserved |
 | `STOCK_MOVES_EXPORT_TOO_MANY` | {total} movements match — more than the {limit} one sheet carries. Narrow the dates, the place or the product and export again. |
 | `STOCK_PRODUCT_NOT_FOUND` | The product {product} was not found. |

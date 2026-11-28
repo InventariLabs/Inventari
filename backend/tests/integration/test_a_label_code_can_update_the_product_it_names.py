@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.contracts import UserContextDTO
 from app.core.testing import ShelfRow
 from app.models.item import Item
+from app.models.storage_location import StorageLocation
 from app.services.items._import import import_items
 
 
@@ -207,3 +208,88 @@ class TestALabelCodeCanUpdateTheProductItNames:
         assert result['updated'] == 0 and result['skipped'] == 0
         await db.refresh(item)
         assert item.name == 'Cocoa'
+
+    async def test_skip_adds_a_shelf_the_product_has_no_record_on(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ):
+        """Leave alone tells one shelf from another, as Overwrite does.
+
+        A corrected sheet is uploaded whole: the shelves the product already
+        sits on are left alone, and the shelves that are new to it arrive.
+        """
+        db = real_async_db_session
+        mapping = {
+            'name': 'Name',
+            'sku': 'SKU',
+            'quantity': 'Quantity',
+            'location': 'Shelf',
+        }
+        first = await import_items(
+            db,
+            _csv(
+                [
+                    {
+                        'Name': 'RevFlour',
+                        'SKU': 'RV-FL1',
+                        'Quantity': 12,
+                        'Shelf': 'RevShelfA',
+                    },
+                    {
+                        'Name': 'RevFlour',
+                        'SKU': 'RV-FL1',
+                        'Quantity': 'lots',
+                        'Shelf': 'RevShelfB',
+                    },
+                ]
+            ),
+            'stock.csv',
+            mapping,
+            _ctx(async_test_user),
+            on_label_match='add',
+        )
+        assert (first['imported'], first['failed']) == (1, 1), first
+
+        corrected = await import_items(
+            db,
+            _csv(
+                [
+                    {
+                        'Name': 'RevFlour',
+                        'SKU': 'RV-FL1',
+                        'Quantity': 12,
+                        'Shelf': 'RevShelfA',
+                    },
+                    {
+                        'Name': 'RevFlour',
+                        'SKU': 'RV-FL1',
+                        'Quantity': 2,
+                        'Shelf': 'RevShelfB',
+                    },
+                ]
+            ),
+            'stock.csv',
+            mapping,
+            _ctx(async_test_user),
+            on_label_match='skip',
+        )
+
+        assert (corrected['imported'], corrected['skipped'], corrected['failed']) == (
+            1,
+            1,
+            0,
+        ), corrected
+        records = (
+            await db.execute(
+                select(Item.quantity, StorageLocation.name)
+                .join(StorageLocation, StorageLocation.id == Item.storage_location_id)
+                .where(
+                    Item.organization_id == async_test_user.organization_id,
+                    Item.name == 'RevFlour',
+                )
+                .order_by(StorageLocation.name)
+            )
+        ).all()
+        assert [(name, quantity) for quantity, name in records] == [
+            ('RevShelfA', Decimal('12')),
+            ('RevShelfB', Decimal('2')),
+        ]

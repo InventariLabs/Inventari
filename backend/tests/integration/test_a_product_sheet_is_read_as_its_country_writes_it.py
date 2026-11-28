@@ -38,16 +38,25 @@ def _reader_language():
     set_current_lang('en')
 
 
-async def _import(db: AsyncSession, user, sheet: str, language: str = 'pl') -> dict:
+async def _import(
+    db: AsyncSession,
+    user,
+    sheet: str,
+    language: str = 'pl',
+    *,
+    mapping: dict = MAPPING,
+    **options,
+) -> dict:
     set_current_lang(language)
     return await import_items(
         db,
         sheet.encode('cp1250'),
         'arkusz.csv',
-        MAPPING,
+        mapping,
         UserContextDTO(id=user.id, organization_id=user.organization_id, role='admin'),
         create_missing_locations=False,
         create_missing_categories=False,
+        **options,
     )
 
 
@@ -164,3 +173,46 @@ class TestAProductSheetIsReadAsItsCountryWritesIt:
         assert result['imported'] == 0
         assert 'tanio' in result['errors'][0]['error']
         assert 'koniec marca' in result['errors'][1]['error']
+
+    async def test_a_price_names_its_currency_and_a_quantity_keeps_its_unit(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ):
+        """``ft`` is the forint beside a price and feet beside a quantity."""
+        result = await _import(
+            real_async_db_session,
+            async_test_user,
+            'Produkt;Ilość;Cena;Ważne do;Jm\n'
+            'Kabel;3;pln 12,5;05/11/2026, 10:30;kg\n'
+            'Lina;3 ft;1;;kg\n',
+        )
+
+        assert (result['imported'], result['failed']) == (1, 1), result['errors']
+        assert '3 ft' in result['errors'][0]['error']
+        cable = await _item(real_async_db_session, 'Kabel')
+        assert cable.purchase_price == Decimal('12.5')
+        assert cable.expiry_date == date(2026, 11, 5)
+
+    async def test_an_overwritten_price_names_its_currency(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ):
+        header = 'Produkt;Ilość;Cena;Ważne do;Jm;SKU\n'
+        mapping = {**MAPPING, 'sku': 'SKU'}
+        await _import(
+            real_async_db_session,
+            async_test_user,
+            header + 'Taśma;1;1;;kg;TAPE-1\n',
+            mapping=mapping,
+        )
+
+        result = await _import(
+            real_async_db_session,
+            async_test_user,
+            header + 'Taśma;1;12,5 eur;;kg;TAPE-1\n',
+            mapping=mapping,
+            on_label_match='overwrite',
+        )
+
+        assert result['failed'] == 0, result['errors']
+        tape = await _item(real_async_db_session, 'Taśma')
+        await real_async_db_session.refresh(tape)
+        assert tape.purchase_price == Decimal('12.5')

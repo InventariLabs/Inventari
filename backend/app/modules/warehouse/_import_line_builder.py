@@ -29,6 +29,9 @@ from .models import DocumentLine
 
 logger = get_logger(__name__)
 
+#: ``DocumentLine.name`` and ``ProductTemplate.name`` are both ``String(255)``.
+_NAME_LIMIT = 255
+
 
 def _extract_string(row: pd.Series, col_name: str | None) -> str | None:
     """Read a string column value as the reader typed it, or None when blank.
@@ -49,6 +52,7 @@ def _extract_decimal(
     sheet: SheetColumns,
     *,
     default: Decimal | None = None,
+    money: bool = False,
 ) -> Decimal | None:
     """Read a decimal column value, or ``default`` when the cell is blank.
 
@@ -68,7 +72,7 @@ def _extract_decimal(
     if text is None:
         return default
     try:
-        return sheet.number(text, col_name)
+        return sheet.number(text, col_name, money=money)
     except ValueError as exc:
         raise ServiceRejectionError(
             'import_column_not_a_number', column=col_name, value=text
@@ -216,6 +220,17 @@ async def _build_document_line(
     name = given_name or sku or barcode
     if not name:
         raise ServiceRejectionError('import_line_name_missing')
+    if len(name) > _NAME_LIMIT:
+        # The line and the product stub it may found share one name column.
+        # Left to the driver, the row is a truncation error the reader sees
+        # as "an internal error" and cannot correct.
+        raise ServiceRejectionError(
+            'import_column_too_long',
+            column=column_mapping.get('name')
+            or column_mapping.get('sku')
+            or column_mapping.get('barcode'),
+            limit=_NAME_LIMIT,
+        )
 
     brand = _extract_string(row, column_mapping.get('brand'))
     quantity = _extract_decimal(
@@ -239,7 +254,9 @@ async def _build_document_line(
     uom_id = await uom_resolver.resolve(
         _extract_string(row, column_mapping.get('uom_symbol'))
     )
-    unit_price = _extract_decimal(row, column_mapping.get('unit_price'), sheet)
+    unit_price = _extract_decimal(
+        row, column_mapping.get('unit_price'), sheet, money=True
+    )
     if unit_price is not None and not 0 <= unit_price <= PRICE_MAX:
         column = column_mapping.get('unit_price')
         raise ServiceRejectionError(

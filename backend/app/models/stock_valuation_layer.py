@@ -37,6 +37,12 @@ if TYPE_CHECKING:
 #: expression immutable and the index below possible.
 LAYER_DATED_AT_SQL = "coalesce(document_date, (created_at AT TIME ZONE 'UTC')::date)"
 
+#: The widest ``unit_cost`` the column holds — ``numeric(12, 4)``.
+UNIT_COST_MAX = Decimal('99999999.9999')
+
+#: The widest ``total_value`` the column holds — ``numeric(14, 2)``.
+TOTAL_VALUE_MAX = Decimal('999999999999.99')
+
 
 def layer_dated_at() -> ColumnElement[Any]:
     """The date a cost layer is about, as the index above stores it.
