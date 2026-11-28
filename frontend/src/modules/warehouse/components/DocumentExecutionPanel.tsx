@@ -81,6 +81,7 @@ export function DocumentExecutionPanel({
     t,
   );
   const { resolve } = useScanResolver({
+    everyReadCounts: true,
     handle: async (result) => applyScanResult(result),
     // The panel already said the code is not on this document; a second,
     // vaguer message on top of it would only crowd the first.

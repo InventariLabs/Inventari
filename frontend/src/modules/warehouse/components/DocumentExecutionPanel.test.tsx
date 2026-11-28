@@ -1,6 +1,8 @@
 import { act } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@/test/utils";
+import { http, HttpResponse } from "msw";
+import { server } from "@/test/mocks/server";
+import { fireEvent, render, screen, waitFor, within } from "@/test/utils";
 import { DocumentExecutionPanel } from "./DocumentExecutionPanel";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
 import { documentLine } from "@/test/factories/documents";
@@ -362,6 +364,41 @@ describe("DocumentExecutionPanel", () => {
 
     expect(screen.getByText("Done: 1")).toBeInTheDocument();
     expect(screen.getByText("Pending: 1")).toBeInTheDocument();
+  });
+
+  it("counts each read of a label that is read again during its lookup", async () => {
+    const answers: (() => void)[] = [];
+    server.use(
+      http.get("/api/v1/labels/scan/:code", async () => {
+        await new Promise<void>((resolve) => answers.push(resolve));
+        return HttpResponse.json({
+          action: "show_quick_actions",
+          item: { id: "item-1", name: "Widget" },
+        });
+      }),
+    );
+    render(
+      <DocumentExecutionPanel
+        document={buildDocument()}
+        isPending={false}
+        onCancel={vi.fn()}
+        onSubmit={vi.fn()}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Scan mode" }));
+
+    act(() => {
+      scanCameraMock.triggerScan("STM-EHBH");
+      scanCameraMock.triggerScan("STM-EHBH");
+    });
+    await waitFor(() => expect(answers).toHaveLength(1));
+    await act(async () => answers[0]());
+    await waitFor(() => expect(answers).toHaveLength(2));
+    await act(async () => answers[1]());
+
+    await waitFor(() =>
+      expect(screen.getByLabelText("Executed quantity")).toHaveValue(2),
+    );
   });
 
   it("marks one active target line in scan mode and advances it after scanning", () => {
