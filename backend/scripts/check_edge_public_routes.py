@@ -6,6 +6,12 @@ fallback and came back as ``200 text/html``, which axios reads as success: the
 invitation check and the attestation page worked on the dev server, whose proxy
 has a ``/public`` entry, and nowhere behind a configured edge.
 
+It also refuses the quieter edge mistakes: a path naming another stack or a
+backup copy (``/wp-admin``, ``/config.php~``) or a dot-segment that the SPA
+fallback answers with the application start page and a 200, which a scanner
+reads as a hit; and ``/.well-known/security.txt`` falling back to that page
+instead of serving the operator's file or answering 404.
+
 It also refuses the quieter edge mistake: nginx drops *all* inherited
 ``add_header`` directives the moment a location declares one of its own, so a
 location that adds only ``Cache-Control`` answers without CSP or
@@ -67,6 +73,39 @@ NGINX_DOTFILES = re.compile(
 NGINX_REGEX_LOCATION = re.compile(r'^[ \t]*location ~\*? ', re.MULTILINE)
 # A prefix location, plain or `^~`; `=` and the regex forms start with no `/`.
 NGINX_PREFIX_LOCATION = re.compile(r'^[ \t]*location (\^~ )?(/\S*) \{', re.MULTILINE)
+NGINX_LOCATION_HEAD = re.compile(r'^[ \t]*location[ \t]+(~[*]?)[ \t]+(\S+)[ \t]*\{')
+NGINX_SECURITY_TXT = 'location = /.well-known/security.txt {'
+
+# Requests a scanner sends at a path that names another stack, or a backup copy
+# of a file. Every one of them must reach a location that answers 404: the SPA
+# fallback's 200 index.html reads as a hit and lists the instance as running
+# WordPress or PHP.
+PROBE_URIS = (
+    '/wp-config.php.save',
+    '/wp-admin',
+    '/wp-login.php',
+    '/wp/',
+    '/wp',
+    '/wordpress',
+    '/wordpress/wp-admin',
+    '/vendor/phpunit/phpunit/phpunit.xsd',
+    '/cgi-bin/check',
+    '/phpmyadmin',
+    '/phpMyAdmin/index.php',
+    '/config.php',
+    '/config.asp',
+    '/config.aspx',
+    '/config.jsp',
+    '/config.cgi',
+    '/config.bak',
+    '/config.old',
+    '/config.orig',
+    '/config.save',
+    '/config.swp',
+    '/config.php~',
+    '/X.PHP',
+    '/WP-ADMIN',
+)
 
 
 def check_caddyfile(text: str) -> list[str]:
@@ -227,13 +266,59 @@ def check_nginx_security_headers(text: str) -> list[str]:
     return problems
 
 
-def check_nginx_probe_surface(text: str) -> list[str]:
-    """Refuse an nginx that names its version or answers dotfile probes with 200.
+def _regex_locations(text: str) -> list[tuple[str, str, bool]]:
+    """Regex locations in file order: ``(operator, pattern, answers 404)``.
 
-    Without a rule of its own, ``/.env`` reaches the SPA fallback and comes back
-    as ``200 index.html``: nothing leaks, but a scanner counts it as a hit. The
-    404 rule must be the first regex location — nginx answers with the first
-    regex that matches, and the static-asset one matches ``/.env.js`` as well.
+    A location body is read with brace counting over lines (the file is
+    hand-formatted, one directive per line), so a comment cannot hide it.
+    """
+    lines = text.splitlines()
+    locations: list[tuple[str, str, bool]] = []
+    index = 0
+    while index < len(lines):
+        code = lines[index].split('#', 1)[0]
+        head = NGINX_LOCATION_HEAD.match(code)
+        if head is None:
+            index += 1
+            continue
+        depth = code.count('{') - code.count('}')
+        body = [code.split('{', 1)[1].split('}', 1)[0]] if depth <= 0 else []
+        while index < len(lines) - 1 and depth > 0:
+            index += 1
+            code = lines[index].split('#', 1)[0]
+            depth += code.count('{') - code.count('}')
+            body.append(code if depth > 0 else code.split('}', 1)[0])
+        locations.append(
+            (head.group(1), head.group(2), ''.join(body).strip() == 'return 404;')
+        )
+        index += 1
+    return locations
+
+
+def _first_regex_match(locations: list[tuple[str, str, bool]], uri: str) -> bool | None:
+    """Whether the first regex location matching ``uri`` answers 404; None if none.
+
+    nginx evaluates regex locations in file order and answers with the first
+    that matches, before any prefix location.
+    """
+    for operator, pattern, answers_404 in locations:
+        try:
+            if re.search(pattern, uri, re.IGNORECASE if operator == '~*' else 0):
+                return answers_404
+        except re.error:
+            return False  # a pattern no request can be measured against
+    return None
+
+
+def check_nginx_probe_surface(text: str) -> list[str]:
+    """Refuse an nginx that names its version or answers a probe with 200.
+
+    Without a rule of its own, ``/.env``, ``/wp-admin`` and ``/config.php~``
+    reach the SPA fallback and come back as ``200 index.html``: nothing leaks,
+    but a scanner counts it as a hit. The dot-segment 404 rule must be the first
+    regex location — the static-asset one matches ``/.env.js`` as well — and a
+    rule for paths naming another stack or a backup copy must answer the probes
+    listed in ``PROBE_URIS`` 404 before the fallback, case-insensitively.
     """
     code = '\n'.join(line.split('#', 1)[0] for line in text.splitlines()) + '\n'
     problems: list[str] = []
@@ -254,6 +339,88 @@ def check_nginx_probe_surface(text: str) -> list[str]:
                 'nginx.conf: the dot-segment 404 rule is not the first regex location, '
                 'so an earlier regex answers the probes it was meant to refuse'
             )
+    locations = _regex_locations(code)
+    unanswered = [
+        uri for uri in PROBE_URIS if _first_regex_match(locations, uri) is None
+    ]
+    if unanswered:
+        problems.append(
+            'nginx.conf: no 404 rule answers a path naming another stack or a backup '
+            'copy; the SPA fallback would answer 200 index.html: '
+            + ', '.join(unanswered)
+        )
+    answered_with_app = [
+        uri for uri in PROBE_URIS if _first_regex_match(locations, uri) is False
+    ]
+    if answered_with_app:
+        problems.append(
+            'nginx.conf: an earlier regex location answers a scanner probe with something '
+            'other than 404, so a scanner reads it as a hit: '
+            + ', '.join(answered_with_app)
+        )
+    return problems
+
+
+def check_nginx_security_txt(text: str) -> list[str]:
+    """Refuse an nginx that serves the SPA document where ``security.txt`` belongs.
+
+    ``/.well-known/security.txt`` (RFC 9116) belongs to the operator of the
+    instance, and the image ships none. Without a location of its own the SPA
+    fallback answers it with ``200 index.html``; with one it either serves the
+    operator's file as ``text/plain`` or answers nginx's own 404. The file is
+    mounted outside the web root, so the block maps the address to it with
+    ``alias`` and never falls back to the application.
+    """
+    code = '\n'.join(line.split('#', 1)[0] for line in text.splitlines()) + '\n'
+    start = code.find(NGINX_SECURITY_TXT)
+    if start == -1:
+        return [
+            'nginx.conf: no `location = /.well-known/security.txt` block, so the address '
+            'is answered by the SPA fallback with the application start page'
+        ]
+    block = code[start : code.find('\n    }', start)]
+    problems: list[str] = []
+    if 'default_type text/plain;' not in block:
+        problems.append(
+            'nginx.conf: the security.txt location does not declare '
+            '`default_type text/plain;`, so the operator file may carry the wrong type'
+        )
+    if not re.search(r'^\s*alias\s+\S*security\.txt;', block, re.MULTILINE):
+        problems.append(
+            'nginx.conf: the security.txt location has no `alias` to the operator file, '
+            'so it cannot serve one and does not answer 404 when none is provided'
+        )
+    if 'index.html' in block:
+        problems.append(
+            'nginx.conf: the security.txt location falls back to index.html, so an '
+            'instance that provided no file answers with the application start page'
+        )
+    return problems
+
+
+def check_security_txt_mount(compose: str, directory: Path) -> list[str]:
+    """Refuse a frontend that cannot see the file its nginx maps ``security.txt`` to.
+
+    The image's nginx answers ``/.well-known/security.txt`` from
+    ``/operator/security-txt/security.txt``; the frontend service in the
+    production compose file is what puts the operator's directory there. The
+    two are a contract in two files, neither of which a type checker reads, so
+    a rename in one of them would silently turn every instance's security.txt
+    into a 404. The directory itself is tracked (through its ``.gitignore``) so
+    a fresh checkout has somewhere to put the file; a missing one would let
+    Docker create it owned by root, where the operator cannot write.
+    """
+    problems: list[str] = []
+    if ':/operator/security-txt:ro' not in compose:
+        problems.append(
+            'docker-compose.prod.yml: the frontend service no longer mounts '
+            '/operator/security-txt, so the file nginx aliases cannot reach the container'
+        )
+    if not directory.is_dir():
+        problems.append(
+            'security-txt/ is not in the checkout, so a fresh install has no directory '
+            'for the operator file and Docker would create one owned by root'
+        )
     return problems
 
 
@@ -297,6 +464,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         '--nginx', type=Path, default=REPO_ROOT / 'frontend' / 'nginx.conf'
     )
+    parser.add_argument(
+        '--compose', type=Path, default=REPO_ROOT / 'docker-compose.prod.yml'
+    )
     args = parser.parse_args(argv)
 
     nginx = args.nginx.read_text()
@@ -306,6 +476,8 @@ def main(argv: list[str] | None = None) -> int:
         + check_nginx_document_cache(nginx)
         + check_nginx_security_headers(nginx)
         + check_nginx_probe_surface(nginx)
+        + check_nginx_security_txt(nginx)
+        + check_security_txt_mount(args.compose.read_text(), REPO_ROOT / 'security-txt')
         + check_nginx_proxy_precedence(nginx)
     )
     for problem in problems:

@@ -280,6 +280,8 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	docker compose exec frontend npm run check:boundaries
 	@echo "$(BLUE)[INFO]$(NC) Checking the anonymous tree stays out of the app bundle..."
 	docker compose exec frontend npm run check:public-bundle
+	@echo "$(BLUE)[INFO]$(NC) Checking the edge's 404 rules spare the app's routes and built files..."
+	docker compose exec frontend npm run check:edge-probes
 	@echo "$(BLUE)[INFO]$(NC) Checking every dialog has an accessible name and a way out..."
 	docker compose exec frontend npm run check:dialogs
 	@echo "$(BLUE)[INFO]$(NC) Checking every form control has an accessible name (baseline)..."
@@ -359,7 +361,7 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	@$(MAKE) --no-print-directory perf-phone
 
 # ─── frontend/package.json targets NO make target calls ───────────────────
-# Measured: 85 scripts, 52 called above/here, the rest are deliberate and
+# Measured: 86 scripts, 53 called above/here, the rest are deliberate and
 # each of these has a reason to stay out of the automated gates:
 #   dev / preview                    — interactive sessions, not gates.
 #   test / test:run                  — the Makefile drives vitest inside the

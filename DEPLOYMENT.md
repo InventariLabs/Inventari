@@ -191,6 +191,39 @@ unless `--lang` names another — and the one the server answers a request in
 when the request names no language it speaks. Every user changes their own in
 Settings.
 
+### security.txt
+
+`/.well-known/security.txt` is where a researcher looks for a way to report a
+vulnerability (RFC 9116). It belongs to whoever runs the instance, so the image
+ships none: an installation that provides no file answers `404` on that
+address, not the application's start page, and no instance names the project as
+somebody else's security contact.
+
+To publish one, put a `security.txt` in `security-txt/` in the checkout — the
+directory the frontend service mounts read-only, outside the web root; set
+`SECURITY_TXT_DIR` in `.env` to mount another directory instead — and make it
+readable by the container:
+
+```bash
+cat > security-txt/security.txt <<'EOF'
+Contact: mailto:security@example.com
+Expires: 2027-06-01T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://your.domain/.well-known/security.txt
+Policy: https://your.domain/security-policy
+EOF
+chmod 644 security-txt/security.txt
+```
+
+The file is served as `text/plain` from the next request: a bind mount is
+live, so no recreate is needed unless the frontend container has not been
+started with the mount yet (a first-time install or the update that introduced
+it: `docker compose up -d frontend`). The address answers `404` again when the
+file is removed. `Expires` must be in the future and no more than a year ahead
+(RFC 9116), `Contact` and `Canonical` are the ones below, and `Contact` is the
+address you actually read. `security-txt/.gitignore` keeps your file out of
+`git status`, and `git pull` leaves it alone.
+
 ### Database roles
 
 The database has two roles, and the application uses the weaker one:

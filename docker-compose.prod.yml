@@ -578,6 +578,14 @@ services:
     restart: unless-stopped
     logging: *prod-logging
     mem_limit: 128m
+    volumes:
+      # security.txt belongs to the operator of this instance (DEPLOYMENT.md,
+      # "security.txt"). The image ships none, and the image's nginx answers
+      # `/.well-known/security.txt` with 404 until a file appears here, so a
+      # self-hosted instance never names the project as its own contact. The
+      # directory is mounted read-only outside the web root; `SECURITY_TXT_DIR`
+      # points the mount elsewhere.
+      - ${SECURITY_TXT_DIR:-./security-txt}:/operator/security-txt:ro
     depends_on:
       - backend
     networks:

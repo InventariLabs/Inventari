@@ -115,9 +115,20 @@ says what the release does rather than what changed since them.
   a cell's number or date by what its whole column says — the decimal mark,
   the thousands grouping, a day-first order, a currency code — so a module's
   own import door reads a sheet the way every other door does.
+- An instance can publish `/.well-known/security.txt` (RFC 9116). The image
+  ships none, because the address belongs to whoever runs the instance: put a
+  file in `security-txt/` (DEPLOYMENT.md, *security.txt*) and it is served as
+  `text/plain` from the next request. An instance that provides none answers
+  404 there instead of the application start page, and `git pull` leaves the
+  operator's file alone.
 
 ### Fixed
 
+- A request that names another stack or a backup of a file — `/wp-admin`,
+  `/config.php`, `/config.php~`, `/backup.old`, anything under `/vendor/` —
+  is answered by the Web server with a plain 404 instead of the application
+  start page with a 200, so a scanner no longer reports the instance as
+  running WordPress or PHP.
 - A receipt written in another unit than the product is kept in records the
   price per the product's unit: 500 g at 0.02 opens a record at 20.00 a
   kilogram, not 0.02. A price, or a share of the delivery's costs, that comes

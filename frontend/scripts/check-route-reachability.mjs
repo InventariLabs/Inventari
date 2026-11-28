@@ -346,6 +346,18 @@ function readModules() {
   return { routes, references, ownSettingsScreens, relativeNav };
 }
 
+/**
+ * Every route pattern the app mounts: App.tsx's static table plus each
+ * module's `routes`. The edge gate reads this list to prove that no Web-server
+ * 404 rule answers one of them.
+ */
+export function routePaths() {
+  return [
+    ...extractRoutes(),
+    ...readModules().routes.map((route) => route.path),
+  ];
+}
+
 // ---------------------------------------------------------------------------
 // 2. Reference collection
 // ---------------------------------------------------------------------------

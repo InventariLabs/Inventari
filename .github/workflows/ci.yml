@@ -317,6 +317,11 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run build:check
 
+      # The build it reads, so it follows rather than precedes it; a failed
+      # build leaves no dist and no gate to run.
+      - name: Edge 404 rules spare the app's routes and built files
+        run: npm run check:edge-probes
+
   # The local gate's `vitest run --coverage`, in four parts. As one step it was
   # nearly all of the frontend's time: 42 minutes of a 44-minute job on the
   # two-CPU runner, 16 to 25 of 17 to 27 on the four-CPU one, while everything

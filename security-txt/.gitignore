@@ -1,0 +1,4 @@
+# The operator's own security.txt goes in this directory; it is installation
+# state, not source, and `git pull` must leave it alone. DEPLOYMENT.md,
+# "security.txt".
+security.txt

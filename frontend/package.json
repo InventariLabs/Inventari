@@ -33,6 +33,7 @@
     "check:boundaries": "node scripts/check-module-boundaries.mjs --baseline",
     "perf:phone": "node scripts/measure-phone-budget.mjs",
     "check:public-bundle": "node scripts/check-public-bundle.mjs",
+    "check:edge-probes": "node scripts/check-edge-probes.mjs",
     "check:dialogs": "node scripts/check-dialog-names.mjs --quiet",
     "check:field-names": "node scripts/check-field-names.mjs --baseline",
     "check:field-names:baseline": "node scripts/check-field-names.mjs --write-baseline",
