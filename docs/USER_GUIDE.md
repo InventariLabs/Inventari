@@ -355,9 +355,12 @@ alert** and a **Sublocation**.
 
 - A product named by a SKU you already have is that product, whatever name the
   row gives it. A name written `[REF] Name`, as Odoo's stock export writes it,
-  is read as the reference and the name. A SKU holds letters, digits, dashes,
-  underscores and slashes; a row with another character is refused and names
-  it. Two rows with one name and two SKUs are two products.
+  is read as the reference and the name only where a product already carries
+  that reference; a bracket naming none is part of the name the sheet gives,
+  so `[2 pcs] Batteries` arrives as written. A SKU holds letters, digits,
+  dashes, underscores and slashes; a row with another code in the SKU column
+  is refused and names it. Two rows with one name and two SKUs are two
+  products.
 - A file with no quantity column adds **Products only**: nothing is put into
   stock, and location, category, price, serial number and dates, which describe
   stock, are not read. Choose **One of each** to add one of every row's product
@@ -379,7 +382,9 @@ alert** and a **Sublocation**.
   barcode: **Add anyway** adds it again, **Leave alone** skips it, and
   **Overwrite** writes its columns onto that record. Quantity is never
   overwritten. Where the product stands in several records, the row's location
-  says which one; a row that cannot say is refused. In **Add anyway** mode, a
+  says which one; a row that cannot say is refused. **Leave alone** tells the
+  shelves apart as **Overwrite** does: a shelf the product has no record on is
+  added, so a corrected sheet can be uploaded whole. In **Add anyway** mode, a
   file whose every row finds stock already here says so before it is imported.
 - The result counts every refused row and lists the first few.
   **Download refused rows** gives all of them back in the format you uploaded,
@@ -1931,8 +1936,9 @@ in To do and in the reorder alerts, not as a purchase.
 service providers, manufacturers and employees — with codes, tax IDs and contact details.
 **New partner** adds one, **Import** reads XLSX or CSV (a country may be its
 two-letter code or its name; a row that names the company it belongs to, as
-Odoo's contact export does, becomes that company's contact person when the same
-file adds the company, with their name, e-mail and phone in its notes). On the screen a partner is
+Odoo's contact export does, becomes that company's contact person — whether the
+same file adds the company or the company is already here — with their name,
+e-mail and phone in its notes). On the screen a partner is
 deactivated rather than deleted. The API can also delete one outright
 (`DELETE /partners/{id}`) while no open purchase order names it: the products,
 documents and orders that named it then name no partner, a document already

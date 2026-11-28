@@ -120,6 +120,25 @@ class TestARefusedRowLeavesNothingButALineInTheFile:
         assert (fixed['imported'], fixed['failed']) == (1, 0), fixed
         assert fixed['refused_file'] is None
 
+    def test_a_name_past_the_product_column_names_the_column_and_its_limit(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_auth_headers: dict[str, str],
+        doc_target_location: StorageLocation,
+    ) -> None:
+        sheet = _sheet([('N' * 300, 'LONG-NAME', 1)])
+
+        body = _opening(client, doc_auth_headers, sheet, doc_target_location)
+
+        assert (body['imported'], body['failed']) == (0, 1), body
+        assert body['errors'][0]['error'] == (
+            'Column "Product": the text is longer than 255 characters'
+        )
+        assert not db_session.scalars(
+            select(ProductTemplate).where(ProductTemplate.sku == 'LONG-NAME')
+        ).first()
+
     def test_document_lines_hand_the_refused_rows_back(
         self,
         client: TestClient,
