@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { useInitStatus } from "@/hooks/useInitStatus";
 import { DemoEntry, ACCOUNT_FORM_ID } from "@/components/demo/DemoEntry";
 import { AuthLayout } from "./AuthLayout";
@@ -27,7 +28,11 @@ let landing = "/";
 
 export default function LoginPage() {
   const { t, i18n } = useTranslation("auth");
-  const { data: initStatus } = useInitStatus();
+  const {
+    data: initStatus,
+    isLoading: isStatusLoading,
+    failureCount: statusFailures,
+  } = useInitStatus();
   // The link must name what /register actually offers: on an empty
   // installation it is the first-account bootstrap form ("Create new
   // account"), afterwards it is the access-request form. An approved
@@ -107,7 +112,13 @@ export default function LoginPage() {
     }
   };
 
-  const showAccountForm = !initStatus?.is_demo || accountFormOpen;
+  // Until the first answer the page cannot tell a demo, which folds the
+  // account form away, from any other instance: painting the form first would
+  // swap the card under a demo visitor. A failed or paused request is not
+  // waited for — the form is the way in when nothing else can be learnt.
+  const awaitingStatus = isStatusLoading && statusFailures === 0;
+  const showAccountForm =
+    !awaitingStatus && (!initStatus?.is_demo || accountFormOpen);
 
   return (
     <AuthLayout title={t("login.title", { defaultValue: "Welcome back" })}>
@@ -137,6 +148,7 @@ export default function LoginPage() {
             <p>{t("login.passwordChanged")}</p>
           </div>
         )}
+        {awaitingStatus && <LoadingSpinner />}
         {showAccountForm && (
           <div id={ACCOUNT_FORM_ID}>
             <div className="mb-8 text-center sm:text-left">

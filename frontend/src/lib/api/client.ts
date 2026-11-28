@@ -30,12 +30,17 @@ let _accessToken: string | null = null;
 // in flight) has nothing left to refresh: without this it opened a round of
 // its own, and every one of them announced the same sign-out again.
 let _sessionOver = false;
+// Whether a form held unsaved work when that round ended the session. The
+// sign-in that follows unmounts the form, and a request answered after that
+// still has to say the work was not kept.
+let _endedOverWork = false;
 
 export const tokenStore = {
   get: () => _accessToken,
   set: (token: string) => {
     _accessToken = token;
     _sessionOver = false;
+    _endedOverWork = false;
   },
   clear: () => {
     _accessToken = null;
@@ -167,9 +172,9 @@ const READ_ONLY_POST_ENDPOINTS = new Set([
  * to add" says instead that the session ended — and, for a request that was
  * going to save something, that the work was not saved. A request that saves
  * nothing (a read, or one of the POSTs above) gets the sentence that does not
- * claim otherwise — unless a form on screen holds unsaved work (the same
- * signal the navigation gate reads): the sign-in that follows throws it away,
- * and that is said, whatever the request was.
+ * claim otherwise — unless a form holds unsaved work (the same signal the
+ * navigation gate reads), or held it when the session ended: the sign-in
+ * throws it away, and that is said, whatever the request was.
  */
 function sessionEndedError(
   request: { method?: string; url?: string; readOnly?: boolean } | undefined,
@@ -183,7 +188,8 @@ function sessionEndedError(
     (method === "post" &&
       (request?.readOnly === true ||
         READ_ONLY_POST_ENDPOINTS.has(lastSegment)));
-  const holdsUnsavedWork = useFormGuardStore.getState().dirtyForm !== null;
+  const holdsUnsavedWork =
+    _endedOverWork || useFormGuardStore.getState().dirtyForm !== null;
   return new SessionEndedError(
     !reads
       ? i18next.t("common:errors.sessionEnded")
@@ -288,6 +294,8 @@ api.interceptors.response.use(
         if (isServerRefusal(caught)) {
           tokenStore.clear();
           _sessionOver = true;
+          // Read before the event: its listener is what drops the form.
+          _endedOverWork = useFormGuardStore.getState().dirtyForm !== null;
           window.dispatchEvent(new CustomEvent("auth:logout"));
         }
         return Promise.reject(refreshError);

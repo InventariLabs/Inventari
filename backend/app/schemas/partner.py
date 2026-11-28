@@ -2,9 +2,15 @@ import re
 import uuid
 from datetime import datetime
 from decimal import Decimal
-from typing import Any
+from typing import Annotated, Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    field_validator,
+)
 
 from app.core.contracts import (
     CUSTOMER_ROLE_TYPES as CUSTOMER_ROLE_TYPES,
@@ -25,6 +31,11 @@ ALLOWED_PARTNER_TYPES = frozenset(
 # dropdowns — answers "who is a supplier?" the same way, including modules
 # kept out of the core schemas by the import lint. Re-exported here for the
 # core callers that already import this module.
+
+
+#: A name as it is written: every path that saves one drops the spaces
+#: around it, so two spellings of one company do not sit side by side.
+PartnerName = Annotated[str, StringConstraints(strip_whitespace=True, max_length=255)]
 
 
 class PartnerAddress(BaseModel):
@@ -106,13 +117,14 @@ class PartnerBase(BaseModel):
 
 
 class PartnerCreate(PartnerBase):
+    name: PartnerName
     address: PartnerAddress | None = None
 
 
 class PartnerUpdate(BaseModel):
     """All fields optional — supports partial (PATCH-style) updates via PUT."""
 
-    name: str | None = Field(None, max_length=255)
+    name: PartnerName | None = None
     code: str | None = Field(None, max_length=50)
     type: str | None = Field(None, max_length=30)
     # Free text by design (max 50, no format validation) — domain/geo-neutral

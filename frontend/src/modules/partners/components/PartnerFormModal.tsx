@@ -80,7 +80,8 @@ export default function PartnerFormModal({ partner, onClose }: Props) {
   const isLoading = createMutation.isPending || updateMutation.isPending;
 
   const set = (field: keyof PartnerCreate, value: string) => {
-    // Name is the one field that is never null: it is trimmed on submit.
+    // Name is the one field that is never null: it stays a string here and is
+    // trimmed on submit.
     setForm((prev) => ({
       ...prev,
       [field]: field === "name" ? value : value || null,
@@ -121,6 +122,7 @@ export default function PartnerFormModal({ partner, onClose }: Props) {
 
     const payload: PartnerCreate = {
       ...form,
+      name: form.name.trim(),
       // Normalise empty strings to null for optional fields
       code: form.code?.trim() || null,
       tax_id: form.tax_id?.trim() || null,

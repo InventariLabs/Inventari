@@ -528,6 +528,30 @@ describe("a read that meets the end of the session while a form holds unsaved wo
     expect(sentence).not.toBe(i18next.t("common:errors.sessionEndedRead"));
   });
 
+  it("says it to a read answered after the sign-in took the form away", async () => {
+    server.use(
+      http.get("*/api/v1/things", refuse),
+      http.post("*/api/v1/auth/refresh", ended),
+    );
+    tokenStore.set("expired-token");
+    useFormGuardStore.getState().setDirtyForm("Goods receipt");
+    // The shell's listener signs out, and the redirect unmounts the form.
+    const signOut = () => useFormGuardStore.getState().setDirtyForm(null);
+    window.addEventListener("auth:logout", signOut, { once: true });
+    await message(api.get("/things"));
+
+    expect(useFormGuardStore.getState().dirtyForm).toBeNull();
+    expect(await message(api.get("/things"))).toBe(
+      i18next.t("common:errors.sessionEndedReadUnsaved"),
+    );
+
+    // The next session starts with nothing lost.
+    tokenStore.set("fresh-token");
+    expect(await message(api.get("/things"))).toBe(
+      i18next.t("common:errors.sessionEndedRead"),
+    );
+  });
+
   it("keeps the plain sentence when nothing is unsaved", async () => {
     server.use(
       http.get("*/api/v1/things", refuse),

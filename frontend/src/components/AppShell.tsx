@@ -33,10 +33,10 @@ import { makeTDynamic } from "@/lib/i18nHelpers";
 const trimPath = (path: string) => path.replace(/\/+$/, "") || "/";
 
 const SESSION_END_GRACE_MS = 300;
-// The three sentences the API client gives a request that met the ended session.
+// The sentences of the API client that already say work was not saved. The
+// plain one a read gets says nothing about it, so it does not count.
 const SESSION_END_KEYS = [
   "errors.sessionEnded",
-  "errors.sessionEndedRead",
   "errors.sessionEndedReadUnsaved",
 ] as const;
 
@@ -55,9 +55,8 @@ function isFocusHome(focusModule: string | null, pathname: string): boolean {
 /**
  * A request that shows no toast of its own (a picker's search, a background
  * read) would end the session without a word, so the shell says that what a
- * form held was not kept — unless a toast with a session-end sentence is
- * already on screen, which the callers' catch blocks raise right after the
- * logout event.
+ * form held was not kept — unless a toast already says so, which the callers'
+ * catch blocks raise right after the logout event.
  */
 function sayWorkWasNotKept(t: (key: string) => string): void {
   const sentences = SESSION_END_KEYS.map((key) => t(key));

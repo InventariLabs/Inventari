@@ -221,6 +221,26 @@ describe("AppShell — a session that ends under a form holding work says so", (
     expect(error).not.toHaveBeenCalled();
   });
 
+  it("does not take the plain session-end sentence for the news", () => {
+    vi.useFakeTimers();
+    const error = vi.spyOn(toast, "error").mockReturnValue("id");
+    vi.spyOn(toast, "getToasts").mockReturnValue([
+      { id: 1, title: "Your session has ended. Sign in again." },
+    ]);
+    useFormGuardStore.getState().setDirtyForm("The document form");
+    renderShell();
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent("auth:logout"));
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(error).toHaveBeenCalledWith(
+      expect.stringContaining("was not kept"),
+      expect.objectContaining({ id: "session-ended-unsaved" }),
+    );
+  });
+
   it("stays quiet when nothing on screen holds work", () => {
     vi.useFakeTimers();
     const error = vi.spyOn(toast, "error").mockReturnValue("id");

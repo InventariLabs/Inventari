@@ -143,16 +143,18 @@ export default function RegisterPage() {
       : undefined,
   };
 
-  // The invitation can answer after the visitor has started typing (a slow
-  // connection, a cold API). Prefill only an empty address: an unconditional
-  // set replaced what they had typed with the invited one, silently.
+  // Both lookups can answer after the visitor has started typing (a slow
+  // connection, a cold API). Prefill only an empty field: an unconditional
+  // set would replace what they typed, silently.
   useEffect(() => {
     if (invitation?.invited_email) {
       setEmail((current) => current || invitation.invited_email || "");
     }
   }, [invitation?.invited_email]);
   useEffect(() => {
-    if (approvedRequest?.full_name) setFullName(approvedRequest.full_name);
+    if (approvedRequest?.full_name) {
+      setFullName((current) => current || approvedRequest.full_name || "");
+    }
   }, [approvedRequest?.full_name]);
 
   const {

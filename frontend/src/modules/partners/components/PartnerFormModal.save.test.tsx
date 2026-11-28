@@ -78,9 +78,7 @@ describe("PartnerFormModal — what a save sends", () => {
       MutateOptions,
     ];
     expect(payload).toMatchObject({
-      // The name alone goes as typed, and the server does not trim it
-      // either: this pins today's behaviour, not the wanted one.
-      name: "  Cold Storage Co  ",
+      name: "Cold Storage Co",
       type: "MANUFACTURER",
       tax_id: "PL123",
       code: "CS",

@@ -52,17 +52,55 @@ describe("LoginPage", () => {
       </QueryClientProvider>,
     );
 
-  it("should render login form", () => {
+  it("shows no account form until the instance says what it is", async () => {
+    let answer!: () => void;
+    const answered = new Promise<void>((resolve) => {
+      answer = resolve;
+    });
+    server.use(
+      http.get("/api/v1/auth/init-status", async () => {
+        await answered;
+        return HttpResponse.json({
+          is_initialized: true,
+          is_demo: true,
+          demo_inbox_url: null,
+        });
+      }),
+    );
     renderLogin();
 
-    expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
+    expect(screen.getByRole("status")).toBeInTheDocument();
+    expect(screen.queryByLabelText(/Email/i)).toBeNull();
+    expect(screen.queryByRole("link", { name: /request access/i })).toBeNull();
+
+    answer();
+    await screen.findByRole("button", { name: "Try the demo" });
+    expect(screen.queryByRole("status")).toBeNull();
+    expect(screen.queryByLabelText(/Email/i)).toBeNull();
+  });
+
+  it("offers the account form when the instance cannot be asked", async () => {
+    server.use(
+      http.get("/api/v1/auth/init-status", () =>
+        HttpResponse.json({}, { status: 500 }),
+      ),
+    );
+    renderLogin();
+
+    expect(await screen.findByLabelText(/Email/i)).toBeInTheDocument();
+  });
+
+  it("should render login form", async () => {
+    renderLogin();
+
+    expect(await screen.findByLabelText(/Email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /Sign in/i }),
     ).toBeInTheDocument();
   });
 
-  it("opens with the address registration just created", () => {
+  it("opens with the address registration just created", async () => {
     render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter
@@ -75,7 +113,9 @@ describe("LoginPage", () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByLabelText(/Email/i)).toHaveValue("new@example.com");
+    expect(await screen.findByLabelText(/Email/i)).toHaveValue(
+      "new@example.com",
+    );
   });
 
   it("carries exactly one first-level heading tag", () => {
@@ -93,7 +133,7 @@ describe("LoginPage", () => {
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(2);
   });
 
-  it("fills in the address a new account was just made with", () => {
+  it("fills in the address a new account was just made with", async () => {
     render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter
@@ -106,7 +146,9 @@ describe("LoginPage", () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByLabelText(/Email/i)).toHaveValue("owner@example.com");
+    expect(await screen.findByLabelText(/Email/i)).toHaveValue(
+      "owner@example.com",
+    );
   });
 
   it("should call login and navigate on success", async () => {
@@ -117,7 +159,7 @@ describe("LoginPage", () => {
 
     renderLogin();
 
-    fireEvent.change(screen.getByLabelText(/Email/i), {
+    fireEvent.change(await screen.findByLabelText(/Email/i), {
       target: { value: "test@example.com" },
     });
     fireEvent.change(screen.getByLabelText(/Password/i), {
@@ -141,7 +183,7 @@ describe("LoginPage", () => {
     const { toast } = await import("sonner");
 
     renderLogin();
-    fireEvent.change(screen.getByLabelText(/Email/i), {
+    fireEvent.change(await screen.findByLabelText(/Email/i), {
       target: { value: "test@example.com" },
     });
     fireEvent.change(screen.getByLabelText(/Password/i), {
@@ -173,22 +215,24 @@ describe("LoginPage", () => {
     });
   };
 
-  const submitLogin = () => {
+  const submitLogin = async () => {
     renderLogin();
-    fireEvent.change(screen.getByLabelText(/Email/i), {
+    fireEvent.change(await screen.findByLabelText(/Email/i), {
       target: { value: "wrong@example.com" },
     });
     fireEvent.change(screen.getByLabelText(/Password/i), {
       target: { value: "wrong" },
     });
-    fireEvent.click(screen.getByRole("button", { name: /Sign in/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /Sign in/i }));
+    });
   };
 
   it("should show error toast on rejected credentials", async () => {
     rejectWith(401);
     const { toast } = await import("sonner");
 
-    submitLogin();
+    await submitLogin();
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith("Invalid email or password");
@@ -201,7 +245,7 @@ describe("LoginPage", () => {
     rejectWith(429);
     const { toast } = await import("sonner");
 
-    submitLogin();
+    await submitLogin();
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(
@@ -290,9 +334,9 @@ describe("LoginPage", () => {
     useAuthStore.setState({ signOutReason: "passwordChanged" });
     renderLogin();
 
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Your password has been changed. Sign in with the new one",
-    );
+    expect(
+      screen.getByText(/Your password has been changed. Sign in with the new/),
+    ).toBeInTheDocument();
   });
 
   it("says nothing about a password on an ordinary sign-in", () => {

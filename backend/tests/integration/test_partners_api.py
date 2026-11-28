@@ -130,6 +130,25 @@ class TestPartnersCreate:
         resp = client.post('/api/v1/partners', json=payload, headers=auth_headers)
         assert resp.status_code == 409
 
+    def test_a_name_is_saved_without_the_spaces_around_it(
+        self, client: TestClient, auth_headers: dict
+    ):
+        created = client.post(
+            '/api/v1/partners',
+            json=_supplier_payload(name='  Cold Storage Co  '),
+            headers=auth_headers,
+        )
+        assert created.status_code == 201, created.text
+        assert created.json()['name'] == 'Cold Storage Co'
+
+        renamed = client.put(
+            f'/api/v1/partners/{created.json()["id"]}',
+            json={'name': ' Cold Chain Co '},
+            headers=auth_headers,
+        )
+        assert renamed.status_code == 200, renamed.text
+        assert renamed.json()['name'] == 'Cold Chain Co'
+
     def test_create_same_name_different_type_allowed(
         self, client: TestClient, auth_headers: dict
     ):

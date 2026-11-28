@@ -348,6 +348,37 @@ describe("RegisterPage", () => {
     expect(screen.getByLabelText(/Email address/i)).toHaveValue("not-an-email");
   });
 
+  it("keeps a name typed before the approved request answers", async () => {
+    let answer!: () => void;
+    const answered = new Promise<void>((resolve) => {
+      answer = resolve;
+    });
+    server.use(
+      http.get("/api/v1/auth/registration-link/tok1", async () => {
+        await answered;
+        return HttpResponse.json({
+          email: "jan@example.com",
+          full_name: "Jan Link",
+        });
+      }),
+    );
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/register?token=tok1"]}>
+          <RegisterPage />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    fireEvent.change(screen.getByLabelText(/Full name/i), {
+      target: { value: "Janina Typed" },
+    });
+    answer();
+
+    expect(await screen.findByText(/jan@example.com/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Full name/i)).toHaveValue("Janina Typed");
+  });
+
   it("names the invited role the way the rest of the product does", async () => {
     // The API answers with the key (`user`); "invited ... as user" named a
     // role that exists nowhere else — every other screen says Member.
