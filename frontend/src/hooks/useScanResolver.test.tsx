@@ -214,7 +214,7 @@ describe("useScanResolver", () => {
     ]);
   });
 
-  it("does not queue a second lookup while one is in flight", async () => {
+  it("looks a symbol up once however often it is read meanwhile", async () => {
     // The camera fires repeatedly at the same symbol.
     let release: (value: LabelScanView) => void = () => {};
     vi.mocked(labelsApi.scan).mockReturnValue(
@@ -239,6 +239,115 @@ describe("useScanResolver", () => {
       await first;
     });
     await waitFor(() => expect(result.current.isResolving).toBe(false));
+  });
+
+  /** Lookups that stay out until the test answers them, in call order. */
+  const heldLookups = () => {
+    const release: ((value: LabelScanView) => void)[] = [];
+    vi.mocked(labelsApi.scan).mockImplementation(
+      () =>
+        new Promise<LabelScanView>((resolve) => {
+          release.push(resolve);
+        }),
+    );
+    return release;
+  };
+
+  it("answers a different code read during a lookup, in reading order", async () => {
+    const release = heldLookups();
+    const handle = vi.fn().mockReturnValue(true);
+    const { result } = renderHook(() => useScanResolver({ handle }), {
+      wrapper,
+    });
+    await act(async () => {
+      void result.current.resolve("LOC-1");
+      void result.current.resolve("LOC-2");
+      // The second symbol is held in front of the camera.
+      void result.current.resolve("LOC-2");
+    });
+    expect(labelsApi.scan).toHaveBeenCalledTimes(1);
+
+    await act(async () => release[0](location));
+    expect(labelsApi.scan).toHaveBeenCalledTimes(2);
+    expect(result.current.isResolving).toBe(true);
+
+    await act(async () => release[1](location));
+    expect(handle.mock.calls.map((call) => call[1])).toEqual([
+      "LOC-1",
+      "LOC-2",
+    ]);
+    expect(labelsApi.scan).toHaveBeenCalledTimes(2);
+    expect(result.current.isResolving).toBe(false);
+  });
+
+  it("asks again for a code read after another one that is still waiting", async () => {
+    const release = heldLookups();
+    const handle = vi.fn().mockReturnValue(true);
+    const { result } = renderHook(() => useScanResolver({ handle }), {
+      wrapper,
+    });
+    await act(async () => {
+      void result.current.resolve("LOC-1");
+      void result.current.resolve("LOC-2");
+      void result.current.resolve("LOC-1");
+    });
+    for (const turn of [0, 1, 2]) {
+      await act(async () => release[turn](location));
+    }
+    expect(handle.mock.calls.map((call) => call[1])).toEqual([
+      "LOC-1",
+      "LOC-2",
+      "LOC-1",
+    ]);
+  });
+
+  it("goes on to the waiting code when the lookup ahead of it fails", async () => {
+    vi.mocked(labelsApi.scan)
+      .mockRejectedValueOnce(axiosError("BOOM", "boom"))
+      .mockResolvedValueOnce(location);
+    const handle = vi.fn().mockReturnValue(true);
+    const { result } = renderHook(() => useScanResolver({ handle }), {
+      wrapper,
+    });
+    await act(async () => {
+      void result.current.resolve("LOC-1");
+      await result.current.resolve("LOC-2");
+    });
+    expect(handle).toHaveBeenCalledWith(location, "LOC-2");
+  });
+
+  it("judges a waiting code with the handler the screen has by then", async () => {
+    const release = heldLookups();
+    const before = vi.fn().mockReturnValue(true);
+    const after = vi.fn().mockReturnValue(true);
+    const { result, rerender } = renderHook(
+      ({ handle }) => useScanResolver({ handle }),
+      { wrapper, initialProps: { handle: before } },
+    );
+    await act(async () => {
+      void result.current.resolve("LOC-1");
+      void result.current.resolve("LOC-2");
+    });
+    await act(async () => release[0](location));
+    rerender({ handle: after });
+    await act(async () => release[1](location));
+    expect(before).toHaveBeenCalledTimes(1);
+    expect(after).toHaveBeenCalledWith(location, "LOC-2");
+  });
+
+  it("drops what was still waiting when the screen is gone", async () => {
+    const release = heldLookups();
+    const handle = vi.fn().mockReturnValue(true);
+    const { result, unmount } = renderHook(() => useScanResolver({ handle }), {
+      wrapper,
+    });
+    await act(async () => {
+      void result.current.resolve("LOC-1");
+      void result.current.resolve("LOC-2");
+    });
+    unmount();
+    await act(async () => release[0](location));
+    expect(labelsApi.scan).toHaveBeenCalledTimes(1);
   });
 
   it("ignores an empty code", async () => {

@@ -757,6 +757,73 @@ describe("WmsReceivingView on a phone", () => {
     expect(counted).not.toHaveBeenCalled();
   });
 
+  it("books a location label answered late on the item it was read for", async () => {
+    serveDocument();
+    serveLocations([
+      { id: "wh", name: "Main Warehouse", is_leaf: false },
+      {
+        id: "shelf-a2",
+        name: "Aisle A, shelf 2",
+        parent_id: "wh",
+        short_code: "A-02-01",
+      },
+    ]);
+    const targeted: string[] = [];
+    let release: (() => void) | undefined;
+    server.use(
+      http.post(`${BASE}/start`, () => HttpResponse.json(reopened())),
+      http.get(`${BASE}/session-1`, () => HttpResponse.json(reopened())),
+      http.get("/api/v1/labels/scan/:code", async () => {
+        await new Promise<void>((resolve) => (release = resolve));
+        return HttpResponse.json({
+          status: "storage_context",
+          label_code: "A-02-01",
+          action: "set_storage_context",
+          location: { id: "shelf-a2", name: "Aisle A, shelf 2", icon: "shelf" },
+        });
+      }),
+      http.patch(
+        `/api/v1/warehouse/documents/${DOC}/lines/:lineId`,
+        ({ params }) => {
+          targeted.push(params.lineId as string);
+          return HttpResponse.json({ id: DOC, lines: [] });
+        },
+      ),
+      http.post(`${BASE}/session-1/short-receive`, () =>
+        HttpResponse.json({
+          status: "short_receive_confirmed",
+          line_id: "plums",
+          product_name: "Damson Plums",
+          received_quantity: 10,
+          expected_quantity: 10,
+          uom_symbol: "pcs",
+          message: "",
+          session_complete: false,
+        }),
+      ),
+    );
+    const user = userEvent.setup();
+
+    render(<WmsReceivingView documentId={DOC} onClose={vi.fn()} />);
+    const card = await screen.findByRole("region", { name: "Damson Plums" });
+    await user.click(
+      within(card).getByRole("button", { name: "I'm putting it elsewhere" }),
+    );
+    await user.type(
+      within(card).getByPlaceholderText("Scan the location label"),
+      "A-02-01{Enter}",
+    );
+    await waitFor(() => expect(release).toBeDefined());
+
+    // The worker does not wait: the plums are confirmed and the next card is
+    // up when the label's lookup comes back.
+    await user.click(screen.getByRole("button", { name: "Correct, next" }));
+    await screen.findByRole("region", { name: "Gouda Cheese" });
+    await act(async () => release!());
+
+    await waitFor(() => expect(targeted).toEqual(["doc-plums"]));
+  });
+
   it("asks for a shelf when nothing names one, without the plan's jargon", async () => {
     serveDocument();
     serveLocations([

@@ -47,6 +47,9 @@ interface UseScanResolverOptions {
  * that cannot act on what was scanned says what it is and offers to hand the
  * reader on with the code intact — the code is never rejected as
  * "not found" when the system knows perfectly well what it is.
+ *
+ * A scanner does not wait for the screen: codes are looked up one at a time,
+ * in the order they were read, and each one is answered.
  */
 export function useScanResolver({
   handle,
@@ -55,9 +58,14 @@ export function useScanResolver({
   const { t } = useTranslation("scan");
   const navigate = useNavigate();
   const [isResolving, setIsResolving] = useState(false);
-  // The camera fires repeatedly at the same symbol; a lookup in flight must
-  // not queue up behind itself.
-  const inFlight = useRef(false);
+  // The codes not answered yet, the one being looked up first.
+  const pending = useRef<string[]>([]);
+  const lastTurn = useRef(Promise.resolve());
+  const unmounted = useRef(false);
+  // The screen's answers are taken when the lookup comes back, so a code
+  // that waited is judged against what the one before it changed.
+  const screen = useRef({ handle, acceptUnrecognized });
+  screen.current = { handle, acceptUnrecognized };
   // A failed lookup offers to run the same code again, and the toast with
   // that offer outlives the render that raised it — the attempt goes
   // through whichever `resolve` is current when the button is pressed.
@@ -76,21 +84,24 @@ export function useScanResolver({
     [navigate, t],
   );
 
-  const resolve = useCallback(
-    async (rawCode: string) => {
-      // A camera or a field may hand over a QR's whole address.
-      const code = scannedCode(rawCode);
-      if (!code || inFlight.current) return;
-      inFlight.current = true;
-      setIsResolving(true);
+  useEffect(() => {
+    unmounted.current = false;
+    return () => {
+      unmounted.current = true;
+    };
+  }, []);
+
+  const lookup = useCallback(
+    async (rawCode: string, code: string, abandoned: () => boolean) => {
       try {
         const result = await labelsApi.scan(code);
-        if (await handle(result, code)) return;
+        if (abandoned()) return;
+        if (await screen.current.handle(result, code)) return;
         announceElsewhere(scanSubject(result, code));
       } catch (error) {
         if (
           extractApiErrorCode(error) === "SCAN_UNRECOGNIZED" &&
-          acceptUnrecognized?.(code)
+          screen.current.acceptUnrecognized?.(code)
         ) {
           return;
         }
@@ -126,12 +137,37 @@ export function useScanResolver({
             },
           },
         );
-      } finally {
-        inFlight.current = false;
-        setIsResolving(false);
       }
     },
-    [acceptUnrecognized, announceElsewhere, handle, navigate, t],
+    [announceElsewhere, navigate, t],
+  );
+
+  const resolve = useCallback(
+    (rawCode: string): Promise<void> => {
+      // A camera or a field may hand over a QR's whole address.
+      const code = scannedCode(rawCode);
+      // The camera and a nervous thumb repeat a symbol: the code just read,
+      // still unanswered, is the same reading.
+      if (!code || pending.current.at(-1) === code) return Promise.resolve();
+      // A screen that is gone asks nothing more of what was still waiting:
+      // the first answer may be what took the reader elsewhere.
+      const waited = pending.current.length > 0;
+      const abandoned = () => waited && unmounted.current;
+      pending.current.push(code);
+      setIsResolving(true);
+      const run = async () => {
+        try {
+          if (!abandoned()) await lookup(rawCode, code, abandoned);
+        } finally {
+          pending.current.shift();
+          if (pending.current.length === 0) setIsResolving(false);
+        }
+      };
+      // With nothing ahead of it a code is asked for at once.
+      lastTurn.current = waited ? lastTurn.current.then(run, run) : run();
+      return lastTurn.current;
+    },
+    [lookup],
   );
 
   useEffect(() => {
