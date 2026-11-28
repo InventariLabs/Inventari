@@ -23,6 +23,7 @@ from app.core.import_sheet import SheetColumns, read_rows
 from app.core.import_sheet import cell_text as _cell_text
 from app.core.import_sheet import explain as _explain
 from app.core.import_sheet import row_get as _row_get
+from app.core.location_path import join_location_path
 from app.core.logging import get_logger
 from app.core.refused_rows import refused_rows_file
 from app.i18n.service import get_unit_label
@@ -723,9 +724,9 @@ async def _names_a_new_shelf(
 ) -> bool:
     """Whether the row names a shelf where the product it names has no record.
 
-    Leave alone tells the shelves apart as Overwrite does: a corrected sheet
-    is uploaded whole, and the shelf the product already sits on is left
-    alone while a shelf new to that product still arrives.
+    In Leave alone mode a corrected sheet is uploaded whole: the shelf the
+    product already sits on is left alone while a shelf new to that product
+    still arrives.
     """
     cells = _location_cells(ctx, row)
     if not cells:
@@ -735,18 +736,34 @@ async def _names_a_new_shelf(
 
 
 async def _record_to_overwrite(
-    ctx: _ImportContext, row: pd.Series, found: list[StockRecord], name: str
+    ctx: _ImportContext,
+    row: pd.Series,
+    found: list[StockRecord],
+    name: str,
+    *,
+    labelled: bool,
 ) -> UUID:
     """The one record of those the row names that it is written onto.
 
-    Several records of one product are told apart by the location the row
-    names, an empty one set aside; a row that cannot tell them apart is
-    refused.
+    The location the row names says which records of the product are meant,
+    and an empty one among them is set aside; a row that still cannot tell
+    them apart is refused. A SKU or a barcode naming a location where the
+    product has no record is refused too: Overwrite neither moves a record
+    there nor adds one. A Label Code names one physical record, so a labelled
+    one goes where the row says.
     """
     records = [record for record in found if record.quantity > 0] or found
-    if len(records) > 1 and (cells := _location_cells(ctx, row)):
+    if cells := _location_cells(ctx, row):
         location_id = await ctx.locations.resolve(cells)
-        records = [record for record in records if record.location_id == location_id]
+        here = [record for record in found if record.location_id == location_id]
+        if here:
+            records = [record for record in here if record.quantity > 0] or here
+        elif not labelled:
+            raise ServiceRejectionError(
+                'import_overwrite_other_location',
+                name=name,
+                location=join_location_path(text for _, text in cells),
+            )
     if len(records) != 1:
         raise ServiceRejectionError(
             'import_overwrite_several_records', name=name, count=len(found)
@@ -854,12 +871,14 @@ async def _import_one_row(
     name = identity.name
     assert name is not None
     if ctx.on_label_match != 'add' and (found := ctx.existing.named_by_code(identity)):
-        if ctx.on_label_match == 'skip':
-            if not await _names_a_new_shelf(ctx, row, found):
-                return _RowResult(outcome='skipped')
-        else:
-            record_id = await _record_to_overwrite(ctx, row, found, name)
+        labelled = bool(ctx.existing.named_by_label(identity))
+        if ctx.on_label_match == 'overwrite':
+            record_id = await _record_to_overwrite(
+                ctx, row, found, name, labelled=labelled
+            )
             return await _overwrite_existing(ctx, row, record_id, name, identity.sku)
+        if labelled or not await _names_a_new_shelf(ctx, row, found):
+            return _RowResult(outcome='skipped')
 
     shelves = _shelves(ctx, row)
     if not shelves:

@@ -751,17 +751,13 @@ class TestASkuFromASheet:
         code,
     ):
         db = real_async_db_session
-        row = (
-            {'Name': code, 'Ref': '', 'Quantity': '1'}
-            if code.startswith('[')
-            else {'Name': 'Lamp', 'Ref': code, 'Quantity': '1'}
-        )
+        row = {'Name': 'Lamp', 'Ref': code, 'Quantity': '1'}
 
         result = await _import(db, async_test_user, [row], self.MAPPING)
 
         assert (result['imported'], result['failed']) == (0, 1), result
         reason = result['errors'][0]['error']
-        assert code.strip('[').split(']')[0] in reason
+        assert code in reason
         assert 'SKU may contain only' in reason
         assert await _products(db, async_test_user) == []
 

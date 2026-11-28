@@ -198,7 +198,10 @@ export function PartnerDetailSheet({
           {notes && (
             <DetailRow label={t("fields.notes")}>
               <span className="inline-flex items-start gap-1">
-                <StickyNote size={13} className="mt-0.5 shrink-0" /> {notes}
+                <StickyNote size={13} className="mt-0.5 shrink-0" />
+                <span className="min-w-0 text-left whitespace-pre-line">
+                  {notes}
+                </span>
               </span>
             </DetailRow>
           )}

@@ -209,10 +209,43 @@ class TestALabelCodeCanUpdateTheProductItNames:
         await db.refresh(item)
         assert item.name == 'Cocoa'
 
+    async def test_skip_leaves_a_labelled_record_alone_wherever_the_sheet_puts_it(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ):
+        """A label is one physical record: another shelf does not make a second."""
+        db = real_async_db_session
+        item = await _seeded(db, async_test_user, async_test_storage_location)
+        stands_at = item.storage_location_id
+        before = await _product_count(db, async_test_user.organization_id)
+
+        result = await import_items(
+            db,
+            _csv(
+                [
+                    {
+                        'Name': 'Cocoa',
+                        'Quantity': 4,
+                        'Label Code': 'INV-0007',
+                        'Shelf': 'Another shelf',
+                    }
+                ]
+            ),
+            'stock.csv',
+            {**_MAPPING, 'location': 'Shelf'},
+            _ctx(async_test_user),
+            on_label_match='skip',
+        )
+
+        assert (result['skipped'], result['imported']) == (1, 0), result
+        assert result['created_locations'] == []
+        assert await _product_count(db, async_test_user.organization_id) == before
+        await db.refresh(item)
+        assert item.storage_location_id == stands_at
+
     async def test_skip_adds_a_shelf_the_product_has_no_record_on(
         self, real_async_db_session, async_test_user, async_test_storage_location
     ):
-        """Leave alone tells one shelf from another, as Overwrite does.
+        """Leave alone tells one shelf from another.
 
         A corrected sheet is uploaded whole: the shelves the product already
         sits on are left alone, and the shelves that are new to it arrive.
