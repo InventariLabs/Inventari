@@ -485,6 +485,7 @@
     "notInSource": "No {{name}} at the source. Elsewhere: {{places}}",
     "notAnywhere": "No {{name}} in stock anywhere",
     "chooseSource": "Choose the source location before scanning",
+    "notTaken": "{{name}} was not added. Add or cancel {{current}} first, then scan it again.",
     "error": "Scan error",
     "hint": "Point camera at barcode",
     "torchOn": "Torch on",

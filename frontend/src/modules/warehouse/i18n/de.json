@@ -485,6 +485,7 @@
     "notInSource": "Kein „{{name}}“ an der Quelle. Anderswo: {{places}}",
     "notAnywhere": "Kein „{{name}}“ an irgendeinem Ort auf Lager",
     "chooseSource": "Wählen Sie vor dem Scannen den Quellort aus",
+    "notTaken": "„{{name}}“ wurde nicht hinzugefügt. Zuerst „{{current}}“ hinzufügen oder abbrechen, dann erneut scannen.",
     "error": "Scanfehler",
     "hint": "Kamera auf Barcode richten",
     "torchOn": "Lampe ein",

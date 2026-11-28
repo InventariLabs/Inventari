@@ -8,7 +8,7 @@ import { useQuickAddLine, type QuickAddCatalogue } from "./useQuickAddLine";
 import type { ReceiptDraftLine } from "@/modules/warehouse/components/documentFormShared";
 
 vi.mock("sonner", () => ({
-  toast: { success: vi.fn(), error: vi.fn() },
+  toast: { success: vi.fn(), error: vi.fn(), warning: vi.fn() },
 }));
 
 vi.mock("@/lib/api/productTemplates", () => ({
@@ -229,5 +229,100 @@ describe("useQuickAddLine — on a receipt", () => {
 
     expect(productTemplatesApi.create).not.toHaveBeenCalled();
     expect(appendLine.mock.calls[0][0].product_template_id).toBe("tpl-gouda");
+  });
+});
+
+describe("useQuickAddLine — a scan while the panel is open", () => {
+  const scanned = {
+    name: "Loose bolts",
+    barcode: "123",
+    product_template_id: "tpl-bolts",
+  };
+
+  function opened(catalogue?: QuickAddCatalogue) {
+    const result = setup(catalogue);
+    act(() => result.current.openQuickAdd(scanned));
+    act(() =>
+      result.current.editorProps.onQuickAddChange({
+        quantity: 4,
+        batch_number: "B-7",
+      }),
+    );
+    return result;
+  }
+
+  beforeEach(() => {
+    vi.mocked(toast.warning).mockClear();
+    vi.mocked(productTemplatesApi.create).mockReset();
+  });
+
+  it.each([
+    ["its code", { name: "", barcode: "123" }],
+    ["another of its codes", { ...scanned, barcode: "456" }],
+  ])("counts one more piece of the product read by %s", (_how, again) => {
+    const result = opened();
+
+    act(() => result.current.openQuickAdd(again));
+
+    expect(result.current.quickAddDraft).toMatchObject({
+      name: "Loose bolts",
+      barcode: "123",
+      batch_number: "B-7",
+      quantity: 5,
+    });
+    expect(toast.warning).not.toHaveBeenCalled();
+  });
+
+  it("keeps what it holds and says another product was not added", () => {
+    const result = opened();
+
+    act(() => result.current.openQuickAdd({ name: "", barcode: "999" }));
+
+    expect(result.current.quickAddDraft).toMatchObject({
+      name: "Loose bolts",
+      barcode: "123",
+      batch_number: "B-7",
+      quantity: 4,
+    });
+    expect(toast.warning).toHaveBeenCalledTimes(1);
+  });
+
+  // The line being made was read from the panel before the product was asked
+  // for, so a piece counted into the panel now would not reach it.
+  it("says a piece was not added while the product is being made", async () => {
+    vi.mocked(productTemplatesApi.create).mockReturnValue(
+      new Promise(() => {}),
+    );
+    const result = setup({
+      namesAProduct: true,
+      lines: [],
+      replaceLine: vi.fn(),
+    });
+    act(() =>
+      result.current.openQuickAdd({
+        name: "Loose bolts",
+        barcode: "123",
+        uom_id: "uom-pcs",
+      }),
+    );
+    act(() => void result.current.handleQuickAddSubmit());
+
+    act(() => result.current.openQuickAdd({ barcode: "123" }));
+
+    expect(result.current.quickAddDraft.quantity).toBe(1);
+    expect(toast.warning).toHaveBeenCalledTimes(1);
+  });
+
+  it("opens afresh once the panel is closed", () => {
+    const result = opened();
+    act(() => result.current.closeQuickAdd());
+
+    act(() => result.current.openQuickAdd({ name: "Nuts", barcode: "999" }));
+
+    expect(result.current.quickAddDraft).toMatchObject({
+      name: "Nuts",
+      quantity: 1,
+      batch_number: "",
+    });
   });
 });

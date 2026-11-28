@@ -1,4 +1,4 @@
-import { useId, useState, type ReactNode } from "react";
+import { useId, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Camera, Minus, Plus, ScanLine, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -71,12 +71,12 @@ function candidateFrom(
   };
 }
 
-/** What the card holds once `line` was scanned. */
+/** What the card holds once `line`, its own product, was read. */
 function withPieceRead(
   current: Candidate | null,
   line: ReceiptDraftLine,
 ): Candidate {
-  if (!current || current.line.item_id !== line.item_id) return { line };
+  if (!current) return { line };
   const quantity = Number(current.line.quantity) + Number(line.quantity);
   return { ...current, line: { ...current.line, quantity } };
 }
@@ -185,10 +185,22 @@ export function PhoneLineByLine({
   const { t } = useTranslation(["warehouse", "common"]);
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [query, setQuery] = useState("");
+  // A scan is answered after a lookup: its answer meets the card of now.
+  const onCard = useRef(candidate);
+  onCard.current = candidate;
   const scanner = useDocumentScanner({
-    // The product on the card, read again, is one more piece of it.
-    onAddOrIncrementLine: (line) =>
-      setCandidate((current) => withPieceRead(current, line)),
+    // The product on the card, read again, is one more piece of it. Another
+    // one waits: the card's count is not confirmed yet.
+    onAddOrIncrementLine: (line) => {
+      const held = onCard.current?.line;
+      if (held && held.item_id !== line.item_id) {
+        toast.warning(
+          t("scan.notTaken", { name: line.name, current: held.name }),
+        );
+        return;
+      }
+      setCandidate((current) => withPieceRead(current, line));
+    },
     onOpenQuickAdd: () => toast.warning(t("action.phone.notInStock")),
     stock: { locationId: stockLocationId },
     announceAdded: false,

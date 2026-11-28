@@ -133,6 +133,12 @@ says what the release does rather than what changed since them.
   sheet saying that the label is being checked. Where a scan adds a piece (the
   document and order line editors and the panel that executes a document), a
   second piece read while the first is still being looked up counts as well.
+- A scan no longer writes over what the scan before it put on screen. While the
+  quick-add panel of a document line editor is open, reading its product again
+  adds one piece to the quantity in it and keeps what was typed; another
+  product leaves the panel as it is, with a message that it was not added. The
+  phone's one-by-one entry does the same for another product read while one is
+  still on its card.
 - A printed label's QR code is read by the phone camera in every browser. The
   bundled scanner's zxing port fails to locate some valid matrices however
   clean the picture — about one label in a hundred — so a second reader now

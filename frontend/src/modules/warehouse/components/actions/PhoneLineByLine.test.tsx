@@ -7,6 +7,15 @@ import { PhoneLineByLine } from "./PhoneLineByLine";
 
 const scan = vi.hoisted(() => vi.fn());
 const camera = vi.hoisted(() => ({ onCode: (_code: string) => {} }));
+const toastWarning = vi.hoisted(() => vi.fn());
+
+vi.mock("sonner", () => ({
+  toast: Object.assign(vi.fn(), {
+    success: vi.fn(),
+    error: vi.fn(),
+    warning: toastWarning,
+  }),
+}));
 
 vi.mock("@/lib/api/labels", () => ({ labelsApi: { scan } }));
 // The camera is a live device: the test hands the screen the code it read.
@@ -81,5 +90,26 @@ describe("PhoneLineByLine", () => {
     expect(
       screen.getByLabelText(/How many.*Lean Quark/, { selector: "input" }),
     ).toHaveDisplayValue("2");
+  });
+
+  it("keeps the product on the card and says another one was not added", async () => {
+    scan.mockImplementation(async (code: string) => ({
+      status: "assigned",
+      label_code: code,
+      action: "show_quick_actions",
+      item: { id: code, name: `Goods ${code}`, uom_id: null },
+    }));
+    renderEntry();
+
+    await act(async () => {
+      camera.onCode("AAA");
+      camera.onCode("BBB");
+    });
+
+    await waitFor(() => expect(toastWarning).toHaveBeenCalledTimes(1));
+    expect(toastWarning.mock.calls[0][0]).toContain("Goods BBB was not added");
+    expect(
+      screen.getByLabelText(/How many.*Goods AAA/, { selector: "input" }),
+    ).toHaveDisplayValue("1");
   });
 });

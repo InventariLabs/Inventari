@@ -485,6 +485,7 @@
     "notInSource": "Sem {{name}} na origem. Em outros lugares: {{places}}",
     "notAnywhere": "Sem {{name}} em estoque em nenhum lugar",
     "chooseSource": "Escolha o local de origem antes de escanear",
+    "notTaken": "«{{name}}» não foi adicionado. Primeiro adicione ou cancele «{{current}}» e depois leia-o novamente.",
     "error": "Erro de escaneamento",
     "hint": "Aponte a câmera para o código de barras",
     "torchOn": "Lanterna ligada",

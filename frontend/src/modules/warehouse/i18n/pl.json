@@ -547,6 +547,7 @@
     "notInSource": "Brak „{{name}}” w źródle. Gdzie indziej: {{places}}",
     "notAnywhere": "Brak „{{name}}” na stanie w jakimkolwiek miejscu",
     "chooseSource": "Wybierz miejsce źródłowe przed skanowaniem",
+    "notTaken": "Nie dodano „{{name}}”. Najpierw dodaj lub anuluj „{{current}}”, potem zeskanuj ponownie.",
     "error": "Błąd skanowania",
     "hint": "Skieruj kamerę na kod kreskowy",
     "torchOn": "Latarka wł.",

@@ -485,6 +485,7 @@
     "notInSource": "Aucun « {{name}} » à la source. Ailleurs : {{places}}",
     "notAnywhere": "Aucun « {{name}} » en stock nulle part",
     "chooseSource": "Choisissez l’emplacement source avant de scanner",
+    "notTaken": "« {{name}} » n’a pas été ajouté. Ajoutez ou annulez d’abord « {{current}} », puis scannez-le à nouveau.",
     "error": "Erreur de scan",
     "hint": "Pointer la caméra vers le code-barres",
     "torchOn": "Lampe marche",

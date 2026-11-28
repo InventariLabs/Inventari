@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -52,6 +52,18 @@ function quickAddMakesProduct(draft: QuickAddLineDraft): boolean {
   return !draft.item_id && !draft.product_template_id;
 }
 
+/** Whether a scan's answer is about the product the panel describes. */
+function describesSameProduct(
+  held: QuickAddLineDraft,
+  scanned: Partial<QuickAddLineDraft>,
+): boolean {
+  return (
+    (!!scanned.barcode && scanned.barcode === held.barcode) ||
+    (!!scanned.product_template_id &&
+      scanned.product_template_id === held.product_template_id)
+  );
+}
+
 /**
  * Quick-add-line flow of the document form: draft state, open/close, and
  * submit (appends the draft as a new line). Extracted from
@@ -70,7 +82,12 @@ export function useQuickAddLine(
     createEmptyQuickAddLineDraft(),
   );
 
-  const openQuickAdd = useCallback((prefill?: Partial<QuickAddLineDraft>) => {
+  // What the open panel holds. A scan is answered after a lookup, so its
+  // answer reads this rather than what stood there when the code was read.
+  const onPanel = useRef<QuickAddLineDraft | null>(null);
+  onPanel.current = quickAddOpen ? quickAddDraft : null;
+
+  const startQuickAdd = useCallback((prefill: Partial<QuickAddLineDraft>) => {
     setQuickAddDraft({
       ...createEmptyQuickAddLineDraft(),
       ...prefill,
@@ -78,12 +95,38 @@ export function useQuickAddLine(
     setQuickAddOpen(true);
   }, []);
 
+  // A scan's answer. An open panel is not written over: one more read of its
+  // product is one more piece of it, and anything else is said to be left out.
+  // While the product is being made the line is already read from the panel,
+  // so a piece counted then would not reach it.
+  const openQuickAdd = useCallback(
+    (prefill: Partial<QuickAddLineDraft> = {}) => {
+      const held = onPanel.current;
+      if (!held) {
+        startQuickAdd(prefill);
+      } else if (!creating && describesSameProduct(held, prefill)) {
+        setQuickAddDraft((current) => ({
+          ...current,
+          quantity: (current.quantity ?? 0) + 1,
+        }));
+      } else {
+        toast.warning(
+          t("warehouse:scan.notTaken", {
+            name: prefill.name || prefill.barcode,
+            current: held.name || held.barcode,
+          }),
+        );
+      }
+    },
+    [creating, startQuickAdd, t],
+  );
+
   // Everything the typed line already says carries into the panel, so making
   // the product neither asks for it a second time nor drops it: the code and
   // brand go onto the product, the serial stays with the line.
   const openForTypedLine = (key: string, name: string) => {
     const line = catalogue?.lines.find((candidate) => candidate._key === key);
-    openQuickAdd({
+    startQuickAdd({
       name,
       replaces: key,
       brand: line?.brand ?? "",
