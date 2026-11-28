@@ -236,8 +236,13 @@ async def _attach_to_existing(
     if not partner.contact_person and first:
         changes['contact_person'] = first
     if lines:
-        notes = [partner.notes] if partner.notes else []
-        changes['notes'] = '\n'.join([*notes, *lines])
+        notes = partner.notes.split('\n') if partner.notes else []
+        present = set(notes)
+        # A second upload of the same contact export must not write the same
+        # person into the notes again.
+        added = list(dict.fromkeys(line for line in lines if line not in present))
+        if added:
+            changes['notes'] = '\n'.join([*notes, *added])
     if changes:
         await partner_service.update_async(
             db, org_id, partner_id, PartnerUpdate(**changes), user_id=user.id

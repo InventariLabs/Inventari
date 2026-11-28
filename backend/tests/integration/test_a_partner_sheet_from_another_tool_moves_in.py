@@ -211,6 +211,15 @@ class TestAContactPersonRow:
         )
 
         assert (result['contacts'], result['failed']) == (1, 0), result
+
+        # The same export uploaded again has nothing new to add.
+        again = _import(
+            client,
+            auth_headers,
+            [_odoo(**{'Name': 'Eva', 'Related Company': 'Here Already'})],
+        )
+
+        assert (again['contacts'], again['failed']) == (1, 0), again
         db_session.expire_all()
         company = _partners(db_session)['Here Already']
         assert company.contact_person == 'Maria'
